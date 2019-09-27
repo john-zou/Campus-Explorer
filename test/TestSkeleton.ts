@@ -1,8 +1,6 @@
-// Module Test Skeleton
+import { expect } from "chai";
 
-// Import Statements
-
-
+// rely on autoimport
 
 describe("[TEST CATEGORY NAME]", () => {
     // Declare common objects as local variables
