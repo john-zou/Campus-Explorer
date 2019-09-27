@@ -1,0 +1,319 @@
+{
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_dept": "chem"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_year": 2015.5
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_instructor",
+                "courses_title",
+                "courses_uuid",
+                "courses_year"
+            ],
+            "ORDER": "courses_uuid"
+        }
+    },
+    "isQueryValid": true,
+        "result": [
+            {
+                "courses_instructor": "gates, derek",
+                "courses_title": "str bnd equ chem",
+                "courses_uuid": "31619",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "krems, roman",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31621",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "orvig, christopher e",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31622",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "orvig, christopher e",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31623",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "lindenberg, erin",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31624",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "mcintosh, lawrence",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31625",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "hudson, zachary",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31626",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "terpstra, andrea",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31627",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "legzdins, peter",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31628",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "therrien, jeffrey",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31629",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "lekhi, priya",
+                "courses_title": "strctr bond chem",
+                "courses_uuid": "31630",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "ciufolini, marco",
+                "courses_title": "intr orgnc chem",
+                "courses_uuid": "31632",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "kennepohl, pierre",
+                "courses_title": "coord chem",
+                "courses_uuid": "31634",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "blades, michael",
+                "courses_title": "intro chem anlys",
+                "courses_uuid": "31636",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31638",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31639",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31640",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31641",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31642",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31643",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "zendrowski, dana",
+                "courses_title": "org chem lab",
+                "courses_uuid": "31644",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "sherman, john",
+                "courses_title": "org chem engneer",
+                "courses_uuid": "31646",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "grant, edward",
+                "courses_title": "communcting chem",
+                "courses_uuid": "31648",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "stoodley, robin",
+                "courses_title": "communcting chem",
+                "courses_uuid": "31649",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "lekhi, priya",
+                "courses_title": "aqueous envirmnt",
+                "courses_uuid": "31651",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "krems, roman",
+                "courses_title": "intr quantm mech",
+                "courses_uuid": "31653",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31655",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31656",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31657",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31658",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31659",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31660",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31661",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab i",
+                "courses_uuid": "31662",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "integ chem lab i",
+                "courses_uuid": "31666",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "integ chem lab i",
+                "courses_uuid": "31667",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "integ chem lab i",
+                "courses_uuid": "31668",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "dake, gregory",
+                "courses_title": "adv org chem",
+                "courses_uuid": "31670",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab 2",
+                "courses_uuid": "31672",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab 2",
+                "courses_uuid": "31673",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "chem integ lab 2",
+                "courses_uuid": "31674",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "bussiere, guillaume;monga, vishakha;racicot, leanne;stoodley, robin",
+                "courses_title": "intg chem lab 2",
+                "courses_uuid": "31676",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "straus, suzana",
+                "courses_title": "biophysical chem",
+                "courses_uuid": "31678",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "gates, derek",
+                "courses_title": "polymer chem",
+                "courses_uuid": "31680",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "tanner, martin",
+                "courses_title": "bioorgan chem",
+                "courses_uuid": "31682",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "kennepohl, pierre",
+                "courses_title": "bio-inorganic",
+                "courses_uuid": "31684",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "kennepohl, pierre",
+                "courses_title": "bioinorganc chem",
+                "courses_uuid": "31694",
+                "courses_year": 2016
+            },
+            {
+                "courses_instructor": "tanner, martin",
+                "courses_title": "adv bioorg chem",
+                "courses_uuid": "31698",
+                "courses_year": 2016
+            }
+        ]
+    
+}

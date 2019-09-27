@@ -1,0 +1,22 @@
+{
+    "query": {
+        "WHERE": {
+            "NOT": {
+                "LT": {
+                    "courses_avg": 80
+                },
+                "GT": {
+                    "courses_avg": 80
+                }
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

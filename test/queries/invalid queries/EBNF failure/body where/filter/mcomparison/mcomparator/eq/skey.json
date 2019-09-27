@@ -1,0 +1,17 @@
+{
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_dept": 69
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

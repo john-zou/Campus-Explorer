@@ -1,0 +1,10 @@
+{
+    "query": {
+        "WHERE": {},
+        "OPTIONS": {
+            "INVALID OPTION": {}
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

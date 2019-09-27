@@ -1,0 +1,14 @@
+{
+    "query": {
+        "WHERE": {
+        },
+        "AN EXCESS KEY": {
+
+        },
+        "OPTIONS": {
+            "COLUMNS": [ "courses_dept" ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

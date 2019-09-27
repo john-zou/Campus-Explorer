@@ -1,0 +1,529 @@
+{
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "OR": [
+                        {
+                            "IS": {
+                                "courses_dept": "chem"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_dept": "biol"
+                            }
+                        }
+                        
+                    ]
+
+                },
+                {
+                    "GT": {
+                        "courses_avg": 90
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg",
+                "courses_pass",
+                "courses_fail",
+                "courses_audit",
+                "courses_id",
+                "courses_instructor",
+                "courses_title",
+                "courses_uuid",
+                "courses_year"
+            ],
+            "ORDER": "courses_dept"
+        }
+    },
+    "isQueryValid": true,
+    
+        "result": [
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92.19,
+                "courses_pass": 26,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "347",
+                "courses_instructor": "douglas, carl;schulte, patricia",
+                "courses_title": "prin&meth rsch i",
+                "courses_uuid": "42215",
+                "courses_year": 2014
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92.1,
+                "courses_pass": 10,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "34457",
+                "courses_year": 2008
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92.1,
+                "courses_pass": 10,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "34458",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.17,
+                "courses_pass": 18,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "blake, robert wm;ganders, fred r",
+                "courses_title": "biology research",
+                "courses_uuid": "54187",
+                "courses_year": 2010
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92,
+                "courses_pass": 15,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "20703",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.42,
+                "courses_pass": 19,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "ellis, shona margaret",
+                "courses_title": "biology research",
+                "courses_uuid": "72224",
+                "courses_year": 2013
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.42,
+                "courses_pass": 19,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "72225",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.42,
+                "courses_pass": 12,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "blake, robert wm;ganders, fred r",
+                "courses_title": "biology research",
+                "courses_uuid": "89119",
+                "courses_year": 2009
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.42,
+                "courses_pass": 12,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "89120",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.74,
+                "courses_pass": 23,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "462",
+                "courses_instructor": "bohlmann, jorg",
+                "courses_title": "ecolg plant bioc",
+                "courses_uuid": "20716",
+                "courses_year": 2012
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92,
+                "courses_pass": 15,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "ellis, shona margaret",
+                "courses_title": "biology research",
+                "courses_uuid": "20702",
+                "courses_year": 2012
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.74,
+                "courses_pass": 23,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "462",
+                "courses_instructor": "",
+                "courses_title": "ecolg plant bioc",
+                "courses_uuid": "20717",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.92,
+                "courses_pass": 13,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "19750",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92.19,
+                "courses_pass": 26,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "347",
+                "courses_instructor": "",
+                "courses_title": "prin&meth rsch i",
+                "courses_uuid": "42216",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.92,
+                "courses_pass": 13,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "singh, santokh",
+                "courses_title": "biology research",
+                "courses_uuid": "19749",
+                "courses_year": 2011
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.63,
+                "courses_pass": 27,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "462",
+                "courses_instructor": "",
+                "courses_title": "ecolg plant bioc",
+                "courses_uuid": "54204",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 91.21,
+                "courses_pass": 24,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "440",
+                "courses_instructor": "",
+                "courses_title": "plant genomics",
+                "courses_uuid": "72211",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 94.33,
+                "courses_pass": 27,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "462",
+                "courses_instructor": "bohlmann, jorg",
+                "courses_title": "ecolg plant bioc",
+                "courses_uuid": "55240",
+                "courses_year": 2015
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 91.21,
+                "courses_pass": 24,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "440",
+                "courses_instructor": "cronk, quentin charles",
+                "courses_title": "plant genomics",
+                "courses_uuid": "72210",
+                "courses_year": 2013
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 94.33,
+                "courses_pass": 27,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "462",
+                "courses_instructor": "",
+                "courses_title": "ecolg plant bioc",
+                "courses_uuid": "55241",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.48,
+                "courses_pass": 29,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "347",
+                "courses_instructor": "",
+                "courses_title": "prin&meth rsch i",
+                "courses_uuid": "72152",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92.36,
+                "courses_pass": 11,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "464",
+                "courses_instructor": "mizumoto, kota",
+                "courses_title": "animal dvl gntcs",
+                "courses_uuid": "55244",
+                "courses_year": 2015
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.48,
+                "courses_pass": 29,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "347",
+                "courses_instructor": "douglas, carl;schulte, patricia",
+                "courses_title": "prin&meth rsch i",
+                "courses_uuid": "72151",
+                "courses_year": 2013
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 92.36,
+                "courses_pass": 11,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "464",
+                "courses_instructor": "",
+                "courses_title": "animal dvl gntcs",
+                "courses_uuid": "55245",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.17,
+                "courses_pass": 18,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "449",
+                "courses_instructor": "",
+                "courses_title": "biology research",
+                "courses_uuid": "54188",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "biol",
+                "courses_avg": 90.63,
+                "courses_pass": 27,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "462",
+                "courses_instructor": "bohlmann, jorg",
+                "courses_title": "ecolg plant bioc",
+                "courses_uuid": "54203",
+                "courses_year": 2010
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 90.75,
+                "courses_pass": 4,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "501",
+                "courses_instructor": "krems, roman",
+                "courses_title": "quant mech chem",
+                "courses_uuid": "82242",
+                "courses_year": 2012
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 92.57,
+                "courses_pass": 7,
+                "courses_fail": 0,
+                "courses_audit": 1,
+                "courses_id": "514",
+                "courses_instructor": "",
+                "courses_title": "crystal structre",
+                "courses_uuid": "54622",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 90.56,
+                "courses_pass": 9,
+                "courses_fail": 0,
+                "courses_audit": 1,
+                "courses_id": "514",
+                "courses_instructor": "patrick, brian",
+                "courses_title": "crystal structre",
+                "courses_uuid": "82248",
+                "courses_year": 2012
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 90.56,
+                "courses_pass": 9,
+                "courses_fail": 0,
+                "courses_audit": 1,
+                "courses_id": "514",
+                "courses_instructor": "",
+                "courses_title": "crystal structre",
+                "courses_uuid": "82249",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 91.6,
+                "courses_pass": 5,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "533",
+                "courses_instructor": "blades, michael;turner, robin",
+                "courses_title": "bioanalyt chem",
+                "courses_uuid": "31359",
+                "courses_year": 2013
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 92.57,
+                "courses_pass": 7,
+                "courses_fail": 0,
+                "courses_audit": 1,
+                "courses_id": "514",
+                "courses_instructor": "patrick, brian",
+                "courses_title": "crystal structre",
+                "courses_uuid": "54621",
+                "courses_year": 2011
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 91.33,
+                "courses_pass": 9,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "533",
+                "courses_instructor": "blades, michael;turner, robin",
+                "courses_title": "bioanalyt chem",
+                "courses_uuid": "54633",
+                "courses_year": 2011
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 91.33,
+                "courses_pass": 9,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "533",
+                "courses_instructor": "",
+                "courses_title": "bioanalyt chem",
+                "courses_uuid": "54634",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 90.43,
+                "courses_pass": 7,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "534",
+                "courses_instructor": "chen, david",
+                "courses_title": "prin chem separ",
+                "courses_uuid": "54635",
+                "courses_year": 2011
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 90.43,
+                "courses_pass": 7,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "534",
+                "courses_instructor": "",
+                "courses_title": "prin chem separ",
+                "courses_uuid": "54636",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 92.5,
+                "courses_pass": 8,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "534",
+                "courses_instructor": "chen, david",
+                "courses_title": "prin chem separ",
+                "courses_uuid": "82264",
+                "courses_year": 2012
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 90.75,
+                "courses_pass": 4,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "501",
+                "courses_instructor": "",
+                "courses_title": "quant mech chem",
+                "courses_uuid": "82243",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 92.5,
+                "courses_pass": 8,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "534",
+                "courses_instructor": "",
+                "courses_title": "prin chem separ",
+                "courses_uuid": "82265",
+                "courses_year": 1900
+            },
+            {
+                "courses_dept": "chem",
+                "courses_avg": 91.6,
+                "courses_pass": 5,
+                "courses_fail": 0,
+                "courses_audit": 0,
+                "courses_id": "533",
+                "courses_instructor": "",
+                "courses_title": "bioanalyt chem",
+                "courses_uuid": "31360",
+                "courses_year": 1900
+            }
+        ]
+    
+}

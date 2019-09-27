@@ -1,0 +1,12 @@
+{
+    "query": {
+        "WHERE": {
+            "INVALID FILTER KEY": []
+        },
+        "OPTIONS": {
+            "COLUMNS": [ "courses_dept" ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

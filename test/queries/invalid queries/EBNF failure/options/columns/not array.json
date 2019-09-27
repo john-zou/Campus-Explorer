@@ -1,0 +1,10 @@
+{
+    "query": {
+        "WHERE": {},
+        "OPTIONS": {
+            "COLUMNS": 1
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

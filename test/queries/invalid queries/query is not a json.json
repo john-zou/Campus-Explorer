@@ -1,0 +1,5 @@
+{
+    "query": "im not a json object",
+    "isQueryValid": false,
+    "result": "InsightError"
+}

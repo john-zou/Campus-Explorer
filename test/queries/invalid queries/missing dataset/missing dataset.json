@@ -1,0 +1,37 @@
+{
+    "query": {
+        "WHERE": {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            "GT": {
+                                "missing_avg": 90
+                            }
+                        },
+                        {
+                            "IS": {
+                                "missing_dept": "adhe"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ": {
+                        "missing_avg": 95
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "missing_dept",
+                "missing_id",
+                "missing_avg"
+            ],
+            "ORDER": "missing_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

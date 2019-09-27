@@ -1,0 +1,5 @@
+{
+    "query": { "WHERE": {} },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

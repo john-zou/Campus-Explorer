@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import Log from "../src/Util";
+import Log from "../src/util/Util";
 import { ITestQuery } from "./InsightFacade.spec";
 import {expect} from "chai";
 import {InsightError, ResultTooLargeError} from "../src/controller/IInsightFacade";
@@ -12,6 +12,7 @@ export default class TestUtil {
         try {
             if (test.isQueryValid) {
                 expect(response).to.deep.equal(test.result);
+                done();
             } else {
                 if (test.result === "ResultTooLargeError") {
                     expect(response).to.be.instanceOf(ResultTooLargeError);
@@ -57,7 +58,8 @@ export default class TestUtil {
 
             try {
                 const query = JSON.parse(content.toString());
-                TestUtil.validate(query, {title: "string", query: null, isQueryValid: "boolean", result: null});
+                // modified to avoid writing title for every test
+                TestUtil.validate(query, {query: null, isQueryValid: "boolean", result: null});
                 query["filename"] = file;
                 testQueries.push(query);
             } catch (err) {
