@@ -2,7 +2,6 @@ import { QueryValidator } from "../src/services/QueryValidator";
 import { InsightDatasetKind } from "../src/controller/IInsightFacade";
 import { expect } from "chai";
 import { QueryValidationResult as Res, QueryValidationResultFlag as R } from "../src/services/IQueryValidator";
-/* tslint:disable */
 // Module Test Skeleton
 
 // Import Statements
@@ -26,8 +25,8 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("Missing body", async () => {
         const q = {
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.MissingBody);
@@ -35,48 +34,48 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("Missing options", async () => {
         const q = {
-            "WHERE": {}
+            WHERE: {}
         };
         t(q, R.MissingOptions);
     });
 
     it("Has too many keys", async () => {
         const q = {
-            "WHERE": {}, "OPTIONS": { "COLUMNS": "test_avg" }, "extraneous_key": "value"
+            WHERE: {}, OPTIONS: { COLUMNS: "test_avg" }, extraneous_key: "value"
         };
         t(q, R.TooManyKeys_Query);
     });
 
     it("Body is wrong type", async () => {
         const q = {
-            "WHERE": "wrong type", "OPTIONS": { "COLUMNS": ["test_avg"] }
+            WHERE: "wrong type", OPTIONS: { COLUMNS: ["test_avg"] }
         };
         t(q, R.WrongType_Body);
     });
 
     it("Options is wrong type", async () => {
         const q = {
-            "WHERE": {}, "OPTIONS": "wrong type"
+            WHERE: {}, OPTIONS: "wrong type"
         };
         t(q, R.WrongType_Options);
     });
 
     it("Options is missing columns", async () => {
         const q = {
-            "WHERE": {},
-            "OPTIONS": {
+            WHERE: {},
+            OPTIONS: {
 
             }
-        }
+        };
         t(q, R.MissingColumns);
     });
 
     it("Options has invalid key", async () => {
         const q = {
-            "WHERE": {},
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"],
-                "invalid_key": "value"
+            WHERE: {},
+            OPTIONS: {
+                COLUMNS: ["test_avg"],
+                invalid_key: "value"
             }
         };
         t(q, R.InvalidKey_Options);
@@ -84,17 +83,17 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("Filter has wrong key", async () => {
         const q = {
-            "WHERE": { wrong_key: "lol" },
-            "OPTIONS": { "COLUMNS": ["test_avg"] }
+            WHERE: { wrong_key: "lol" },
+            OPTIONS: { COLUMN: ["test_avg"] }
         };
         t(q, R.WrongKey_Filter);
     });
 
     it("Columns is not array", async () => {
         const q = {
-            "WHERE": {},
-            "OPTIONS": {
-                "COLUMNS": 123,
+            WHERE: {},
+            OPTIONS: {
+                COLUMNS: 123,
             }
         };
         t(q, R.ColumnsIsNotNonEmptyArray);
@@ -102,26 +101,26 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("Columns contains non-string (i.e. obj or array)", async () => {
         const q = {
-            "WHERE": {},
-            "OPTIONS": { "COLUMNS": ["test_avg", [1, 2, 3]] }
+            WHERE: {},
+            OPTIONS: { COLUMNS: ["test_avg", [1, 2, 3]] }
         };
         t(q, R.ColumnsContainsWrongType);
     });
 
     it("Columns contains non-string (i.e. obj or array)", async () => {
         const q = {
-            "WHERE": {},
-            "OPTIONS": { "COLUMNS": ["test_avg", { "key": "value" }] }
+            WHERE: {},
+            OPTIONS: { COLUMNS: ["test_avg", { key: "value" }] }
         };
         t(q, R.ColumnsContainsWrongType);
     });
 
     it("Order is wrong type", async () => {
         const q = {
-            "WHERE": {},
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"],
-                "ORDER": [1, 2, 3],
+            WHERE: {},
+            OPTIONS: {
+                COLUMNS: ["test_avg"],
+                ORDER: [1, 2, 3],
             }
         };
         t(q, R.WrongType_Order);
@@ -131,16 +130,16 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     // LOGICCOMPARISON
     it("Filter has too many keys", async () => {
         const q = {
-            "WHERE": {
-                "AND": [{
-                    "IS": { "test_dept": "*" }
+            WHERE: {
+                AND: [{
+                    IS: { test_dept: "*" }
                 }],
-                "OR": [{
-                    "IS": { "test_dept": "*" }
+                OR: [{
+                    IS: { test_dept: "*" }
                 }]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.TooManyKeys_Filter);
@@ -148,11 +147,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("AND value is wrong type", async () => {
         const q = {
-            "WHERE": {
-                "AND": 123
+            WHERE: {
+                AND: 123
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongType_LogicComparison);
@@ -160,11 +159,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("AND array member contains non-objects", async () => {
         const q = {
-            "WHERE": {
-                "AND": ["not an object"]
+            WHERE: {
+                AND: ["not an object"]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongValue_LogicComparison);
@@ -172,11 +171,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("OR value is wrong type", async () => {
         const q = {
-            "WHERE": {
-                "OR": 123
+            WHERE: {
+                OR: 123
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongType_LogicComparison);
@@ -184,11 +183,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("OR array member contains non-objects", async () => {
         const q = {
-            "WHERE": {
-                "OR": ["not an object"]
+            WHERE: {
+                OR: ["not an object"]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongValue_LogicComparison);
@@ -196,11 +195,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("AND array member contains invalid filter", async () => {
         const q = {
-            "WHERE": {
-                "AND": [{ "not_a_filter": "value" }]
+            WHERE: {
+                AND: [{ not_a_filter: "value" }]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongKey_Filter);
@@ -209,23 +208,23 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     //MCOMPARISON
     it("M(ath)comparison not an object", async () => {
         const q = {
-            "WHERE": {
-                "GT": ["this is in an array"]
+            WHERE: {
+                GT: ["this is in an array"]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
-        }
+        };
         t(q, R.WrongType_MComparison);
     });
 
     it("M(ath)comparison value not exactly 1 property", async () => {
         const q = {
-            "WHERE": {
-                "GT": { "test_avg": 80, "test_pass": 80 }
+            WHERE: {
+                GT: { test_avg: 80, test_pass: 80 }
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongValue_MComparison);
@@ -233,23 +232,23 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("M(ath)comparison not an object", async () => {
         const q = {
-            "WHERE": {
-                "LT": ["this is in an array"]
+            WHERE: {
+                LT: ["this is in an array"]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
-        }
+        };
         t(q, R.WrongType_MComparison);
     });
 
     it("M(ath)comparison value not exactly 1 property", async () => {
         const q = {
-            "WHERE": {
-                "LT": { "test_avg": 80, "test_pass": 80 }
+            WHERE: {
+                LT: { test_avg: 80, test_pass: 80 }
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongValue_MComparison);
@@ -257,23 +256,23 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("M(ath)comparison not an object", async () => {
         const q = {
-            "WHERE": {
-                "EQ": ["this is in an array"]
+            WHERE: {
+                EQ: ["this is in an array"]
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
-        }
+        };
         t(q, R.WrongType_MComparison);
     });
 
     it("M(ath)comparison value not exactly 1 property", async () => {
         const q = {
-            "WHERE": {
-                "EQ": { "test_avg": 80, "test_pass": 80 }
+            WHERE: {
+                EQ: { "test_avg": 80, "test_pass": 80 }
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongValue_MComparison);
@@ -282,11 +281,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     // SComparison
     it("S(tring)comparison not an object", async () => {
         const q = {
-            "WHERE": {
-                "IS": 123
+            WHERE: {
+                IS: 123
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongType_SComparison);
@@ -294,11 +293,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("S(tring)comparison value not exactly 1 property", async () => {
         const q = {
-            "WHERE": {
-                "IS": { "test_dept": "owen", "test_instructor": "owen" }
+            WHERE: {
+                IS: { test_dept: "owen", test_instructor: "owen" }
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongValue_SComparison);
@@ -307,11 +306,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     // Negation
     it("Negation not an object", async () => {
         const q = {
-            "WHERE": {
-                "NOT": 123
+            WHERE: {
+                NOT: 123
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongType_Negation);
@@ -319,11 +318,11 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     it("Negation value is not a filter", async () => {
         const q = {
-            "WHERE": {
-                "NOT": { "Imnot": "afilter" }
+            WHERE: {
+                NOT: { Imnot: "afilter" }
             },
-            "OPTIONS": {
-                "COLUMNS": ["test_avg"]
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
             }
         };
         t(q, R.WrongKey_Filter);
