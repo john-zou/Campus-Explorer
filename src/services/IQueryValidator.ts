@@ -15,10 +15,10 @@ export enum QueryValidationResultFlag {
     MissingColumns,
     InvalidKey_Options,
     TooManyKeys_Filter,
-    WrongType_LogicComparison_AND,
-    WrongType_LogicComparison_OR,
-    WrongValue_LogicComparison_AND,
-    WrongValue_LogicComparison_OR
+    WrongType_LogicComparison,
+    WrongValue_LogicComparison,
+    WrongType_MComparison,
+    WrongValue_MComparison
 }
 
 export class QueryValidationResult {
