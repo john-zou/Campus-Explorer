@@ -18,7 +18,10 @@ export enum QueryValidationResultFlag {
     WrongType_LogicComparison,
     WrongValue_LogicComparison,
     WrongType_MComparison,
-    WrongValue_MComparison
+    WrongValue_MComparison,
+    WrongType_SComparison,
+    WrongValue_SComparison,
+    WrongType_Negation
 }
 
 export class QueryValidationResult {
