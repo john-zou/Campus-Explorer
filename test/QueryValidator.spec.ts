@@ -2,7 +2,7 @@ import { QueryValidator } from "../src/services/QueryValidator";
 import { InsightDatasetKind } from "../src/controller/IInsightFacade";
 import { expect } from "chai";
 import { QueryValidationResult as Res, QueryValidationResultFlag as R } from "../src/services/IQueryValidator";
-
+/* tslint:disable */
 // Module Test Skeleton
 
 // Import Statements
