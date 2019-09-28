@@ -17,7 +17,8 @@ export enum QueryValidationResultFlag {
     TooManyKeys_Filter,
     WrongType_LogicComparison_AND,
     WrongType_LogicComparison_OR,
-    WrongValue_LogicComparison_AND
+    WrongValue_LogicComparison_AND,
+    WrongValue_LogicComparison_OR
 }
 
 export class QueryValidationResult {
@@ -33,5 +34,5 @@ export class QueryValidationResult {
 
 export interface IQueryValidator {
     // Takes in a JSON and datasetkind and returns a validation result.
-    validate(json: any, datasetId: string, kind: InsightDatasetKind): QueryValidationResult;
+    validate(json: any, datasetIds: string[], kind: InsightDatasetKind): QueryValidationResult;
 }
