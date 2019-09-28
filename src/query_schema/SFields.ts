@@ -1,1 +1,1 @@
-export var sfields: string[] = ["dept", "id", "instructor", "title", "uuid"];
+export const sfields: string[] = ["dept", "id", "instructor", "title", "uuid"];

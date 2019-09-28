@@ -1,1 +1,1 @@
-export var mfields: string[] = ["avg", "pass", "fail", "audit", "year"];
+export const mfields: string[] = ["avg", "pass", "fail", "audit", "year"];
