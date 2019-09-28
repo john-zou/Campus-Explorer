@@ -210,7 +210,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     it("M(ath)comparison not an object", async () => {
         const q = {
             "WHERE": {
-                "GT": [ "this is in an array" ]
+                "GT": ["this is in an array"]
             },
             "OPTIONS": {
                 "COLUMNS": ["test_avg"]
@@ -230,4 +230,124 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
         };
         t(q, R.WrongValue_MComparison);
     });
+
+    it("M(ath)comparison not an object", async () => {
+        const q = {
+            "WHERE": {
+                "LT": ["this is in an array"]
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        }
+        t(q, R.WrongType_MComparison);
+    });
+
+    it("M(ath)comparison value not exactly 1 property", async () => {
+        const q = {
+            "WHERE": {
+                "LT": { "test_avg": 80, "test_pass": 80 }
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        };
+        t(q, R.WrongValue_MComparison);
+    });
+
+    it("M(ath)comparison not an object", async () => {
+        const q = {
+            "WHERE": {
+                "EQ": ["this is in an array"]
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        }
+        t(q, R.WrongType_MComparison);
+    });
+
+    it("M(ath)comparison value not exactly 1 property", async () => {
+        const q = {
+            "WHERE": {
+                "EQ": { "test_avg": 80, "test_pass": 80 }
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        };
+        t(q, R.WrongValue_MComparison);
+    });
+
+    // SComparison
+    it("S(tring)comparison not an object", async () => {
+        const q = {
+            "WHERE": {
+                "IS": 123
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        };
+        t(q, R.WrongType_SComparison);
+    });
+
+    it("S(tring)comparison value not exactly 1 property", async () => {
+        const q = {
+            "WHERE": {
+                "IS": { "test_dept": "owen", "test_instructor": "owen" }
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        };
+        t(q, R.WrongValue_SComparison);
+    });
+
+    // Negation
+    it("Negation not an object", async () => {
+        const q = {
+            "WHERE": {
+                "NOT": 123
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        };
+        t(q, R.WrongType_Negation);
+    });
+
+    it("Negation value is not a filter", async () => {
+        const q = {
+            "WHERE": {
+                "NOT": { "Imnot": "afilter" }
+            },
+            "OPTIONS": {
+                "COLUMNS": ["test_avg"]
+            }
+        };
+        t(q, R.WrongKey_Filter);
+    });
+});
+
+describe("QueryValidator Tests: Sane Invalid Query: ID problems", () => {
+    const v: QueryValidator = new QueryValidator();
+    const idStrings: string[] = ["test1", "test2"];
+
+    // helper
+    const t = (q: any, res: R): void => {
+        expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res)
+    };
+
+    it("multiple valid IDs", async () => {
+
+    });
+});
+
+describe("QueryValidator Tests: Sane Invalid Query: Column Problems", () => {
+
+});
+
+describe("QueryValidator Tests: Sane Invalid Query: Too many results", () => {
+
 });
