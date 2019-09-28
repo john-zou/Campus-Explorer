@@ -1,10 +1,6 @@
 import { InsightDatasetKind } from "../controller/IInsightFacade";
 
-/**
- * Listed in order of precedence
- * 
- * */
-export enum QueryValidationResult {
+export enum QueryValidationResultFlag {
     Valid,
     NotJSON,
     MissingBody,
@@ -12,10 +8,26 @@ export enum QueryValidationResult {
     TooManyKeys_Query,
     WrongType_Body,
     WrongType_Options,
-    // Too many keys at the query level (i.e. has body, has options, then has st xtra)
+    WrongKey_Filter,
+    ColumnsIsNotNonEmptyArray,
+    ColumnsContainsWrongType,
+    WrongType_Order,
+    MissingColumns,
+    InvalidKey_Options,
+    TooManyKeys_Filter,
+    WrongType_LogicComparison_AND,
+    WrongType_LogicComparison_OR,
+    WrongValue_LogicComparison_AND
+}
 
-    // not really possible but we need this validate takes in "any"
-    // todo: add more
+export class QueryValidationResult {
+    public readonly Result: QueryValidationResultFlag;
+    public readonly ID: string;
+
+    public constructor(flag: QueryValidationResultFlag, id: string) {
+        this.Result = flag;
+        this.ID = id;
+    }
 }
 
 
