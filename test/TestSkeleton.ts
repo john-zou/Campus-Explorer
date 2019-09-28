@@ -4,8 +4,6 @@ import { expect } from "chai";
 
 describe("[TEST CATEGORY NAME]", () => {
     // Declare common objects as local variables
-
-
     before(() => {
         // Runs once, before any "beforeEach"
 

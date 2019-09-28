@@ -129,16 +129,16 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     //     const expected: string[] = [id];
     //     await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
     // });
-    class MockParsedData implements IParsedData{
+    class MockParsedData implements IParsedData {
         public data: any[] = [{data: "value"}];
         public id: string = "mock";
         public kind: InsightDatasetKind = InsightDatasetKind.Courses;
         public numRows: 1;
     }
 
-    class MockDataParser implements IDataParser{
+    class MockDataParser implements IDataParser {
         public parseDatasetZip(id: string, content: string, kind: InsightDatasetKind):
-            Promise<import("../src/data/IParsedData").IParsedData> {
+            Promise<import ("../src/data/IParsedData").IParsedData> {
             return Promise.resolve(new MockParsedData());
         }
     }

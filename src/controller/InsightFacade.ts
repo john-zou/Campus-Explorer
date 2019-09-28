@@ -51,7 +51,8 @@ export default class InsightFacade implements IInsightFacade {
         // for each section in ordered array
         //   if (filter(section, queryfilter))
         //     build new object, add to results array
-        return this.queryPerformer.performQuery(query);
+        return this.queryPerformer.performQuery(query,
+            this.datasetManager.getAllData(), this.datasetManager.datasetIds);
     }
 
     public listDatasets(): Promise<InsightDataset[]> {

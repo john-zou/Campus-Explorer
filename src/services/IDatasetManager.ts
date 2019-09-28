@@ -17,4 +17,7 @@ export interface IDatasetManager {
      *  returns undefined if does not exist
      */
     getData(id: string): IParsedData;
+
+    // Returns all Datasets as an IParsedData array
+    getAllData(): IParsedData[];
 }

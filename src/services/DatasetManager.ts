@@ -59,6 +59,10 @@ export class DatasetManager implements IDatasetManager {
         return this.parsedDatasets.find((d: IParsedData) => d.id === id);
     }
 
+    public getAllData(): IParsedData[] {
+        return this.parsedDatasets;
+    }
+
     private isInvalidId(id: string): boolean {
         return id.includes("_") || id.trim().length === 0;
     }

@@ -31,7 +31,6 @@ export class QueryValidationResult {
     }
 }
 
-
 export interface IQueryValidator {
     // Takes in a JSON and datasetkind and returns a validation result.
     validate(json: any, datasetIds: string[], kind: InsightDatasetKind): QueryValidationResult;
