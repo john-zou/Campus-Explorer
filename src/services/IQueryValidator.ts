@@ -21,7 +21,9 @@ export enum QueryValidationResultFlag {
     WrongValue_MComparison,
     WrongType_SComparison,
     WrongValue_SComparison,
-    WrongType_Negation
+    WrongType_Negation,
+    IdDoesNotExist,
+    MoreThanOneId,
 }
 
 export class QueryValidationResult {
