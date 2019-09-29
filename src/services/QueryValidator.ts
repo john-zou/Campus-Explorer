@@ -29,8 +29,27 @@ export class QueryValidator implements IQueryValidator {
         const filterValidationResult = this.validateFilter(where, datasetIds);
     }
 
-    private validateFilter(filter: any, datasetIds: string[]) {
+    private validateFilterArray(filters: any[], datasetIds: string[]): [F, string] {
+        // TODO: check that all the ID strings are the same, then return it along with a "Valid"
+        // if so
         throw new NotImplementedError();
+    }
+
+    private validateFilter(filter: any, datasetIds: string[]): [F, string]  {
+        if (this.hasTooManyKeys(filter, 1)) {
+            return [F.TooManyKeys_Filter, null];
+        }
+        const key = Object.keys(filter)[0];
+        switch (key) {
+            case "AND":
+                return this.validateFilterArray(filter.AND, datasetIds);
+            case "OR":
+                return this.validateFilterArray(filter.OR, datasetIds);
+            case "NOT":
+                return this.validateFilter(filter.NOT, datasetIds);
+            default:
+                return [F.WrongKey_Filter, null];
+        }
     }
 
     private hasTooManyKeys(json: any, max: number) {
