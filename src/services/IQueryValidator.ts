@@ -28,7 +28,7 @@ export class QueryValidationResult {
     public readonly Result: QueryValidationResultFlag;
     public readonly ID: string;
 
-    public constructor(flag: QueryValidationResultFlag, id: string) {
+    public constructor(flag: QueryValidationResultFlag, id: string = null) {
         this.Result = flag;
         this.ID = id;
     }
