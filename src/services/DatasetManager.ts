@@ -3,7 +3,7 @@ import { InsightDatasetKind, InsightDataset, InsightError } from "../controller/
 import { IParsedData } from "../data/IParsedData";
 import { IDataParser } from "../data/IDataParser";
 import { Factory } from "./Factory";
-import Log from "../util/Util";
+import Log from "../Util";
 import Insight from "../util/Insight";
 import { remove } from "fs-extra";
 

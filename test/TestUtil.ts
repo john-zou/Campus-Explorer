@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import Log from "../src/util/Util";
+import Log from "../src/Util";
 import { ITestQuery } from "./InsightFacade.spec";
 import {expect} from "chai";
 import {InsightError, ResultTooLargeError} from "../src/controller/IInsightFacade";

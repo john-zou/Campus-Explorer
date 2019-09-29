@@ -3,7 +3,7 @@ import * as fs from "fs-extra";
 import { InsightDatasetKind, InsightDataset } from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
 import { InsightError, NotFoundError } from "../src/controller/IInsightFacade";
-import Log from "../src/util/Util";
+import Log from "../src/Util";
 import TestUtil from "./TestUtil";
 import { IDataParser } from "../src/data/IDataParser";
 import { IParsedData } from "../src/data/IParsedData";
