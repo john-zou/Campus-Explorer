@@ -14,9 +14,8 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
 
     // helper
     const t = (q: any, res: R): void => {
-        expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res)
+        expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res);
     };
-
 
     it("Not JSON format", async () => {
         const q: string = "not a json object";
@@ -79,7 +78,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
             }
         };
         t(q, R.InvalidKey_Options);
-    })
+    });
 
     it("Filter has wrong key", async () => {
         const q = {
@@ -205,7 +204,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
         t(q, R.WrongKey_Filter);
     });
 
-    //MCOMPARISON
+    // MCOMPARISON
     it("M(ath)comparison not an object", async () => {
         const q = {
             WHERE: {
@@ -269,7 +268,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     it("M(ath)comparison value not exactly 1 property", async () => {
         const q = {
             WHERE: {
-                EQ: { "test_avg": 80, "test_pass": 80 }
+                EQ: { test_avg: 80, test_pass: 80 }
             },
             OPTIONS: {
                 COLUMNS: ["test_avg"]
@@ -335,18 +334,18 @@ describe("QueryValidator Tests: Sane Invalid Query: ID problems", () => {
 
     // helper
     const t = (q: any, res: R): void => {
-        expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res)
+        expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res);
     };
 
     it("multiple valid IDs", async () => {
-
+        // todo (low priority)
     });
 });
 
 describe("QueryValidator Tests: Sane Invalid Query: Column Problems", () => {
-
+    // todo (low priority)
 });
 
 describe("QueryValidator Tests: Sane Invalid Query: Too many results", () => {
-
+    // todo (low priority)
 });
