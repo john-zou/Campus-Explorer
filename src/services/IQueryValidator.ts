@@ -2,7 +2,6 @@ import { InsightDatasetKind } from "../controller/IInsightFacade";
 
 export enum QueryValidationResultFlag {
     Valid,
-    NotJSON,
     MissingBody,
     MissingOptions,
     TooManyKeys_Query,
@@ -11,9 +10,7 @@ export enum QueryValidationResultFlag {
     WrongKey_Filter,
     ColumnsIsNotNonEmptyArray,
     ColumnsContainsWrongType,
-    WrongType_Order,
     MissingColumns,
-    InvalidKey_Options,
     TooManyKeys_Filter,
     WrongType_LogicComparison,
     WrongValue_LogicComparison,
@@ -38,7 +35,8 @@ export enum QueryValidationResultFlag {
     OrderContainsInvalidField,
     OrderContainsFieldNotInColumns,
     SValueNotAString,
-    SValueContainsInternalAsterisk
+    SValueContainsInternalAsterisk,
+    WrongType_Order
 }
 
 export class QueryValidationResult {

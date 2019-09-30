@@ -17,11 +17,6 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
         expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res);
     };
 
-    it("Not JSON format", async () => {
-        const q: string = "not a json object";
-        t(q, R.NotJSON);
-    });
-
     it("Missing body", async () => {
         const q = {
             OPTIONS: {
@@ -77,7 +72,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
                 invalid_key: "value"
             }
         };
-        t(q, R.InvalidKey_Options);
+        t(q, R.TooManyKeys_Options);
     });
 
     it("Filter has wrong key", async () => {
@@ -96,22 +91,6 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
             }
         };
         t(q, R.ColumnsIsNotNonEmptyArray);
-    });
-
-    it("Columns contains non-string (i.e. obj or array)", async () => {
-        const q = {
-            WHERE: {},
-            OPTIONS: { COLUMNS: ["test_avg", [1, 2, 3]] }
-        };
-        t(q, R.ColumnsContainsWrongType);
-    });
-
-    it("Columns contains non-string (i.e. obj or array)", async () => {
-        const q = {
-            WHERE: {},
-            OPTIONS: { COLUMNS: ["test_avg", { key: "value" }] }
-        };
-        t(q, R.ColumnsContainsWrongType);
     });
 
     it("Order is wrong type", async () => {

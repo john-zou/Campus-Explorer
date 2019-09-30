@@ -1,3 +1,4 @@
+/* tslint:disable:max-file-line-count */
 import { IQueryValidator, QueryValidationResult as R, QueryValidationResultFlag as F } from "./IQueryValidator";
 import { InsightDatasetKind } from "../controller/IInsightFacade";
 import { isObject } from "util";
@@ -54,7 +55,6 @@ export class QueryValidator implements IQueryValidator {
         }
         return new R(F.Valid, idFromOptions);
     }
-
     private validateOptions(options: any, datasetIds: string[]): [F, string] {
         // Check that options is an object
         if (options == null || typeof options !== "object") {
@@ -97,7 +97,6 @@ export class QueryValidator implements IQueryValidator {
             return [columnsValidationResultFlag, columnsValidationResultId];
         }
     }
-
     private validateOrder(order: any, cid: string, ids: string[], fields: string[]): F {
         if (order == null || typeof order !== "string") {
             return F.WrongType_Order;
@@ -124,12 +123,6 @@ export class QueryValidator implements IQueryValidator {
         // Otherwise, the order is fine
         return F.Valid;
     }
-
-    /**
-     * @return a triple: Validation Result Flag, and if valid, the single id, and m/sfields from columns
-     * @param cols the value of the COLUMNS key
-     * @param datasetIds list of datasetIds present in the system
-     */
     private validateColumns(cols: any, datasetIds: string[]): [F, string, string[]] {
         // Check if columns is an array
         if (!(Array.isArray(cols))) {
@@ -142,7 +135,6 @@ export class QueryValidator implements IQueryValidator {
         // Return the result of checking each string
         return this.validateColumnStrings(cols, datasetIds);
     }
-
     private validateColumnStrings(cols: any[], datasetIds: string[]): [F, string, string[]] {
         // Check the first item
         const firstItem: any = cols[0];
@@ -174,7 +166,6 @@ export class QueryValidator implements IQueryValidator {
         }
         return [F.Valid, firstId, fieldsArray];
     }
-
     private validateColumnString(str: string, datasetIds: string[]): [F, string, string] {
         const parseResult: [F, string, string] = this.parseKeystring(str);
         const parseResultFlag: F = parseResult[0];
@@ -186,13 +177,16 @@ export class QueryValidator implements IQueryValidator {
             return [F.IdDoesNotExist, null, null];
         }
         const field: string = parseResult[2];
-        if (SFields.includes(field) || MFields.includes(field)) {
+        if (!(SFields.includes(field) || MFields.includes(field))) {
             return [F.ColumnContainsInvalidField, null, null];
         }
         return [F.Valid, id, field];
     }
-
-    private validateFilterArray(filters: any[], datasetIds: string[]): [F, string] {
+    private validateFilterArray(filters: any, datasetIds: string[]): [F, string] {
+        // Check that the value is indeed an array
+        if (!Array.isArray(filters)) {
+            return [F.WrongType_LogicComparison, null];
+        }
         // Check that all the ID strings are the same, then return it along with a "Valid"
         if (!filters || filters.length === 0) {
             return [F.WrongType_LogicComparison, null];
@@ -214,32 +208,22 @@ export class QueryValidator implements IQueryValidator {
         }
         return result;
     }
-
     private validateFilter(filter: any, datasetIds: string[]): [F, string]  {
         if (this.hasTooManyKeys(filter, 1)) {
             return [F.TooManyKeys_Filter, null];
         }
         const key = Object.keys(filter)[0];
         switch (key) {
-            case "AND":
-                return this.validateFilterArray(filter.AND, datasetIds);
-            case "OR":
-                return this.validateFilterArray(filter.OR, datasetIds);
-            case "NOT":
-                return this.validateFilter(filter.NOT, datasetIds);
-            case "LT":
-                return this.validateMComparison(filter.LT, datasetIds);
-            case "GT":
-                return this.validateMComparison(filter.GT, datasetIds);
-            case "EQ":
-                return this.validateMComparison(filter.EQ, datasetIds);
-            case "IS":
-                return this.validateSComparison(filter.IS, datasetIds);
-            default:
-                return [F.WrongKey_Filter, null];
+            case "AND": return this.validateFilterArray(filter.AND, datasetIds);
+            case "OR": return this.validateFilterArray(filter.OR, datasetIds);
+            case "NOT": return this.validateFilter(filter.NOT, datasetIds);
+            case "LT": return this.validateMComparison(filter.LT, datasetIds);
+            case "GT": return this.validateMComparison(filter.GT, datasetIds);
+            case "EQ": return this.validateMComparison(filter.EQ, datasetIds);
+            case "IS": return this.validateSComparison(filter.IS, datasetIds);
+            default: return [F.WrongKey_Filter, null];
         }
     }
-
     private validateSComparison(sc: any, datasetIds: string[]): [F, string] {
         if (sc == null || typeof sc !== "object") {
             return [F.WrongType_SComparison, null];
@@ -274,7 +258,6 @@ export class QueryValidator implements IQueryValidator {
             return [F.Valid, id];
         }
     }
-
     private validateSValue(value: string): F {
         for (let i = 1; i < value.length - 1; ++i) {
             if (value[i] === "*") {
@@ -283,7 +266,6 @@ export class QueryValidator implements IQueryValidator {
         }
         return F.Valid;
     }
-
     private validateMComparison(mc: any, datasetIds: string[]): [F, string] {
         // Validate the key
         if (mc == null || typeof mc !== "object") {
@@ -314,7 +296,6 @@ export class QueryValidator implements IQueryValidator {
         // It's valid!
         return [F.Valid, id];
     }
-
     private parseKeystring(str: string): [F, string, string] {
         let ss: string[] = str.split("_");
         if (ss.length === 1) {
@@ -325,11 +306,9 @@ export class QueryValidator implements IQueryValidator {
         }
         return [F.Valid, ss[0], ss[1]];
     }
-
     private hasTooManyKeys(json: any, max: number) {
         return Object.keys(json).length > max;
     }
-
     private isMissingKey(json: any, key: string): boolean {
         return !Object.keys(json).includes(key);
     }
