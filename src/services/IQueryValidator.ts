@@ -24,6 +24,13 @@ export enum QueryValidationResultFlag {
     WrongType_Negation,
     IdDoesNotExist,
     MoreThanOneId,
+    TooManyKeys_MComparison,
+    TooManyUnderscores,
+    NoUnderscore,
+    NoIdstring,
+    NoKeyfield,
+    InvalidMfield,
+    MValueNotANumber
 }
 
 export class QueryValidationResult {
