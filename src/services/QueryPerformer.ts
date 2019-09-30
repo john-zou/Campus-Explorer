@@ -4,6 +4,7 @@ import { KeyMap } from "../query_schema/KeyMap";
 import { IQueryValidator, QueryValidationResult, QueryValidationResultFlag } from "./IQueryValidator";
 import { Factory } from "./Factory";
 import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
+import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
@@ -13,24 +14,25 @@ export class QueryPerformer implements IQueryPerformer {
         this.queryValidator = queryValidator;
     }
 
-    public async performQuery (query: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
+    public async performQuery (queryIn: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
         const validatorResult: QueryValidationResult =
-            this.queryValidator.validate(query, datasetsIDs, InsightDatasetKind.Courses);
+            this.queryValidator.validate(queryIn, datasetsIDs, InsightDatasetKind.Courses);
         if (validatorResult.Result !== QueryValidationResultFlag.Valid) {
             // Invalid Query
             return Promise.reject(new InsightError(validatorResult.Result));
         }
         const id: string = validatorResult.ID;
 
+        let query: IQuery = queryIn;
         // Create dataset given id
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
         });
 
         // Sort dataset into given order
-        if (query["OPTIONS"].keys().includes("ORDER")) {
-            sortedData = await this.orderData(query["OPTIONS"]["ORDER"], sortedData);
+        if (Object.keys(query.OPTIONS).includes("ORDER")) {
+            sortedData = await this.orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
         }
 
         // Set field
@@ -60,7 +62,7 @@ export class QueryPerformer implements IQueryPerformer {
     }
 
     private filterWhereRec (parsedData: any, where: any): boolean {
-        return false;
+        return true;
         // pseudo code
         // if (leaf in where)
         //  return true or false
