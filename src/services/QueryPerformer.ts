@@ -3,9 +3,6 @@ import { IParsedData } from "../data/IParsedData";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryWhere: any;
-    // private keyMap = {
-    //     key1: "key"
-    // };
 
     public async performQuery (query: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
