@@ -26,8 +26,6 @@ export class QueryPerformer implements IQueryPerformer {
 
         let query: IQuery = queryIn;
         // Create dataset given id
-        // tslint:disable-next-line:no-console
-        console.log(datasets);
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
         });
