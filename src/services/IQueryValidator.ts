@@ -33,7 +33,12 @@ export enum QueryValidationResultFlag {
     MValueNotANumber,
     TooManyKeys_SComparison,
     InvalidSField,
-    TooManyKeys_Options
+    TooManyKeys_Options,
+    ColumnContainsInvalidField,
+    OrderContainsInvalidField,
+    OrderContainsFieldNotInColumns,
+    SValueNotAString,
+    SValueContainsInternalAsterisk
 }
 
 export class QueryValidationResult {
