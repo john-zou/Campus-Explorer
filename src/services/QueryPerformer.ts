@@ -3,26 +3,43 @@ import { IParsedData } from "../data/IParsedData";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryWhere: any;
+    private keyMap = {
+        dept: "Subject",
+        id: "Course",
+        avg: "Avg",
+        instructor: "Professor",
+        title: "Title",
+        pass: "Pass",
+        fail: "Fail",
+        audit: "Audit",
+        year: "Year"
+    };
 
     public async performQuery (query: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
         let id = "";
 
         // Create ordered data set
-        let data: any[] = await this.orderData(query["order"], datasets.find((d: IParsedData) => {
+        let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
-        }));
+        });
+
+        if (query["options"].keys().includes("order")) {
+            sortedData = await this.orderData(query["options"]["order"], sortedData);
+        }
 
         // Set field
         this.queryWhere = query["where"];
 
         // Return with filtered, ordered data
-        return Promise.resolve(data.filter(this.filterWhere));
+        return Promise.resolve(sortedData.data.filter(this.filterWhere));
     }
 
     // Order dataset according to parameter in order
-    private orderData (order: any, dataset: IParsedData): Promise <any[]> {
-        return Promise.reject("Not implemented error");
+    private orderData (order: any, dataset: IParsedData): Promise <IParsedData> {
+        dataset.data = dataset.data.sort();
+
+        return Promise.resolve(dataset);
     }
 
     // Returns if data is in where, wrapper for recursive function
@@ -38,5 +55,4 @@ export class QueryPerformer implements IQueryPerformer {
         // else
         //  some logical combination of filterWhereRec calls on children
     }
-
 }
