@@ -3,6 +3,9 @@ import { DatasetManager } from "./DatasetManager";
 import { DataParser } from "../data/DataParser";
 
 export class Factory {
+    public static getQueryValidator(): import ("./IQueryValidator").IQueryValidator {
+        throw new Error("Method not implemented.");
+    }
     public static getDataParser(): import ("../data/IDataParser").IDataParser {
         return new DataParser();
     }
