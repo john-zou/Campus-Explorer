@@ -22,18 +22,19 @@ export class QueryPerformer implements IQueryPerformer {
             return Promise.reject(new InsightError(validatorResult.Result));
         }
         const id: string = validatorResult.ID;
+
         // Create dataset given id
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
         });
 
         // Sort dataset into given order
-        if (query["options"].keys().includes("order")) {
-            sortedData = await this.orderData(query["options"]["order"], sortedData);
+        if (query["OPTIONS"].keys().includes("ORDER")) {
+            sortedData = await this.orderData(query["OPTIONS"]["ORDER"], sortedData);
         }
 
         // Set field
-        this.queryWhere = query["where"];
+        this.queryWhere = query["WHERE"];
 
         // Return with filtered, ordered data
         return Promise.resolve(sortedData.data.filter(this.filterWhere));

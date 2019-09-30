@@ -1,10 +1,11 @@
 import { QueryPerformer } from "./QueryPerformer";
 import { DatasetManager } from "./DatasetManager";
 import { DataParser } from "../data/DataParser";
+import { QueryValidator } from "./QueryValidator";
 
 export class Factory {
     public static getQueryValidator(): import ("./IQueryValidator").IQueryValidator {
-        throw new Error("Method not implemented.");
+        return new QueryValidator();
     }
     public static getDataParser(): import ("../data/IDataParser").IDataParser {
         return new DataParser();
