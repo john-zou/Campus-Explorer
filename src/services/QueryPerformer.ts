@@ -1,19 +1,17 @@
 import { IQueryPerformer } from "./IQueryPerformer";
 import { IParsedData } from "../data/IParsedData";
+import { KeyMap } from "../query_schema/KeyMap";
+import { IQueryValidator } from "./IQueryValidator";
+import { Factory } from "./Factory";
 
 export class QueryPerformer implements IQueryPerformer {
+    private queryValidator: IQueryValidator;
     private queryWhere: any;
-    private keyMap = {
-        dept: "Subject",
-        id: "Course",
-        avg: "Avg",
-        instructor: "Professor",
-        title: "Title",
-        pass: "Pass",
-        fail: "Fail",
-        audit: "Audit",
-        year: "Year"
-    };
+    // Note that all implementation uses case insensitivity
+
+    public constructor(queryValidator: IQueryValidator = Factory.getQueryValidator()) {
+        this.queryValidator = queryValidator;
+    }
 
     public async performQuery (query: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
@@ -37,7 +35,10 @@ export class QueryPerformer implements IQueryPerformer {
 
     // Order dataset according to parameter in order
     private orderData (order: any, dataset: IParsedData): Promise <IParsedData> {
-        dataset.data = dataset.data.sort();
+        let orderKey: string = order.split("_")[1];
+        // dataset.data = dataset.data.sort((a:any, b:any) => {
+        //     // with a little help from https://mzl.la/2ospbkN
+        // });
 
         return Promise.resolve(dataset);
     }
