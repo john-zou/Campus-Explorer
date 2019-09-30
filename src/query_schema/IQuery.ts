@@ -1,7 +1,10 @@
 export interface IQuery {
-    WHERE: IAnd|IOr|ILt|IGt|IEq|IIs|INot;
-    OPTIONS: IOptionsWithoutOrder | IOptionsWithOrder;
+    WHERE: IFilter;
+    OPTIONS: IOptions;
 }
+
+export type IFilter = IAnd|IOr|ILt|IGt|IEq|IIs|INot;
+export type IOptions = IOptionsWithoutOrder | IOptionsWithOrder;
 
 export interface IOptionsWithOrder {
     COLUMNS: string[];
@@ -13,15 +16,15 @@ export interface IOptionsWithoutOrder {
 }
 
 export interface IAnd {
-    AND: Array<IAnd|IOr|ILt|IGt|IEq|IIs|INot>;
+    AND: IFilter[];
 }
 
 export interface IOr {
-    OR: Array<IAnd|IOr|ILt|IGt|IEq|IIs|INot>;
+    OR: IFilter[];
 }
 
 export interface INot {
-    NOT: IAnd|IOr|ILt|IGt|IEq|IIs|INot;
+    NOT: IFilter[];
 }
 
 export interface ILt {
