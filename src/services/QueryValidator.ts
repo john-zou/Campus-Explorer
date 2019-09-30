@@ -1,4 +1,3 @@
-/* tslint:disable:max-file-line-count */
 import { IQueryValidator, QueryValidationResult as R, QueryValidationResultFlag as F } from "./IQueryValidator";
 import { InsightDatasetKind } from "../controller/IInsightFacade";
 import { isObject } from "util";
@@ -93,6 +92,10 @@ export class QueryValidator implements IQueryValidator {
             const order: any = options.ORDER;
             const orderValidationResult: F =
                 this.validateOrder(order, columnsValidationResultId, datasetIds, columnFields);
+            if (orderValidationResult !== F.Valid) {
+                return [orderValidationResult, null];
+            }
+            return [orderValidationResult, columnsValidationResultId];
         } else {
             return [columnsValidationResultFlag, columnsValidationResultId];
         }
