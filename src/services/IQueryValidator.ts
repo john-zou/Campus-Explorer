@@ -30,7 +30,10 @@ export enum QueryValidationResultFlag {
     NoIdstring,
     NoKeyfield,
     InvalidMfield,
-    MValueNotANumber
+    MValueNotANumber,
+    TooManyKeys_SComparison,
+    InvalidSField,
+    TooManyKeys_Options
 }
 
 export class QueryValidationResult {
