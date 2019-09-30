@@ -1,8 +1,9 @@
 import { IQueryPerformer } from "./IQueryPerformer";
 import { IParsedData } from "../data/IParsedData";
 import { KeyMap } from "../query_schema/KeyMap";
-import { IQueryValidator } from "./IQueryValidator";
+import { IQueryValidator, QueryValidationResult, QueryValidationResultFlag } from "./IQueryValidator";
 import { Factory } from "./Factory";
+import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
@@ -15,8 +16,12 @@ export class QueryPerformer implements IQueryPerformer {
 
     public async performQuery (query: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
-        let id = "";
-
+        const validatorResult: QueryValidationResult =
+            this.queryValidator.validate(query, datasetsIDs, InsightDatasetKind.Courses);
+        if (validatorResult.Result !== QueryValidationResultFlag.Valid) {
+            return Promise.reject(new InsightError(validatorResult.Result));
+        }
+        const id: string = validatorResult.ID;
         // Create ordered data set
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
