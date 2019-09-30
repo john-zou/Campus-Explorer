@@ -13,23 +13,26 @@ export function validateFilterArray(filters: any, datasetIds: string[]): [F, str
     }
     // Essentially, folds the validateFilter results into one, making sure they are
     // all valid and all have the same ID.
-    let result: [F, string] = this.validateFilter(filters[0], datasetIds);
-    if (result[0] !== F.Valid) {
-        return result;
+    let firstResult: [F, string] = this.validateFilter(filters[0], datasetIds);
+    if (firstResult[0] !== F.Valid) {
+        return firstResult;
     }
     for (let i = 1; i < filters.length; ++i) {
         let nextResult: [F, string] = this.validateFilter(filters[i], datasetIds);
         if (nextResult[0] !== F.Valid) {
             return nextResult;
         }
-        if (nextResult[1] !== result[1]) { // verify they have the same ID
+        if (nextResult[1] !== firstResult[1]) { // verify they have the same ID
             return [F.MoreThanOneId, ""];
         }
     }
-    return result;
+    return firstResult;
 }
 
 export function validateFilter(filter: any, datasetIds: string[]): [F, string]  {
+    if (filter == null || typeof filter !== "object") {
+        return [F.WrongValue_LogicComparison, null];
+    }
     if (this.hasTooManyKeys(filter, 1)) {
         return [F.TooManyKeys_Filter, null];
     }
@@ -47,6 +50,9 @@ export function validateFilter(filter: any, datasetIds: string[]): [F, string]  
 }
 
 export function validateSComparison(sc: any, datasetIds: string[]): [F, string] {
+    if (Array.isArray(sc)) {
+        return [F.WrongType_SComparison, null];
+    }
     if (sc == null || typeof sc !== "object") {
         return [F.WrongType_SComparison, null];
     }
@@ -91,7 +97,9 @@ export function validateSValue(value: string): F {
 }
 
 export function validateMComparison(mc: any, datasetIds: string[]): [F, string] {
-    // Validate the key
+    if (Array.isArray(mc)) {
+        return [F.WrongType_MComparison, null];
+    }
     if (mc == null || typeof mc !== "object") {
         return [F.WrongType_MComparison, null];
     }
@@ -102,20 +110,20 @@ export function validateMComparison(mc: any, datasetIds: string[]): [F, string] 
     const parseResult: [F, string, string] = this.parseKeystring(key);
     const parseResultFlag: F = parseResult[0];
     if (parseResultFlag !== F.Valid) {
-        return [parseResultFlag, ""];
+        return [parseResultFlag, null];
     }
     const id: string = parseResult[1];
     if (!datasetIds.includes(id)) {
-        return [F.IdDoesNotExist, ""];
+        return [F.IdDoesNotExist, null];
     }
     const mfield: string = parseResult[2];
     if (!MFields.includes(mfield)) {
-        return [F.InvalidMfield, ""];
+        return [F.InvalidMfield, null];
     }
     // Validate the value -- it must be a number
     const value: any = Object.values(mc)[0];
     if (value == null || typeof value !== "number") {
-        return [F.MValueNotANumber, ""];
+        return [F.MValueNotANumber, null];
     }
     // It's valid!
     return [F.Valid, id];
@@ -130,4 +138,12 @@ export function parseKeystring(str: string): [F, string, string] {
         return [F.TooManyUnderscores, null, null];
     }
     return [F.Valid, ss[0], ss[1]];
+}
+
+export function hasTooManyKeys(json: any, max: number) {
+    return Object.keys(json).length > max;
+}
+
+export function isMissingKey(json: any, key: string): boolean {
+    return !Object.keys(json).includes(key);
 }

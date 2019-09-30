@@ -205,7 +205,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
                 COLUMNS: ["test_avg"]
             }
         };
-        t(q, R.WrongValue_MComparison);
+        t(q, R.TooManyKeys_MComparison);
     });
 
     it("M(ath)comparison not an object", async () => {
@@ -229,7 +229,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
                 COLUMNS: ["test_avg"]
             }
         };
-        t(q, R.WrongValue_MComparison);
+        t(q, R.TooManyKeys_MComparison);
     });
 
     it("M(ath)comparison not an object", async () => {
@@ -253,7 +253,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
                 COLUMNS: ["test_avg"]
             }
         };
-        t(q, R.WrongValue_MComparison);
+        t(q, R.TooManyKeys_MComparison);
     });
 
     // SComparison
@@ -278,7 +278,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
                 COLUMNS: ["test_avg"]
             }
         };
-        t(q, R.WrongValue_SComparison);
+        t(q, R.TooManyKeys_SComparison);
     });
 
     // Negation
@@ -291,7 +291,7 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
                 COLUMNS: ["test_avg"]
             }
         };
-        t(q, R.WrongType_Negation);
+        t(q, R.WrongValue_LogicComparison);
     });
 
     it("Negation value is not a filter", async () => {

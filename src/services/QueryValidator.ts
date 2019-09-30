@@ -4,18 +4,18 @@ import { isObject } from "util";
 import { NotImplementedError } from "restify";
 import { mfields as MFields } from "../query_schema/MFields";
 import { sfields as SFields } from "../query_schema/SFields";
-import { validateFilter, parseKeystring } from "./QueryValidationFunctions";
+import { validateFilter, parseKeystring, hasTooManyKeys, isMissingKey } from "./QueryValidationFunctions";
 
 export class QueryValidator implements IQueryValidator {
     public validate(json: any, datasetIds: string[], kind: InsightDatasetKind): R {
         // Highest level checks
-        if (this.isMissingKey(json, "WHERE")) {
+        if (isMissingKey(json, "WHERE")) {
             return new R(F.MissingBody);
         }
-        if (this.isMissingKey(json, "OPTIONS")) {
+        if (isMissingKey(json, "OPTIONS")) {
             return new R(F.MissingOptions);
         }
-        if (this.hasTooManyKeys(json, 2)) {
+        if (hasTooManyKeys(json, 2)) {
             return new R(F.TooManyKeys_Query);
         }
         // WrongType_Body -- BODY in EBNF is property WHERE
@@ -72,11 +72,11 @@ export class QueryValidator implements IQueryValidator {
         // Check for too many keys in options
         if (orderExists) {
             // Ensure there are no more than 2 keys
-            if (this.hasTooManyKeys(options, 2)) {
+            if (hasTooManyKeys(options, 2)) {
                 return [F.TooManyKeys_Options, null];
             }
         } else {
-            if (this.hasTooManyKeys(options, 1)) {
+            if (hasTooManyKeys(options, 1)) {
                 return [F.TooManyKeys_Options, null];
             }
         }
@@ -170,6 +170,7 @@ export class QueryValidator implements IQueryValidator {
         }
         return [F.Valid, firstId, fieldsArray];
     }
+
     private validateColumnString(str: string, datasetIds: string[]): [F, string, string] {
         const parseResult: [F, string, string] = parseKeystring(str);
         const parseResultFlag: F = parseResult[0];
@@ -187,10 +188,4 @@ export class QueryValidator implements IQueryValidator {
         return [F.Valid, id, field];
     }
 
-    private hasTooManyKeys(json: any, max: number) {
-        return Object.keys(json).length > max;
-    }
-    private isMissingKey(json: any, key: string): boolean {
-        return !Object.keys(json).includes(key);
-    }
 }
