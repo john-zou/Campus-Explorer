@@ -3,6 +3,17 @@ import { IParsedData } from "../data/IParsedData";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryWhere: any;
+    private keyMap = {
+        dept: "Subject",
+        id: "Course",
+        avg: "Avg",
+        instructor: "Professor",
+        title: "Title",
+        pass: "Pass",
+        fail: "Fail",
+        audit: "Audit",
+        year: "Year"
+    };
 
     public async performQuery (query: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
@@ -26,11 +37,9 @@ export class QueryPerformer implements IQueryPerformer {
 
     // Order dataset according to parameter in order
     private orderData (order: any, dataset: IParsedData): Promise <IParsedData> {
-        // Check for null/undefined order parameter
-        if (order === null || order === undefined) {
-            return Promise.reject(); // Bad key
-        }
-        return Promise.reject("Not implemented error");
+        dataset.data = dataset.data.sort();
+
+        return Promise.resolve(dataset);
     }
 
     // Returns if data is in where, wrapper for recursive function
