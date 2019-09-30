@@ -4,6 +4,7 @@ import { isObject } from "util";
 import { NotImplementedError } from "restify";
 import { mfields as MFields } from "../query_schema/MFields";
 import { sfields as SFields } from "../query_schema/SFields";
+import { validateFilter, parseKeystring } from "./QueryValidationFunctions";
 
 export class QueryValidator implements IQueryValidator {
     public validate(json: any, datasetIds: string[], kind: InsightDatasetKind): R {
@@ -32,7 +33,7 @@ export class QueryValidator implements IQueryValidator {
         let id: string = "";
         if (Object.keys(where).length !== 0) {
             // "WHERE" must be a good filter
-            const filterValidationResult: [F, string] = this.validateFilter(where, datasetIds);
+            const filterValidationResult: [F, string] = validateFilter(where, datasetIds);
             const filterValidationFlag: F = filterValidationResult[0];
             if (filterValidationFlag !== F.Valid) {
                 return new R(filterValidationFlag);
@@ -104,7 +105,7 @@ export class QueryValidator implements IQueryValidator {
         if (order == null || typeof order !== "string") {
             return F.WrongType_Order;
         }
-        const parseResult: [F, string, string] = this.parseKeystring(order);
+        const parseResult: [F, string, string] = parseKeystring(order);
         const parseResultFlag: F = parseResult[0];
         if (parseResultFlag !== F.Valid) {
             return parseResultFlag;
@@ -170,7 +171,7 @@ export class QueryValidator implements IQueryValidator {
         return [F.Valid, firstId, fieldsArray];
     }
     private validateColumnString(str: string, datasetIds: string[]): [F, string, string] {
-        const parseResult: [F, string, string] = this.parseKeystring(str);
+        const parseResult: [F, string, string] = parseKeystring(str);
         const parseResultFlag: F = parseResult[0];
         if (parseResultFlag !== F.Valid) {
             return [parseResultFlag, null, null];
@@ -185,130 +186,7 @@ export class QueryValidator implements IQueryValidator {
         }
         return [F.Valid, id, field];
     }
-    private validateFilterArray(filters: any, datasetIds: string[]): [F, string] {
-        // Check that the value is indeed an array
-        if (!Array.isArray(filters)) {
-            return [F.WrongType_LogicComparison, null];
-        }
-        // Check that all the ID strings are the same, then return it along with a "Valid"
-        if (!filters || filters.length === 0) {
-            return [F.WrongType_LogicComparison, null];
-        }
-        // Essentially, folds the validateFilter results into one, making sure they are
-        // all valid and all have the same ID.
-        let result: [F, string] = this.validateFilter(filters[0], datasetIds);
-        if (result[0] !== F.Valid) {
-            return result;
-        }
-        for (let i = 1; i < filters.length; ++i) {
-            let nextResult: [F, string] = this.validateFilter(filters[i], datasetIds);
-            if (nextResult[0] !== F.Valid) {
-                return nextResult;
-            }
-            if (nextResult[1] !== result[1]) { // verify they have the same ID
-                return [F.MoreThanOneId, ""];
-            }
-        }
-        return result;
-    }
-    private validateFilter(filter: any, datasetIds: string[]): [F, string]  {
-        if (this.hasTooManyKeys(filter, 1)) {
-            return [F.TooManyKeys_Filter, null];
-        }
-        const key = Object.keys(filter)[0];
-        switch (key) {
-            case "AND": return this.validateFilterArray(filter.AND, datasetIds);
-            case "OR": return this.validateFilterArray(filter.OR, datasetIds);
-            case "NOT": return this.validateFilter(filter.NOT, datasetIds);
-            case "LT": return this.validateMComparison(filter.LT, datasetIds);
-            case "GT": return this.validateMComparison(filter.GT, datasetIds);
-            case "EQ": return this.validateMComparison(filter.EQ, datasetIds);
-            case "IS": return this.validateSComparison(filter.IS, datasetIds);
-            default: return [F.WrongKey_Filter, null];
-        }
-    }
-    private validateSComparison(sc: any, datasetIds: string[]): [F, string] {
-        if (sc == null || typeof sc !== "object") {
-            return [F.WrongType_SComparison, null];
-        }
-        if (this.hasTooManyKeys(sc, 1)) {
-            return [F.TooManyKeys_SComparison, null];
-        }
-        const key: string = Object.keys(sc)[0];
-        const parseResult: [F, string, string] = this.parseKeystring(key);
-        const parseResultFlag: F = parseResult[0];
-        if (parseResultFlag !== F.Valid) {
-            return [parseResultFlag, null];
-        }
-        const id: string = parseResult[1];
-        if (!datasetIds.includes(id)) {
-            return [F.IdDoesNotExist, null];
-        }
-        const sfield: string = parseResult[2];
-        if (!SFields.includes(sfield)) {
-            return [F.InvalidSField, null];
-        }
-        // Validate the value -- it must be a string and must have no internal asterisk
-        const value: any = Object.values(sc)[0];
-        if (value == null || typeof value !== "string") {
-            return [F.SValueNotAString, null];
-        }
-        // Finally, validate the value!
-        const sValueValidationResult: F = this.validateSValue(value);
-        if (sValueValidationResult !== F.Valid) {
-            return [sValueValidationResult, null];
-        } else {
-            return [F.Valid, id];
-        }
-    }
-    private validateSValue(value: string): F {
-        for (let i = 1; i < value.length - 1; ++i) {
-            if (value[i] === "*") {
-                return F.SValueContainsInternalAsterisk;
-            }
-        }
-        return F.Valid;
-    }
-    private validateMComparison(mc: any, datasetIds: string[]): [F, string] {
-        // Validate the key
-        if (mc == null || typeof mc !== "object") {
-            return [F.WrongType_MComparison, null];
-        }
-        if (this.hasTooManyKeys(mc, 1)) {
-            return [F.TooManyKeys_MComparison, null];
-        }
-        const key: string = Object.keys(mc)[0];
-        const parseResult: [F, string, string] = this.parseKeystring(key);
-        const parseResultFlag: F = parseResult[0];
-        if (parseResultFlag !== F.Valid) {
-            return [parseResultFlag, ""];
-        }
-        const id: string = parseResult[1];
-        if (!datasetIds.includes(id)) {
-            return [F.IdDoesNotExist, ""];
-        }
-        const mfield: string = parseResult[2];
-        if (!MFields.includes(mfield)) {
-            return [F.InvalidMfield, ""];
-        }
-        // Validate the value -- it must be a number
-        const value: any = Object.values(mc)[0];
-        if (value == null || typeof value !== "number") {
-            return [F.MValueNotANumber, ""];
-        }
-        // It's valid!
-        return [F.Valid, id];
-    }
-    private parseKeystring(str: string): [F, string, string] {
-        let ss: string[] = str.split("_");
-        if (ss.length === 1) {
-            return [F.NoUnderscore, null, null];
-        }
-        if (ss.length > 2) {
-            return [F.TooManyUnderscores, null, null];
-        }
-        return [F.Valid, ss[0], ss[1]];
-    }
+
     private hasTooManyKeys(json: any, max: number) {
         return Object.keys(json).length > max;
     }
