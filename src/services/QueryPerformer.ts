@@ -18,14 +18,16 @@ export class QueryPerformer implements IQueryPerformer {
         const validatorResult: QueryValidationResult =
             this.queryValidator.validate(query, datasetsIDs, InsightDatasetKind.Courses);
         if (validatorResult.Result !== QueryValidationResultFlag.Valid) {
+            // Invalid Query
             return Promise.reject(new InsightError(validatorResult.Result));
         }
         const id: string = validatorResult.ID;
-        // Create ordered data set
+        // Create dataset given id
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
         });
 
+        // Sort dataset into given order
         if (query["options"].keys().includes("order")) {
             sortedData = await this.orderData(query["options"]["order"], sortedData);
         }
