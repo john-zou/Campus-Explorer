@@ -44,13 +44,20 @@ export default class InsightFacade implements IInsightFacade {
         // for each section in ordered array
         //   if (filter(section, queryfilter))
         //     build new object, add to results array
-        throw new InsightError("performQuery");
-        return await this.queryPerformer.performQuery(query,
-            this.datasetManager.getAllData(), this.datasetManager.datasetIds);
+        try {
+            return await this.queryPerformer.performQuery(query,
+                this.datasetManager.getAllData(), this.datasetManager.datasetIds);
+        } catch (err) {
+            return Promise.reject(err);
+        }
+
     }
 
     public async listDatasets(): Promise<InsightDataset[]> {
-        throw new InsightError("TIMEOUT!");
-        return await this.datasetManager.listDatasets();
+        try {
+            return await this.datasetManager.listDatasets();
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
 }
