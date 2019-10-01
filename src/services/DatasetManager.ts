@@ -1,15 +1,13 @@
 import { IDatasetManager } from "./IDatasetManager";
-import { InsightDatasetKind, InsightDataset, InsightError } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightDataset, InsightError, NotFoundError } from "../controller/IInsightFacade";
 import { IParsedData } from "../data/IParsedData";
 import { IDataParser } from "../data/IDataParser";
 import { Factory } from "./Factory";
-import Log from "../Util";
-import Insight from "../util/Insight";
-import { remove } from "fs-extra";
 
 export class DatasetManager implements IDatasetManager {
     private dataParser: IDataParser;
     private parsedDatasets: IParsedData[] = [];
+
     public get datasetIds(): string[] {
         return this.parsedDatasets.map((d: IParsedData) => d.id);
     }
@@ -29,7 +27,7 @@ export class DatasetManager implements IDatasetManager {
         }
         // check if dataset is in our list
         if (this.datasetIds.includes(id)) {
-            throw new InsightError("There is already a dataset with give ID in the list");
+            throw new InsightError("There is already a dataset with given ID in the list");
         }
         // call dataparser
         this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
@@ -38,15 +36,15 @@ export class DatasetManager implements IDatasetManager {
     public async removeDataset(id: string): Promise<string> {
         // check if id is null or undefined
         if (id  === null || id === undefined) {
-            return Insight.Error("Null or undefined argument");
+            throw new InsightError("Null or undefined argument");
         }
         // check if valid id
         if (this.isInvalidId(id)) {
-            return Insight.Error("Invalid Error");
+            throw new InsightError("Invalid ID");
         }
         // check if dataset in datasetIDs
         if (!this.datasetIds.includes(id)) {
-            return Insight.NotFound("ID not in dataset");
+            throw new NotFoundError("ID not in dataset");
         }
         // remove from parsedData
         this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
@@ -54,15 +52,27 @@ export class DatasetManager implements IDatasetManager {
         return id;
     }
 
-    public async listDatasets(): Promise<InsightDataset[]> {
+    // Might be slow because it returns more information than is requested
+    public async listDatasetsOld(): Promise<InsightDataset[]> {
         return this.parsedDatasets;
     }
 
-    public getData(id: string): IParsedData {
+    public async listDatasets(): Promise<InsightDataset[]> {
+        let ret: InsightDataset[] = [];
+        for (const dataset of this.parsedDatasets) {
+            const strictlyInsightDataset: InsightDataset = {
+                id: dataset.id, kind: dataset.kind, numRows: dataset.numRows
+            };
+            ret.push(strictlyInsightDataset);
+        }
+        return ret;
+    }
+
+    public async getData(id: string): Promise<IParsedData> {
         return this.parsedDatasets.find((d: IParsedData) => d.id === id);
     }
 
-    public getAllData(): IParsedData[] {
+    public async getAllData(): Promise<IParsedData[]> {
         return this.parsedDatasets;
     }
 

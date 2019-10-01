@@ -23,23 +23,42 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        await this.datasetManager.addDataset(id, content, kind);
-        return this.datasetManager.datasetIds;
+        try {
+            await this.datasetManager.addDataset(id, content, kind);
+            return this.datasetManager.datasetIds;
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
 
     public async removeDataset(id: string): Promise<string> {
-        return await this.datasetManager.removeDataset(id);
+        // throw new InsightError("TIMEOUT!");
+        try {
+            return await this.datasetManager.removeDataset(id);
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
 
     public async performQuery(query: any): Promise <any[]> {
         // for each section in ordered array
         //   if (filter(section, queryfilter))
         //     build new object, add to results array
-        return await this.queryPerformer.performQuery(query,
-            this.datasetManager.getAllData(), this.datasetManager.datasetIds);
+        // return Promise.reject(new InsightError());
+        try {
+            return await this.queryPerformer.performQuery(query,
+                await this.datasetManager.getAllData(), this.datasetManager.datasetIds);
+        } catch (err) {
+            return Promise.reject(err);
+        }
+
     }
 
     public async listDatasets(): Promise<InsightDataset[]> {
-        return await this.datasetManager.listDatasets();
+        try {
+            return await this.datasetManager.listDatasets();
+        } catch (err) {
+            return Promise.reject(new InsightError());
+        }
     }
 }
