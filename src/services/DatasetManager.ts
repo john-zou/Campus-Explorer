@@ -23,6 +23,10 @@ export class DatasetManager implements IDatasetManager {
         if (id === null || content === null || id === undefined || content === undefined) {
             throw new InsightError("Null argument(s)");
         }
+        // check if id has underscore or is only whitespace
+        if (id.includes("_") || id.trim().length === 0) {
+            throw new InsightError("ID must not contain _ and must not be fully whitespace");
+        }
         // check if dataset is in our list
         if (this.datasetIds.includes(id)) {
             throw new InsightError("There is already a dataset with give ID in the list");

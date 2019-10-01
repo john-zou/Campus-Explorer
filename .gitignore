@@ -14,3 +14,4 @@ test/*.js
 test/*.map
 .DS_Store
 .env
+test/Sandbox.ts
