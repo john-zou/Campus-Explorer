@@ -3,10 +3,6 @@ import { InsightDatasetKind, InsightDataset, InsightError, NotFoundError } from 
 import { IParsedData } from "../data/IParsedData";
 import { IDataParser } from "../data/IDataParser";
 import { Factory } from "./Factory";
-import Log from "../Util";
-import Insight from "../util/Insight";
-import { remove } from "fs-extra";
-import { strict } from "assert";
 
 export class DatasetManager implements IDatasetManager {
     private dataParser: IDataParser;
