@@ -112,23 +112,24 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
             }
         );
 
-    // it("Should add a valid dataset with non-Json file or Json but invalid file", async () => {
-    //     const id1: string = "goodButHasInvalidFiles";
-    //     const id2: string = "oneBadValidJsonFile";
-    //     const id3: string = "oneBadValidJsonFileKey";
-    //     const expected1: string[] = [id1];
-    //     const expected2: string[] = [id1, id2];
-    //     const expected3: string[] = [id1, id2, id3];
-    //     await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
-    //     await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
-    //     await expectFulfilled(insightFacade.addDataset(id3, datasets[id3], InsightDatasetKind.Courses), expected3);
-    // });
+    it("Should add a valid dataset with non-Json file or Json but invalid file", async () => {
+        const id1: string = "goodButHasInvalidFiles";
+        const id2: string = "oneBadValidJsonFile";
+        const id3: string = "oneBadValidJsonFileKey";
+        const expected1: string[] = [id1];
+        const expected2: string[] = [id1, id2];
+        const expected3: string[] = [id1, id2, id3];
+        await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
+        await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
+        await expectFulfilled(insightFacade.addDataset(id3, datasets[id3], InsightDatasetKind.Courses), expected3);
+    });
 
-    // it("Should add a valid dataset despite all flavors of invalid sections because some are valid", async () => {
-    //     const id: string = "invalidSectionsOneValid";
-    //     const expected: string[] = [id];
-    //     await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
-    // });
+    it("Should add a valid dataset despite all flavors of invalid sections because some are valid", async () => {
+        const id: string = "invalidSectionsOneValid";
+        const expected: string[] = [id];
+        await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+    });
+
     class MockParsedData implements IParsedData {
         public data: any[] = [{data: "value"}];
         public id: string = "mock";
@@ -187,38 +188,38 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         await expectRejected(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), InsightError);
     });
 
-    // it("Should not add invalid dataset (no sections)", async () => {
-    //     const id: string = "noSections";
-    //     await expectRejected(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), InsightError);
-    // });
+    it("Should not add invalid dataset (no sections)", async () => {
+        const id: string = "noSections";
+        await expectRejected(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), InsightError);
+    });
 
-    // it("Should add two datasets successfully", async () => {
-    //     const id1: string = "courses";
-    //     const id2: string = "engl";
-    //     const expected1: string[] = [id1];
-    //     const expected2: string[] = [id1, id2];
-    //     await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
-    //     await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
-    // });
+    it("Should add two datasets successfully", async () => {
+        const id1: string = "courses";
+        const id2: string = "engl";
+        const expected1: string[] = [id1];
+        const expected2: string[] = [id1, id2];
+        await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
+        await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
+    });
 
-    // it("Should list the dataset after adding", async () => {
-    //     const id: string = "courses";
-    //     await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-    //     const ds: InsightDataset[] = await insightFacade.listDatasets();
-    //     expect(ds.length).to.equal(1);
-    //     expect(ds[0].kind).to.equal(InsightDatasetKind.Courses);
-    //     expect(ds[0].id).to.equal(id);
-    // });
+    it("Should list the dataset after adding", async () => {
+        const id: string = "courses";
+        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        const ds: InsightDataset[] = await insightFacade.listDatasets();
+        expect(ds.length).to.equal(1);
+        expect(ds[0].kind).to.equal(InsightDatasetKind.Courses);
+        expect(ds[0].id).to.equal(id);
+    });
 
-    // it("Should list nothing before adding and after adding then removing", async () => {
-    //     const id: string = "courses";
-    //     let ds: InsightDataset[] = await insightFacade.listDatasets();
-    //     expect(ds.length).to.equal(0);
-    //     await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-    //     await insightFacade.removeDataset(id);
-    //     ds = await insightFacade.listDatasets();
-    //     expect(ds.length).to.equal(0);
-    // });
+    it("Should list nothing before adding and after adding then removing", async () => {
+        const id: string = "courses";
+        let ds: InsightDataset[] = await insightFacade.listDatasets();
+        expect(ds.length).to.equal(0);
+        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        await insightFacade.removeDataset(id);
+        ds = await insightFacade.listDatasets();
+        expect(ds.length).to.equal(0);
+    });
 
     it("Should reject with InsightError on null id",
         async () => {
@@ -259,54 +260,54 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         }
     );
 
-    // it("Should remove a dataset after adding it", async () => {
-    //     const id: string = "courses";
-    //     await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-    //     await expectFulfilled(insightFacade.removeDataset(id), id);
-    // });
+    it("Should remove a dataset after adding it", async () => {
+        const id: string = "courses";
+        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        await expectFulfilled(insightFacade.removeDataset(id), id);
+    });
 
-    // it("Should reject with InsightError on removal of invalid id name after adding a dataset", async () => {
-    //     const id: string = "courses";
-    //     await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-    //     const id1: string = "_";
-    //     const id2: string = " ";
-    //     const id3: string = "courses_";
-    //     const id4: string = "_courses";
-    //     await expectRejected(insightFacade.removeDataset(id1), InsightError);
-    //     await expectRejected(insightFacade.removeDataset(id2), InsightError);
-    //     await expectRejected(insightFacade.removeDataset(id3), InsightError);
-    //     await expectRejected(insightFacade.removeDataset(id4), InsightError);
+    it("Should reject with InsightError on removal of invalid id name after adding a dataset", async () => {
+        const id: string = "courses";
+        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        const id1: string = "_";
+        const id2: string = " ";
+        const id3: string = "courses_";
+        const id4: string = "_courses";
+        await expectRejected(insightFacade.removeDataset(id1), InsightError);
+        await expectRejected(insightFacade.removeDataset(id2), InsightError);
+        await expectRejected(insightFacade.removeDataset(id3), InsightError);
+        await expectRejected(insightFacade.removeDataset(id4), InsightError);
 
-    // });
+    });
 
-    // it("Should remove the exact requested dataset after adding two datasets", async () => {
-    //     const id1: string = "courses";
-    //     const id2: string = "engl";
-    //     await insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses);
-    //     await insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses);
-    //     await expectFulfilled(insightFacade.removeDataset(id1), id1);
-    //     const ds: InsightDataset[] = await insightFacade.listDatasets();
-    //     expect(ds.length).to.equal(1);
-    //     expect(ds[0].id).to.equal(id2);
-    // });
+    it("Should remove the exact requested dataset after adding two datasets", async () => {
+        const id1: string = "courses";
+        const id2: string = "engl";
+        await insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses);
+        await insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses);
+        await expectFulfilled(insightFacade.removeDataset(id1), id1);
+        const ds: InsightDataset[] = await insightFacade.listDatasets();
+        expect(ds.length).to.equal(1);
+        expect(ds[0].id).to.equal(id2);
+    });
 
-    // it("Should reject with NotFoundError on valid but nonexistent id both before and after adding a valid dataset",
-    //     async () => {
-    //         const validNonexistentId: string = "valid";
-    //         const existentId: string = "courses";
-    //         await expectRejected(insightFacade.removeDataset(validNonexistentId), NotFoundError);
-    //         await insightFacade.addDataset(existentId, datasets[existentId], InsightDatasetKind.Courses);
-    //         await expectRejected(insightFacade.removeDataset(validNonexistentId), NotFoundError);
-    //     });
+    it("Should reject with NotFoundError on valid but nonexistent id both before and after adding a valid dataset",
+        async () => {
+            const validNonexistentId: string = "valid";
+            const existentId: string = "courses";
+            await expectRejected(insightFacade.removeDataset(validNonexistentId), NotFoundError);
+            await insightFacade.addDataset(existentId, datasets[existentId], InsightDatasetKind.Courses);
+            await expectRejected(insightFacade.removeDataset(validNonexistentId), NotFoundError);
+        });
 
-    // it("Should allow dataset to be added again after removing it",
-    //     async () => {
-    //         const id: string = "courses";
-    //         const expected: string[] = [id];
-    //         await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-    //         await insightFacade.removeDataset(id);
-    //         await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
-    //     });
+    it("Should allow dataset to be added again after removing it",
+        async () => {
+            const id: string = "courses";
+            const expected: string[] = [id];
+            await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+            await insightFacade.removeDataset(id);
+            await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+        });
 });
 
 /*
