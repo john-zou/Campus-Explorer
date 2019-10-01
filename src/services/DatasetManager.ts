@@ -32,11 +32,7 @@ export class DatasetManager implements IDatasetManager {
             throw new InsightError("There is already a dataset with give ID in the list");
         }
         // call dataparser
-        try {
-            this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
-        } catch (err) {
-            throw err;
-        }
+        this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
     }
 
     public async removeDataset(id: string): Promise<string> {

@@ -323,6 +323,11 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
             await insightFacade.removeDataset(id);
             await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
         });
+
+    it("This is just to clear the cache",
+        async () => {
+            return;
+        });
 });
 
 /*
