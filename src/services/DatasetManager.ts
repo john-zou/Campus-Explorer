@@ -6,10 +6,12 @@ import { Factory } from "./Factory";
 import Log from "../Util";
 import Insight from "../util/Insight";
 import { remove } from "fs-extra";
+import { strict } from "assert";
 
 export class DatasetManager implements IDatasetManager {
     private dataParser: IDataParser;
     private parsedDatasets: IParsedData[] = [];
+
     public get datasetIds(): string[] {
         return this.parsedDatasets.map((d: IParsedData) => d.id);
     }
@@ -54,8 +56,20 @@ export class DatasetManager implements IDatasetManager {
         return id;
     }
 
-    public async listDatasets(): Promise<InsightDataset[]> {
+    // Might be slow because it returns more information than is requested
+    public async listDatasetsOld(): Promise<InsightDataset[]> {
         return this.parsedDatasets;
+    }
+
+    public async listDatasets(): Promise<InsightDataset[]> {
+        let ret: InsightDataset[] = [];
+        for (const dataset of this.parsedDatasets) {
+            const strictlyInsightDataset: InsightDataset = {
+                id: dataset.id, kind: dataset.kind, numRows: dataset.numRows
+            };
+            ret.push(strictlyInsightDataset);
+        }
+        return ret;
     }
 
     public async getData(id: string): Promise<IParsedData> {

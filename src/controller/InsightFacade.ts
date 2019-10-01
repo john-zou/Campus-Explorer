@@ -54,6 +54,16 @@ export default class InsightFacade implements IInsightFacade {
 
     }
 
+    // Old version that returns IParsedData[]
+    public async listDatasetsOld(): Promise<InsightDataset[]> {
+        try {
+            return await this.datasetManager.listDatasets();
+        } catch (err) {
+            return Promise.reject(err);
+        }
+    }
+
+    //
     public async listDatasets(): Promise<InsightDataset[]> {
         try {
             return await this.datasetManager.listDatasets();
