@@ -8,18 +8,17 @@ import { parseSectionsFromFile } from "./DataParsingFunctions";
 
 export class DataParser implements IDataParser {
     public async parseDatasetZip(id: string, content: string, kind: InsightDatasetKind): Promise<IParsedData> {
-        let courses: JSZip;
         if (id === null || content === null) {
             return Insight.Error("Null arguments");
         }
         try {
             const zip: JSZip = await JSZip.loadAsync(content, { base64: true });
-            courses = zip.folder("courses");
-            let files: any[] = Object.values(courses.files);
+            const courses: JSZip = zip.folder("courses");
+            let files: JSZip.JSZipObject[] = Object.values(courses.files);
             if (files.length === 0) {
                 return Insight.Error("No files in courses folder");
             }
-            const parsedData: IParsedData = this.parseFiles(id, files);
+            const parsedData: IParsedData = await this.parseFiles(id, files);
             if (parsedData.numRows === 0) {
                 return Insight.Error("No valid sections");
             } else {
@@ -30,10 +29,13 @@ export class DataParser implements IDataParser {
         }
     }
 
-    private parseFiles(id: string, files: any[]): IParsedData {
+    private async parseFiles(id: string, files: JSZip.JSZipObject[]): Promise<IParsedData> {
         const parsedData: ParsedCoursesData = new ParsedCoursesData(id);
-        for (const file in files) {
-            parseSectionsFromFile(file, parsedData);
+        for (const file of files) {
+            try { await parseSectionsFromFile(file, parsedData);
+            } catch (err) { // from JSON parsing
+                continue;
+            }
         }
         return parsedData;
     }

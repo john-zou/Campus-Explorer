@@ -29,10 +29,10 @@ export class DatasetManager implements IDatasetManager {
         }
         // call dataparser
         this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
-        return Promise.resolve();
+        return;
     }
 
-    public removeDataset(id: string): Promise<string> {
+    public async removeDataset(id: string): Promise<string> {
         // check if id is null or undefined
         if (id  === null || id === undefined) {
             return Insight.Error("Null or undefined argument");
@@ -48,11 +48,11 @@ export class DatasetManager implements IDatasetManager {
         // remove from parsedData
         this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
         // return resolved
-        return Promise.resolve(id);
+        return id;
     }
 
-    public listDatasets(): Promise<InsightDataset[]> {
-        return Promise.resolve(this.parsedDatasets);
+    public async listDatasets(): Promise<InsightDataset[]> {
+        return this.parsedDatasets;
     }
 
     public getData(id: string): IParsedData {
