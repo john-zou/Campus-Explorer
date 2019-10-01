@@ -17,7 +17,6 @@ export default class InsightFacade implements IInsightFacade {
 
     constructor() {
         // Log.trace("InsightFacadeImpl::init()");
-
         this.datasetManager = Factory.getDatasetManager();
         this.queryPerformer = Factory.getQueryPerformer();
         // Log.trace("InsightFacade constructor: dependencies injected.");
@@ -28,27 +27,19 @@ export default class InsightFacade implements IInsightFacade {
         return this.datasetManager.datasetIds;
     }
 
-    public removeDataset(id: string): Promise<string> {
-        return this.datasetManager.removeDataset(id);
+    public async removeDataset(id: string): Promise<string> {
+        return await this.datasetManager.removeDataset(id);
     }
 
-    public performQuery(query: any): Promise <any[]> {
+    public async performQuery(query: any): Promise <any[]> {
         // for each section in ordered array
         //   if (filter(section, queryfilter))
         //     build new object, add to results array
-        return this.queryPerformer.performQuery(query,
+        return await this.queryPerformer.performQuery(query,
             this.datasetManager.getAllData(), this.datasetManager.datasetIds);
     }
 
-    public listDatasets(): Promise<InsightDataset[]> {
-        return this.datasetManager.listDatasets();
+    public async listDatasets(): Promise<InsightDataset[]> {
+        return await this.datasetManager.listDatasets();
     }
-
-    // Some helper functions we will (probably) need
-
-    //  Check to see if a query is valid
-    private validateQuery(query: any): boolean {return true; }
-
-    // Check to see if a section meets given criteria
-    private filter(section: any, criteria: any): boolean {return true; }
 }
