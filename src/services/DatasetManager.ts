@@ -27,7 +27,7 @@ export class DatasetManager implements IDatasetManager {
         }
         // check if dataset is in our list
         if (this.datasetIds.includes(id)) {
-            throw new InsightError("There is already a dataset with give ID in the list");
+            throw new InsightError("There is already a dataset with given ID in the list");
         }
         // call dataparser
         this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
