@@ -23,9 +23,12 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        throw new InsightError("TIMEOUT!");
-        // await this.datasetManager.addDataset(id, content, kind);
-        // return this.datasetManager.datasetIds;
+        try {
+            await this.datasetManager.addDataset(id, content, kind);
+        } catch (err) {
+            throw err;
+        }
+        return this.datasetManager.datasetIds;
     }
 
     public async removeDataset(id: string): Promise<string> {

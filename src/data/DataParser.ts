@@ -25,9 +25,8 @@ export class DataParser implements IDataParser {
             } else {
                 return parsedData;
             }
-        } catch (err) {
-            throw err;
-            // throw new InsightError(`Zip file failed to load: ${id}`);
+        } catch (err) { // TODO: fix this... right now it swallows the errors in Try block
+            throw new InsightError(`Zip file failed to load: ${id}`);
         }
     }
 
