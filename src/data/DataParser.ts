@@ -12,28 +12,31 @@ export class DataParser implements IDataParser {
         if (id === null || content === null) {
             throw new InsightError("Null arguments");
         }
+        let zip: JSZip;
         try {
-            const zip: JSZip = await JSZip.loadAsync(content, { base64: true });
-            const courses: JSZip = zip.folder("courses");
-            let files: JSZip.JSZipObject[] = Object.values(courses.files);
-            if (files.length === 0) {
-                throw new InsightError("No files in courses folder");
-            }
-            const parsedData: IParsedData = await this.parseFiles(id, files);
-            if (parsedData.numRows === 0) {
-                throw new InsightError("No valid sections");
-            } else {
-                return parsedData;
-            }
-        } catch (err) { // TODO: fix this... right now it swallows the errors in Try block
+            zip = await JSZip.loadAsync(content, { base64: true });
+        } catch (err) {
             throw new InsightError(`Zip file failed to load: ${id}`);
+        }
+        const courses: JSZip = zip.folder("courses");
+        let files: JSZip.JSZipObject[] = Object.values(courses.files);
+        if (files.length === 0) {
+            throw new InsightError("No files in courses folder");
+        }
+        let parsedData: IParsedData;
+        parsedData = await this.parseFiles(id, files);
+        if (parsedData.numRows === 0) {
+            throw new InsightError("No valid sections");
+        } else {
+            return parsedData;
         }
     }
 
     private async parseFiles(id: string, files: JSZip.JSZipObject[]): Promise<IParsedData> {
         const parsedData: ParsedCoursesData = new ParsedCoursesData(id);
         for (const file of files) {
-            try { await parseSectionsFromFile(file, parsedData);
+            try {
+                await parseSectionsFromFile(file, parsedData);
             } catch (err) { // from JSON parsing
                 // Log.trace(err);
                 continue;
