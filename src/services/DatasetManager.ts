@@ -58,11 +58,11 @@ export class DatasetManager implements IDatasetManager {
         return this.parsedDatasets;
     }
 
-    public getData(id: string): IParsedData {
+    public async getData(id: string): Promise<IParsedData> {
         return this.parsedDatasets.find((d: IParsedData) => d.id === id);
     }
 
-    public getAllData(): IParsedData[] {
+    public async getAllData(): Promise<IParsedData[]> {
         return this.parsedDatasets;
     }
 

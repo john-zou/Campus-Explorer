@@ -16,8 +16,8 @@ export interface IDatasetManager {
      *  returns first instance of dataset with given id
      *  returns undefined if does not exist
      */
-    getData(id: string): IParsedData;
+    getData(id: string): Promise<IParsedData>;
 
     // Returns all Datasets as an IParsedData array
-    getAllData(): IParsedData[];
+    getAllData(): Promise<IParsedData[]>;
 }
