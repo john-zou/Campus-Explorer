@@ -16,31 +16,16 @@ export default class InsightFacade implements IInsightFacade {
     private queryPerformer: IQueryPerformer;
 
     constructor() {
-        Log.trace("InsightFacadeImpl::init()");
+        // Log.trace("InsightFacadeImpl::init()");
 
         this.datasetManager = Factory.getDatasetManager();
         this.queryPerformer = Factory.getQueryPerformer();
-        Log.trace("InsightFacade constructor: dependencies injected.");
+        // Log.trace("InsightFacade constructor: dependencies injected.");
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         await this.datasetManager.addDataset(id, content, kind);
-        return Promise.resolve(this.datasetManager.datasetIds);
-
-        // let courses: JSZip;
-
-        // if (id === null || content === null) {
-        //     return this.IE("Null arguments");
-        // }
-        // return JSZip.loadAsync(content, {base64: true}).then((zip: JSZip) => {
-        //     courses = zip.folder("courses");
-        //     let files: any = Object.values(courses.files);
-        //     if (files.length === 0) {
-        //         return this.IE("No files in courses folder"); // TODO: put in helper function
-        //     }
-        // }).catch ((err: any) => {
-        //     return this.IE(`Zip file failed to load: ${id}`);
-        // });
+        return this.datasetManager.datasetIds;
     }
 
     public removeDataset(id: string): Promise<string> {

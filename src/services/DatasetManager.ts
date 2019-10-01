@@ -21,15 +21,18 @@ export class DatasetManager implements IDatasetManager {
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<void> {
         // check if id or content is null/undefined
         if (id === null || content === null || id === undefined || content === undefined) {
-            return Insight.Error("Null argument(s)");
+            throw new InsightError("Null argument(s)");
         }
         // check if dataset is in our list
         if (this.datasetIds.includes(id)) {
-            return Insight.Error("There is already a dataset with give ID in the list");
+            throw new InsightError("There is already a dataset with give ID in the list");
         }
         // call dataparser
-        this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
-        return;
+        try {
+            this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
+        } catch (err) {
+            throw err;
+        }
     }
 
     public async removeDataset(id: string): Promise<string> {

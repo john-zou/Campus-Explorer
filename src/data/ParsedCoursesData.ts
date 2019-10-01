@@ -1,6 +1,7 @@
 import { IParsedData } from "./IParsedData";
 import { ISection } from "./ISection";
 import { InsightDatasetKind } from "../controller/IInsightFacade";
+import Log from "../Util";
 
 export class ParsedCoursesData implements IParsedData {
     private mdata: ISection[] = [];

@@ -23,16 +23,17 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     // Reference any datasets you've added to test/data here and they will
     // automatically be loaded in the 'before' hook.
     const datasetsToLoad: { [id: string]: string } = {
+        simpleGood: "./test/data/simpleGood.zip",
         courses: "./test/data/courses.zip",
-        // engl: "./test/data/engl.zip",
+        engl: "./test/data/engl.zip",
         bad: "./test/data/bad.zip",
-        // goodButHasInvalidFiles: "./test/data/goodButHasInvalidFiles.zip",
-        // noCoursesFolder: "./test/data/noCoursesFolder.zip",
-        // noFilesInCoursesFolder: "./test/data/noFilesInCoursesFolder.zip",
-        // oneBadValidJsonFile: "./test/data/oneBadValidJsonFile.zip",
-        // noSections: "./test/data/noSections.zip",
-        // oneBadValidJsonFileKey: "./test/data/oneBadValidJsonFileKey.zip",
-        // invalidSectionsOneValid: "./test/data/invalidSectionsOneValid.zip"
+        goodButHasInvalidFiles: "./test/data/goodButHasInvalidFiles.zip",
+        noCoursesFolder: "./test/data/noCoursesFolder.zip",
+        noFilesInCoursesFolder: "./test/data/noFilesInCoursesFolder.zip",
+        oneBadValidJsonFile: "./test/data/oneBadValidJsonFile.zip",
+        noSections: "./test/data/noSections.zip",
+        oneBadValidJsonFileKey: "./test/data/oneBadValidJsonFileKey.zip",
+        invalidSectionsOneValid: "./test/data/invalidSectionsOneValid.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -69,27 +70,41 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     });
 
     // This is a unit test. You should create more like this!
-    it("Should add a valid dataset", function () {
+    it("Should add a valid dataset", async function () {
         const id: string = "courses";
         const expected: string[] = [id];
-        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
-            expect(result).to.deep.equal(expected);
-        }).catch((err: any) => {
-            expect.fail(err, expected, "Should not have rejected");
-        });
+        let result;
+        try {
+            result = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            throw err;
+        }
+        expect(result).to.deep.equal(expected);
     });
 
-    // it("Should reject with InsightError on invalid id", async () => {
-    //     const id: string = "classes";
-    //     const id1: string = "_";
-    //     const id2: string = " ";
-    //     const id3: string = "aaa_";
-    //     const id4: string = "_aaa";
-    //     await expectRejected(insightFacade.addDataset(id1, datasets[id], InsightDatasetKind.Courses), InsightError);
-    //     await expectRejected(insightFacade.addDataset(id2, datasets[id], InsightDatasetKind.Courses), InsightError);
-    //     await expectRejected(insightFacade.addDataset(id3, datasets[id], InsightDatasetKind.Courses), InsightError);
-    //     await expectRejected(insightFacade.addDataset(id4, datasets[id], InsightDatasetKind.Courses), InsightError);
-    // });
+    it("Should add the simpleGood dataset", async function () {
+        const id: string = "simpleGood";
+        const expected: string[] = [id];
+        let result;
+        try {
+            result = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        } catch (err) {
+            throw err;
+        }
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("Should reject with InsightError on invalid id", async () => {
+        const id: string = "classes";
+        const id1: string = "_";
+        const id2: string = " ";
+        const id3: string = "aaa_";
+        const id4: string = "_aaa";
+        await expectRejected(insightFacade.addDataset(id1, datasets[id], InsightDatasetKind.Courses), InsightError);
+        await expectRejected(insightFacade.addDataset(id2, datasets[id], InsightDatasetKind.Courses), InsightError);
+        await expectRejected(insightFacade.addDataset(id3, datasets[id], InsightDatasetKind.Courses), InsightError);
+        await expectRejected(insightFacade.addDataset(id4, datasets[id], InsightDatasetKind.Courses), InsightError);
+    });
 
     // helper functions
     let expectFulfilled = (p: Promise<any>, expected: any) =>

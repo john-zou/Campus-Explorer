@@ -1,21 +1,37 @@
 import { ParsedCoursesData } from "./ParsedCoursesData";
 import { KeyMap } from "../query_schema/KeyMap";
 import { Section } from "./Section";
-import { isDeepStrictEqual } from "util";
 import { ISection } from "./ISection";
+import JSZip = require("jszip");
+import Log from "../Util";
 
-export function parseSectionsFromFile(file: any, parsedData: ParsedCoursesData): void {
-    // Check if it's an array
-    if (!Array.isArray(file)) {
-        return;
+export async function parseSectionsFromFile(file: JSZip.JSZipObject, parsedData: ParsedCoursesData): Promise<void> {
+    const jsonString: string = await file.async("text");
+    const json: any = JSON.parse(jsonString);
+    // Check if it has exactly two keys (expecting result and rank)
+    if (json == null || typeof json !== "object") {
+        throw new Error("JSON.parse returned a non-object");
     }
+    if (Object.keys(json).length !== 2) {
+        throw new Error("Current file does not have exactly 2 keys");
+    }
+    // Check if it has the "result" key
+    if (Object.keys(json)[0] !== "result") {
+        throw new Error("Current file does not have 'result' key");
+    }
+    // Check if it's an array
+    if (!Array.isArray(json.result)) {
+        throw new Error("Result value is not an array");
+    }
+    // Log.trace(json.result);
     // For each item in the array, try to parse it as a section
-    for (const item in file) {
-        parseSectionFromFile(item, parsedData);
+    for (const potentialSection of json.result) {
+        // Log.trace(JSON.stringify(potentialSection));
+        parseSection(potentialSection, parsedData);
     }
 }
 
-export function parseSectionFromFile(json: any, parsedData: ParsedCoursesData): void {
+export function parseSection(json: any, parsedData: ParsedCoursesData): void {
     if (isValidSection(json)) {
         const newSection: ISection = Section.fromValidSectionData(json);
         parsedData.addSection(newSection);
@@ -25,13 +41,16 @@ export function parseSectionFromFile(json: any, parsedData: ParsedCoursesData): 
 export function isValidSection(json: any): boolean {
     // Check if it's an object
     if (json == null || typeof json !== "object") {
+        // Log.trace("Not an object");
         return false;
     }
     // Check for the presence of all necessary keys:
     const keysInJson: string[] = Object.keys(json);
+    // Log.trace(keysInJson.toString());
     const requiredKeys: string[] = Object.values(KeyMap);
-    for (const key in requiredKeys) {
+    for (const key of requiredKeys) {
         if (!keysInJson.includes(key)) {
+            // Log.trace(`Missing a key: ${key}`);
             return false;
         }
     }
