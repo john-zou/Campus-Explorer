@@ -27,13 +27,17 @@ export default class InsightFacade implements IInsightFacade {
             await this.datasetManager.addDataset(id, content, kind);
             return this.datasetManager.datasetIds;
         } catch (err) {
-            throw err;
+            return Promise.reject(err);
         }
     }
 
     public async removeDataset(id: string): Promise<string> {
         // throw new InsightError("TIMEOUT!");
-        return await this.datasetManager.removeDataset(id);
+        try {
+            return await this.datasetManager.removeDataset(id);
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
 
     public async performQuery(query: any): Promise <any[]> {
@@ -46,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public async listDatasets(): Promise<InsightDataset[]> {
-        // throw new InsightError("TIMEOUT!");
+        throw new InsightError("TIMEOUT!");
         return await this.datasetManager.listDatasets();
     }
 }
