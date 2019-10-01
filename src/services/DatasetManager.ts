@@ -1,5 +1,5 @@
 import { IDatasetManager } from "./IDatasetManager";
-import { InsightDatasetKind, InsightDataset, InsightError } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightDataset, InsightError, NotFoundError } from "../controller/IInsightFacade";
 import { IParsedData } from "../data/IParsedData";
 import { IDataParser } from "../data/IDataParser";
 import { Factory } from "./Factory";
@@ -38,15 +38,15 @@ export class DatasetManager implements IDatasetManager {
     public async removeDataset(id: string): Promise<string> {
         // check if id is null or undefined
         if (id  === null || id === undefined) {
-            return Insight.Error("Null or undefined argument");
+            throw new InsightError("Null or undefined argument");
         }
         // check if valid id
         if (this.isInvalidId(id)) {
-            return Insight.Error("Invalid Error");
+            throw new InsightError("Invalid ID");
         }
         // check if dataset in datasetIDs
         if (!this.datasetIds.includes(id)) {
-            return Insight.NotFound("ID not in dataset");
+            throw new NotFoundError("ID not in dataset");
         }
         // remove from parsedData
         this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
