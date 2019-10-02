@@ -9,9 +9,6 @@ export function validateOptions(options: any, datasetIds: string[]): [F, string]
         return [F.WrongType_Options, null];
     }
     // Check that options contains column key
-    if (Object.keys(options).length === 0) {
-        return [F.MissingColumns, null];
-    }
     if (!Object.keys(options).includes("COLUMNS")) {
         return [F.MissingColumns, null];
     }
@@ -23,13 +20,14 @@ export function validateOptions(options: any, datasetIds: string[]): [F, string]
         if (hasTooManyKeys(options, 2)) {
             return [F.TooManyKeys_Options, null];
         }
-    } else {
+    } else { // COLUMNS must be the only key
         if (hasTooManyKeys(options, 1)) {
             return [F.TooManyKeys_Options, null];
         }
     }
     const columnsValidationResult: [F, string, string[]] =
-        this.validateColumns(options.COLUMNS, datasetIds);
+        validateColumns(options.COLUMNS, datasetIds);
+        // Maggie <3
     const columnsValidationResultFlag: F = columnsValidationResult[0];
     if (columnsValidationResultFlag !== F.Valid) {
         return [columnsValidationResultFlag, null];
@@ -40,7 +38,7 @@ export function validateOptions(options: any, datasetIds: string[]): [F, string]
         const columnFields: string[] = columnsValidationResult[2];
         const order: any = options.ORDER;
         const orderValidationResult: F =
-            this.validateOrder(order, columnsValidationResultId, datasetIds, columnFields);
+            validateOrder(order, columnsValidationResultId, datasetIds, columnFields);
         if (orderValidationResult !== F.Valid) {
             return [orderValidationResult, null];
         }
@@ -49,27 +47,38 @@ export function validateOptions(options: any, datasetIds: string[]): [F, string]
         return [columnsValidationResultFlag, columnsValidationResultId];
     }
 }
-export function validateOrder(order: any, cid: string, ids: string[], fields: string[]): F {
-    if (order == null || typeof order !== "string") {
+
+// the datasetIds are passed for more descriptive invalid result flag
+export function validateOrder(orderValue: any,
+                              idFromColumns: string,
+                              datasetIds: string[],
+                              fieldsFromColumns: string[]): F {
+    if (orderValue == null || typeof orderValue !== "string") {
         return F.WrongType_Order;
     }
-    const parseResult: [F, string, string] = parseKeystring(order);
+    const parseResult: [F, string, string] = parseKeystring(orderValue);
     const parseResultFlag: F = parseResult[0];
     if (parseResultFlag !== F.Valid) {
         return parseResultFlag;
     }
-    const id: string = parseResult[1];
-    if (!ids.includes(id)) {
+    const idString: string = parseResult[1];
+    if (idString.length === 0) {
+        return F.NoIdstring;
+    }
+    if (!datasetIds.includes(idString)) {
         return F.IdDoesNotExist;
     }
-    if (id !== cid) {
+    if (idString !== idFromColumns) {
         return F.MoreThanOneId;
     }
     const field: string = parseResult[2];
-    if (SFields.includes(field) || MFields.includes(field)) {
+    if (field.length === 0) {
+        return F.EmptyField;
+    }
+    if (!(SFields.includes(field) || MFields.includes(field))) {
         return F.OrderContainsInvalidField;
     }
-    if (!fields.includes(field)) {
+    if (!fieldsFromColumns.includes(field)) {
         return F.OrderContainsFieldNotInColumns;
     }
     // Otherwise, the order is fine
@@ -86,25 +95,29 @@ export function validateColumns(cols: any, datasetIds: string[]): [F, string, st
         return [F.ColumnsIsNotNonEmptyArray, null, null];
     }
     // Return the result of checking each string
-    return this.validateColumnStrings(cols, datasetIds);
+    return validateColumnStrings(cols, datasetIds);
 }
 
+/**
+ * @param cols must be a non-empty array (otherwise it may give wrong invalid flag (but daijoubu))
+ */
 export function validateColumnStrings(cols: any[], datasetIds: string[]): [F, string, string[]] {
     // Check the first item
     const firstItem: any = cols[0];
     if (firstItem == null || typeof firstItem !== "string") {
         return [F.ColumnsContainsWrongType, null, null];
     }
-    const firstResult: [F, string, string] = this.validateColumnString(firstItem, datasetIds);
+    const firstResult: [F, string, string] = validateColumnString(firstItem, datasetIds);
     const firstResultFlag: F = firstResult[0];
     if (firstResult[0] !== F.Valid) {
         return [firstResultFlag, null, null];
     }
+    // The field is guaranteed to be in MFields or SFields
     const firstId: string = firstResult[1];
-    let fieldsArray: string[] = [firstId];
+    let fields: string[] = [firstId];
     // Iterate through the rest
     for (let i = 1; i < cols.length; ++i) {
-        const result: [F, string, string] = this.validateColumnString(cols[i], datasetIds);
+        const result: [F, string, string] = validateColumnString(cols[i], datasetIds);
         const resultFlag: F = result[0];
         if (resultFlag !== F.Valid) {
             return [resultFlag, null, null];
@@ -114,11 +127,11 @@ export function validateColumnStrings(cols: any[], datasetIds: string[]): [F, st
             return [F.MoreThanOneId, null, null];
         }
         const resultField: string = result[2];
-        if (!fieldsArray.includes(resultField)) {
-            fieldsArray.push(resultField);
+        if (!fields.includes(resultField)) {
+            fields.push(resultField);
         }
     }
-    return [F.Valid, firstId, fieldsArray];
+    return [F.Valid, firstId, fields];
 }
 
 export function validateColumnString(str: string, datasetIds: string[]): [F, string, string] {
@@ -128,10 +141,16 @@ export function validateColumnString(str: string, datasetIds: string[]): [F, str
         return [parseResultFlag, null, null];
     }
     const id: string = parseResult[1];
+    if (id.length === 0) {
+        return [F.NoIdstring, null, null];
+    }
     if (!datasetIds.includes(id)) {
         return [F.IdDoesNotExist, null, null];
     }
     const field: string = parseResult[2];
+    if (field.length === 0) {
+        return [F.EmptyField, null, null];
+    }
     if (!(SFields.includes(field) || MFields.includes(field))) {
         return [F.ColumnContainsInvalidField, null, null];
     }
