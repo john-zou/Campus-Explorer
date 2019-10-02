@@ -9,6 +9,9 @@ import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
     private queryWhere: any;
+    private MCOMPARISON: string[] = ["LT", "GT", "EQ"];
+    private SCOMPARISON: string[] = ["IS"];
+    private LOGIC: string[] = ["AND", "OR"];
 
     public constructor(queryValidator: IQueryValidator = Factory.getQueryValidator()) {
         this.queryValidator = queryValidator;
@@ -58,15 +61,36 @@ export class QueryPerformer implements IQueryPerformer {
 
     // Returns if data is in where, wrapper for recursive function
     private filterWhere (parsedData: any): boolean {
-        return this.filterWhereRec(parsedData, this.queryWhere);
+        return this.whereFilter(parsedData, this.queryWhere);
     }
 
-    private filterWhereRec (parsedData: any, where: any): boolean {
-        return true;
-        // pseudo code
-        // if (leaf in where)
-        //  return true or false
-        // else
-        //  some logical combination of filterWhereRec calls on children
+    private whereFilter (parsedData: any, filter: any): boolean {
+        // Case breakdown - written in nested ifs for clarity
+        // Logic comparison
+        let mode: string = Object.keys(filter)[0];
+        if (this.LOGIC.includes(mode)) {
+            if (mode === "OR") {
+                return this.whereFilter(parsedData, filter.OR[0]) || this.whereFilter(parsedData, filter.OR[1]);
+            }
+            if (mode === "AND") {
+                return this.whereFilter(parsedData, filter.OR[0]) && this.whereFilter(parsedData, filter.OR[1]);
+            }
+        }
+        // MComparison
+        if (this.MCOMPARISON.includes(mode)) {
+            return this.whereMcomp(parsedData, filter[mode]);
+        }
+        // SComparison
+        if (this.SCOMPARISON.includes(mode)) {
+            return this.whereScomp(parsedData, filter[mode]);
+        }
+    }
+
+    private whereMcomp (parsedData: any, mcomp: string): boolean {
+        return true; // stub
+    }
+
+    private whereScomp (parsedData: any, scomp: string): boolean {
+        return true; // stub
     }
 }
