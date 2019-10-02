@@ -91,6 +91,8 @@ export function validateSComparison(sc: any, datasetIds: string[]): [F, string] 
 }
 
 export function validateSValue(value: string): F {
+    // SValue is optional * ++ inputstring ++ optional *
+    // inputstring ::= [^*]* // Zero or more of any character, except asterisk.
     for (let i = 1; i < value.length - 1; ++i) {
         if (value[i] === "*") {
             return F.SValueContainsInternalAsterisk;
@@ -143,6 +145,9 @@ export function parseKeystring(str: string): [F, string, string] {
     if (ss.length > 2) {
         return [F.TooManyUnderscores, null, null];
     }
+    if (ss[0].length === 0) {
+        return [F.NoIdstring, null, null];
+    } // Idstring must have one or more of any character
     return [F.Valid, ss[0], ss[1]];
 }
 

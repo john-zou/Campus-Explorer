@@ -45,7 +45,7 @@ export class DatasetManager implements IDatasetManager {
         return id;
     }
 
-    // Might be slow because it returns more information than is requested
+    // Causes timeout for autobot d1
     public async listDatasetsOld(): Promise<InsightDataset[]> {
         return this.parsedDatasets;
     }

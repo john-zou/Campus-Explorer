@@ -13,6 +13,12 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
     const idStrings: string[] = ["test"];
 
     // helper
+    /**
+     * Runs QueryValidator's validate function on the query, and compares
+     * its result's flag to the expected result flag.
+     * @param q query
+     * @param res expected result flag
+     */
     const t = (q: any, res: R): void => {
         expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res);
     };
@@ -305,26 +311,4 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
         };
         t(q, R.WrongKey_Filter);
     });
-});
-
-describe("QueryValidator Tests: Sane Invalid Query: ID problems", () => {
-    const v: QueryValidator = new QueryValidator();
-    const idStrings: string[] = ["test1", "test2"];
-
-    // helper
-    const t = (q: any, res: R): void => {
-        expect(v.validate(q, idStrings, InsightDatasetKind.Courses).Result).to.equal(res);
-    };
-
-    it("multiple valid IDs", async () => {
-        // todo (low priority)
-    });
-});
-
-describe("QueryValidator Tests: Sane Invalid Query: Column Problems", () => {
-    // todo (low priority)
-});
-
-describe("QueryValidator Tests: Sane Invalid Query: Too many results", () => {
-    // todo (low priority)
 });

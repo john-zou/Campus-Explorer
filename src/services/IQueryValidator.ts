@@ -38,7 +38,9 @@ export enum QueryValidationResultFlag {
     SValueContainsInternalAsterisk,
     WrongType_Order,
     HasNoKeys_MComparison,
-    HasNoKeys_SComparison
+    HasNoKeys_SComparison,
+    IdStringIsAllWhitespace,
+    SValueIsEmptyString
 }
 
 export class QueryValidationResult {
