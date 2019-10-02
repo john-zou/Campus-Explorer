@@ -86,3 +86,18 @@ describe("Perform Query Tests", () => {
                                      { courses_dept: "spph", courses_avg: 98.98 }]);
     });
 });
+describe("Where Testing", () => {
+    // ONLY tests valid queries
+    // Constructing a new IParsedData to use in testing
+    before(() => {
+        // Runs once, before any "beforeEach"
+    });
+
+    beforeEach(() => {
+        // do something
+    });
+
+    it("Should do something", async () => {
+        // do something
+    });
+});
