@@ -20,7 +20,7 @@ export class QueryPerformer implements IQueryPerformer {
             this.queryValidator.validate(queryIn, datasetsIDs, InsightDatasetKind.Courses);
         if (validatorResult.Result !== QueryValidationResultFlag.Valid) {
             // Invalid Query
-            return Promise.reject(new InsightError(validatorResult.Result));
+            return Promise.reject(new InsightError(QueryValidationResultFlag[validatorResult.Result]));
         }
         const id: string = validatorResult.ID;
 
