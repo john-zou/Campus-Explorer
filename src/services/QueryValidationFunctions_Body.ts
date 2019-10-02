@@ -59,6 +59,9 @@ export function validateSComparison(sc: any, datasetIds: string[]): [F, string] 
     if (this.hasTooManyKeys(sc, 1)) {
         return [F.TooManyKeys_SComparison, null];
     }
+    if (Object.keys(sc).length === 0) {
+        return [F.HasNoKeys_SComparison, null];
+    }
     const key: string = Object.keys(sc)[0];
     const parseResult: [F, string, string] = this.parseKeystring(key);
     const parseResultFlag: F = parseResult[0];
@@ -105,6 +108,9 @@ export function validateMComparison(mc: any, datasetIds: string[]): [F, string] 
     }
     if (this.hasTooManyKeys(mc, 1)) {
         return [F.TooManyKeys_MComparison, null];
+    }
+    if (Object.keys(mc).length === 0) {
+        return [F.HasNoKeys_MComparison, null];
     }
     const key: string = Object.keys(mc)[0];
     const parseResult: [F, string, string] = this.parseKeystring(key);

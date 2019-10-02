@@ -23,7 +23,9 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     // Reference any datasets you've added to test/data here and they will
     // automatically be loaded in the 'before' hook.
     const datasetsToLoad: { [id: string]: string } = {
+        validOneBadFile: "./test/data/validOneBadFile.zip",
         simpleGood: "./test/data/simpleGood.zip",
+        simpleGoodWithBadSections: "./test/data/simpleGoodWithBadSections.zip",
         courses: "./test/data/courses.zip",
         engl: "./test/data/engl.zip",
         bad: "./test/data/bad.zip",
@@ -137,6 +139,19 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
         await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
         await expectFulfilled(insightFacade.addDataset(id3, datasets[id3], InsightDatasetKind.Courses), expected3);
+    });
+
+    it("Should add a valid dataset with 1 valid section inside a file with invalid sections", async () => {
+        const id: string = "simpleGoodWithBadSections";
+        const expected: string[] = [id];
+        await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+    });
+
+    it("Should add a valid dataset with 1 valid section inside a file with invalid sections, and one bad file",
+    async () => {
+        const id: string = "validOneBadFile";
+        const expected: string[] = [id];
+        await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
     });
 
     it("Should add a valid dataset despite all flavors of invalid sections because some are valid", async () => {
@@ -260,12 +275,13 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         }
     );
 
-    it("Should reject with InsightError on valid id and dataset, but mismatched InsightDatasetKind",
-        async () => {
-            const id: string = "courses";
-            await expectRejected(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms), InsightError);
-        }
-    );
+    // Not applicable for d1:
+    // it("Should reject with InsightError on valid id and dataset, but mismatched InsightDatasetKind",
+    //     async () => {
+    //         const id: string = "courses";
+    //         await expectRejected(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms), InsightError);
+    //     }
+    // );
 
     it("Should reject with InsightError on valid dataset added twice",
         async () => {

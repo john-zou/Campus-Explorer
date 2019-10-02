@@ -36,7 +36,9 @@ export enum QueryValidationResultFlag {
     OrderContainsFieldNotInColumns,
     SValueNotAString,
     SValueContainsInternalAsterisk,
-    WrongType_Order
+    WrongType_Order,
+    HasNoKeys_MComparison,
+    HasNoKeys_SComparison
 }
 
 export class QueryValidationResult {
