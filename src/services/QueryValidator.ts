@@ -4,19 +4,10 @@ import { validateFilter, parseKeystring, hasTooManyKeys, isMissingKey } from "./
 import { validateOptions } from "./QueryValidationFunctions_Options";
 
 export class QueryValidator implements IQueryValidator {
+    // tslint:disable-next-line: max-func-body-length
     public validate(json: any, datasetIds: string[], kind: InsightDatasetKind): R {
-        if (json == null || typeof json !== "object") {
-            return new R(F.QueryIsNotAnObject);
-        }
-        if (isMissingKey(json, "WHERE")) {
-            return new R(F.MissingBody);
-        }
-        if (isMissingKey(json, "OPTIONS")) {
-            return new R(F.MissingOptions);
-        }
-        if (hasTooManyKeys(json, 2)) {
-            return new R(F.TooManyKeys_Query);
-        }
+        // Call validate from Common.ts
+
         // WrongType_Body -- BODY in EBNF is property WHERE
         const where = json.WHERE;
         if (where == null || typeof where !== "object") {
