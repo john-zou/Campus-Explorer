@@ -27,7 +27,7 @@ export default class InsightFacade implements IInsightFacade {
             await this.datasetManager.addDataset(id, content, kind);
             return this.datasetManager.datasetIds;
         } catch (err) {
-            Log.trace(`Failed to add dataset because of :${err}`);
+            Log.trace(`FAILED TO ADD DATASET: ID: ${id}, ${err}`);
             throw err;
         }
     }

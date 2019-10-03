@@ -28,6 +28,7 @@ export class DataParser implements IDataParser {
         if (parsedData.numRows === 0) {
             throw new InsightError("No valid sections");
         } else {
+            Log.trace(`SUCCESSFULLY ADDED DATASET: ID: ${parsedData.id}, numRows: ${parsedData.numRows}`);
             return parsedData;
         }
     }
