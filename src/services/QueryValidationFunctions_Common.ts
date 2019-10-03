@@ -18,7 +18,7 @@ export function validateQueryPreliminary(query: any, kind: InsightDatasetKind): 
     if (hasTransfomations) {
         maxKeys = 3;
     }
-    if (hasTooManyKeys(query, 2)) {
+    if (hasTooManyKeys(query, maxKeys)) {
         return [F.TooManyKeys_Query, false];
     }
     return [F.Valid, hasTransfomations];
