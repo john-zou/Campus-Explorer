@@ -70,7 +70,7 @@ export function isValidSection(json: any): boolean {
     const year: any = json.Year;
     return isString(dept) && isString(id) && isNumber(avg) && isString(instructor)
         && isString(title) && isNumber(pass) && isNumber (fail) && isNumber(audit)
-        && isStringAndCanBeParsedToInt(year);
+        && isString(year);
 }
 
 export function isString(x: any): boolean {
@@ -81,6 +81,7 @@ export function isNumber(x: any): boolean {
     return x != null && typeof x === "number";
 }
 
-export function isStringAndCanBeParsedToInt(x: any): boolean {
-    return isString(x) && parseInt(x, 10) !== undefined;
-}
+// Unused
+// export function isStringAndCanBeParsedToInt(x: any): boolean {
+//     return isString(x) && parseInt(x, 10) !== undefined;
+// }

@@ -3,7 +3,7 @@
 **/.idea/tasks.xml
 
 .vs/
-
+.nyc_output/
 node_modules/
 coverage/
 src/*.js
