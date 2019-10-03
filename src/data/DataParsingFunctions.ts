@@ -34,6 +34,10 @@ export async function parseSectionsFromFile(file: JSZip.JSZipObject, parsedData:
 export function parseSection(json: any, parsedData: ParsedCoursesData): void {
     if (isValidSection(json)) {
         const newSection: ISection = Section.fromValidSectionData(json);
+        // If there is a json.Section === "overall", then set the year to 1900
+        if (json.Section === "overall") {
+            newSection.year = 1900;
+        }
         parsedData.addSection(newSection);
     }
 }
