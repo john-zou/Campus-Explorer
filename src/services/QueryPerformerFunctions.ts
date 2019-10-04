@@ -7,13 +7,12 @@ export function whereFilter(parsedData: ISection, filter: ISmartFilter): boolean
     switch (filter.Type) {
         case FilterType.LogicComparison:
             return whereLComp(parsedData, filter.Filter as ILogicComparison);
-            break;
         case FilterType.MComparison:
-            break;
+            return whereMcomp(parsedData, filter.Filter as IMComparison);
         case FilterType.SComparison:
-            break;
+            return whereScomp(parsedData, filter.Filter as ISComparison);
         case FilterType.Negation:
-            break;
+            return whereNeg(parsedData, filter.Filter as INegation);
         default:
             throw new Error("Invalid Smart Query");
     }
@@ -23,20 +22,27 @@ export function whereMcomp(parsedData: ISection, mcomp: IMComparison): boolean {
     switch (mcomp.MComparator) {
         case MComparator.GT:
             return (parsedData as any)[mcomp.MField] > mcomp.Value;
-            break;
         case MComparator.LT:
             return (parsedData as any)[mcomp.MField] < mcomp.Value;
-            break;
         case MComparator.EQ:
             return (parsedData as any)[mcomp.MField] === mcomp.Value;
-            break;
         default:
             break;
     }
 }
 
 export function whereScomp(parsedData: ISection, scomp: ISComparison): boolean {
-    return true; // stub
+    let reg: RegExp;
+    if (scomp.PrefixAsterisk && scomp.PostfixAsterisk) {
+        reg = new RegExp("[*]?" + scomp.IDString + "[*]?");
+    } else if (scomp.PrefixAsterisk) {
+        reg = new RegExp("[*]?" + scomp.IDString);
+    } else if (scomp.PostfixAsterisk) {
+        reg = new RegExp(scomp.IDString + "[*]?");
+    } else {
+        reg = new RegExp(scomp.IDString);
+    }
+    return reg.test((parsedData as any)[scomp.SField]);
 }
 
 export function whereLComp(parsedData: ISection, lcomp: ILogicComparison): boolean {
@@ -49,7 +55,6 @@ export function whereLComp(parsedData: ISection, lcomp: ILogicComparison): boole
                 }
             }
             return true;
-            break;
         case Logic.OR:
             for (l of lcomp.FilterArray) {
                 if (whereFilter(parsedData, l)) {
@@ -57,7 +62,6 @@ export function whereLComp(parsedData: ISection, lcomp: ILogicComparison): boole
                 }
             }
             return false;
-            break;
         default:
             throw new Error("Invalid Smart Query");
     }
