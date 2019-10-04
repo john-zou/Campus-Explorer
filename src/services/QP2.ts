@@ -2,7 +2,7 @@ import { IQueryPerformer } from "./IQueryPerformer";
 import { IParsedData } from "../data/IParsedData";
 import { QueryValidator } from "./QueryValidator";
 import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
-import { QueryValidationResultFlag } from "./IQueryValidator";
+import { QueryValidationResultFlag, IQueryValidator } from "./IQueryValidator";
 import { SmartQuery } from "../query_schema/SmartQuery";
 import { IQuery } from "../query_schema/IQuery";
 import { ISection } from "../data/ISection";
@@ -10,9 +10,14 @@ import { ISmartFilter, FilterType, ILogicComparison, IMComparison,
     ISComparison, INegation, Logic, MField, MComparator, SField,
     ColumnType, ISmartQuery } from "../query_schema/ISmartQuery";
 import { isMatch, sortByKey } from "./StringMatch";
+import { Factory } from "./Factory";
 
 export class QP2 implements IQueryPerformer {
-    private queryValidator: QueryValidator = new QueryValidator();
+    private queryValidator: IQueryValidator;
+
+    public constructor(queryValidator: IQueryValidator = Factory.getQueryValidator()) {
+        this.queryValidator = queryValidator;
+    }
 
     public async performQuery(query: any, datasets: IParsedData[], datasetIDs: string[]): Promise<any[]> {
         const validationResult = this.queryValidator.validate(query, datasetIDs, InsightDatasetKind.Courses);
@@ -36,6 +41,10 @@ export class QP2 implements IQueryPerformer {
 
         if (sections.length > 5000) {
             throw new InsightError("Too many results");
+        }
+
+        if (sections.length === 0) {
+            return [];
         }
 
         if (q.HasOrder) {

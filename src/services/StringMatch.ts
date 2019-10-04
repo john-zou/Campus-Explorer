@@ -21,7 +21,7 @@ export function isMatch(stringFromData: string, inputStringFromQuery: string,
             return false;
         }
         for (let i = inputStringFromQuery.length - 1, j = stringFromData.length - 1; i >= 0; --i, --j) {
-            if (inputStringFromQuery[i] !== inputStringFromQuery[j]) {
+            if (inputStringFromQuery[i] !== stringFromData[j]) {
                 return false;
             }
         }

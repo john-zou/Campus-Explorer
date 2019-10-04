@@ -1,6 +1,6 @@
 import { ISmartQuery, Column, ISmartFilter, ISmartColumn, ColumnType, MField, SField} from "./ISmartQuery";
 import { buildSmartFilter, getColumns, getColumn } from "./SmartQueryBuildFunctions";
-import { IQuery, IOptionsWithOrder } from "./IQuery";
+import { IQuery, IOptionsWithOrder, IFilter } from "./IQuery";
 
 export class SmartQuery implements ISmartQuery {
     public ID: string;
@@ -23,7 +23,7 @@ export class SmartQuery implements ISmartQuery {
             s.HasFilter = false;
         } else {
             s.HasFilter = true;
-            s.Filter = buildSmartFilter(q.WHERE);
+            s.Filter = buildSmartFilter(q.WHERE as IFilter);
         }
         s.Columns = getColumns(q.OPTIONS.COLUMNS);
         if (Object.keys(q.OPTIONS).includes("ORDER")) {
