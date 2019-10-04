@@ -6,6 +6,7 @@ import { Factory } from "./Factory";
 import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
 import { NotImplementedError } from "restify";
+import { whereFilter, orderData } from "./QueryPerformerFunctions";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
@@ -36,7 +37,7 @@ export class QueryPerformer implements IQueryPerformer {
 
         // Sort dataset into given order
         if (Object.keys(query.OPTIONS).includes("ORDER")) {
-            sortedData = await this.orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
+            sortedData = await orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
         }
 
         // Set field
@@ -46,22 +47,8 @@ export class QueryPerformer implements IQueryPerformer {
         return Promise.resolve(sortedData.data.filter(this.filterWhere));
     }
 
-    // Order dataset according to parameter in order
-    private orderData (order: any, dataset: IParsedData): Promise <IParsedData> {
-        let orderKey: string = order.split("_")[1];
-        dataset.data = dataset.data.sort((a: any, b: any) => {
-            // with a little help from https://mzl.la/2ospbkN
-            if (a.orderKey === Number) {
-                return a.orderKey - b.orderKey;
-            } else {
-                return a.orderKey.toUpperCase() - b.orderKey.toUpperCase();
-            }
-        });
-        return Promise.resolve(dataset);
-    }
-
     // Returns if data is in where, wrapper for recursive function
     private filterWhere (parsedData: any): boolean {
-        return false;
+        return whereFilter(parsedData, this.queryWhere);
     }
 }
