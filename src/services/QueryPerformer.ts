@@ -7,6 +7,8 @@ import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
 import { NotImplementedError } from "restify";
 import { whereFilter, orderData } from "./QueryPerformerFunctions";
+import { ISmartQuery } from "../query_schema/ISmartQuery";
+import { SmartQuery } from "../query_schema/SmartQuery";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
@@ -29,19 +31,20 @@ export class QueryPerformer implements IQueryPerformer {
         }
         const id: string = validatorResult.ID;
 
-        let query: IQuery = queryIn;
+        const query: ISmartQuery = SmartQuery.fromValidQueryJson(id, queryIn);
+
         // Create dataset given id
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
         });
 
-        // Sort dataset into given order
-        if (Object.keys(query.OPTIONS).includes("ORDER")) {
-            sortedData = await orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
-        }
+        // // Sort dataset into given order
+        // if (Object.keys(query.Columns).includes("ORDER")) {
+        //     sortedData = await orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
+        // }
 
-        // Set field
-        this.queryWhere = query["WHERE"];
+        // // Set field
+        // this.queryWhere = query["WHERE"];
 
         // Return with filtered, ordered data
         return Promise.resolve(sortedData.data.filter(this.filterWhere));

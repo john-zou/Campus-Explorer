@@ -1,4 +1,4 @@
-import { ISmartQuery, Column, ISmartFilter} from "./ISmartQuery";
+import { ISmartQuery, Column, ISmartFilter, ISmartColumn} from "./ISmartQuery";
 import { buildSmartFilter, getColumns, getColumn } from "./SmartQueryBuildFunctions";
 import { IQuery, IOptionsWithOrder } from "./IQuery";
 
@@ -7,8 +7,8 @@ export class SmartQuery implements ISmartQuery {
     public HasFilter: boolean;
     public HasOrder: boolean;
     public Filter?: ISmartFilter;
-    public Columns: Column[];
-    public Order?: Column;
+    public Columns: ISmartColumn[];
+    public Order?: ISmartColumn;
 
     private constructor() {
         //

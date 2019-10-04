@@ -1,6 +1,6 @@
 import { ISmartFilter, Logic, MComparator, FilterType,
     ILogicComparison, IMComparison, MField, ISComparison,
-    SField, INegation, Column, mFieldFromString, sFieldFromString } from "./ISmartQuery";
+    SField, INegation, Column, mFieldFromString, sFieldFromString, ISmartColumn, ColumnType } from "./ISmartQuery";
 import { IFilter, IAnd, IOr, IGt, ILt, IEq, IIs, INot } from "./IQuery";
 import { validateColumnString } from "../services/QueryValidationFunctions_Options";
 import { mfields } from "./MFields";
@@ -100,19 +100,24 @@ export function getIdstring(scomparison: any): [string, boolean, boolean] {
     }
 }
 
-export function getColumn(col: string): Column {
+export function getColumn(col: string): ISmartColumn {
+    let smartColumn: ISmartColumn;
     const fieldStr: string = col.split("_")[1];
     if (mfields.includes(fieldStr)) {
-        return mFieldFromString(fieldStr);
+        smartColumn.Type = ColumnType.MField;
+        smartColumn.Field = mFieldFromString(fieldStr);
+        return smartColumn;
     }
     if (sfields.includes(fieldStr)) {
-        return sFieldFromString(fieldStr);
+        smartColumn.Type = ColumnType.SField;
+        smartColumn.Field = sFieldFromString(fieldStr);
+        return smartColumn;
     }
     throw new Error("Invalid field encountered while building SmartQuery");
 }
 
-export function getColumns(cols: string[]): Column[] {
-    let columns: Column[] = [];
+export function getColumns(cols: string[]): ISmartColumn[] {
+    let columns: ISmartColumn[] = [];
     for (const c of cols) {
         columns.push(getColumn(c));
     }
