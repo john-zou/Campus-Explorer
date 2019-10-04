@@ -24,7 +24,7 @@ export interface IOr {
 }
 
 export interface INot {
-    NOT: IFilter[];
+    NOT: IFilter;
 }
 
 export interface ILt {
