@@ -48,7 +48,7 @@ export function buildSComparison(scomparison: any): ISmartFilter {
     let s: ISmartFilter = new SmartFilterSComparison();
     let f: ISComparison = new SComparison();
     f.SField = getSField(scomparison) as SField;
-    [f.IDString, f.PostfixAsterisk, f.PostfixAsterisk] = getIdstring(scomparison);
+    [f.IDString, f.PrefixAsterisk, f.PostfixAsterisk] = getIdstring(scomparison);
     s.Filter = f;
     return s;
 }

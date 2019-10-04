@@ -9,6 +9,7 @@ export interface ISmartQuery {
     Columns: ISmartColumn[];
     Order?: ISmartColumn;
     HasOrder: boolean;
+    OrderString?: string;
 }
 
 export enum MComparator {
