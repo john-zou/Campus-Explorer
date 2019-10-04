@@ -2,19 +2,22 @@ import { IQueryValidator, QueryValidationResult as R, QueryValidationResultFlag 
 import { InsightDatasetKind } from "../controller/IInsightFacade";
 import { validateFilter, parseKeystring, hasTooManyKeys, isMissingKey } from "./QueryValidationFunctions_Body";
 import { validateOptions } from "./QueryValidationFunctions_Options";
+import { validateQueryPreliminary } from "./QueryValidationFunctions_Common";
 
 export class QueryValidator implements IQueryValidator {
     // tslint:disable-next-line: max-func-body-length
-    public validate(json: any, datasetIds: string[], kind: InsightDatasetKind): R {
-        // Call validate from Common.ts
-
+    public validate(query: any, datasetIds: string[], kind: InsightDatasetKind): R {
+        const [result, hasTransformations]: [F, boolean] = validateQueryPreliminary(query, kind);
+        if (result !== F.Valid) {
+            return new R(result);
+        }
         // WrongType_Body -- BODY in EBNF is property WHERE
-        const where = json.WHERE;
+        const where = query.WHERE;
         if (where == null || typeof where !== "object") {
             return new R(F.WrongType_Body);
         }
         // WrongType_Options
-        const options = json.OPTIONS;
+        const options = query.OPTIONS;
         if (options == null || typeof options !== "object") {
             return new R(F.WrongType_Options);
         }
