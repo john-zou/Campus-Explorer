@@ -6,13 +6,21 @@ export interface ISmartQuery {
     ID: string;
     Filter?: ISmartFilter;
     HasFilter: boolean;
-    Columns: Column[];
-    Order?: Column;
+    Columns: ISmartColumn[];
+    Order?: ISmartColumn;
     HasOrder: boolean;
 }
 
 export enum MComparator {
     GT, LT, EQ
+}
+export interface ISmartColumn {
+    Type: ColumnType;
+    Field: Column;
+}
+
+export enum ColumnType {
+    MField, SField
 }
 
 export type Column = MField | SField;
