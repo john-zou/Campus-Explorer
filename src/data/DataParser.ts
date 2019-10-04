@@ -28,6 +28,19 @@ export class DataParser implements IDataParser {
         if (parsedData.numRows === 0) {
             throw new InsightError("No valid sections");
         } else {
+            Log.trace(`==================================================================================`);
+            Log.trace(`| SUCCESSFULLY ADDED DATASET: ID: ${parsedData.id}, numRows: ${parsedData.numRows}`);
+            Log.trace(`---------------------------------------------------------------------------------`);
+            Log.trace(`| Total files in courses folder: ${files.length}`);
+            // Log.trace(`| JSON files with result array: ${}`);
+            // Log.trace(`| JSON files with result key but wrong value type: ${}`);
+            // Log.trace(`| JSON files lacking result key: ${}`);
+            // Log.trace(`| Non-JSON files in courses folder: ${}`);
+            // Log.trace(`| Total invalid sections: ${}`);
+            // Log.trace(`| Average items (any type) per result array: ${}`);
+            // Log.trace(`| Average objects per result array: ${}`);
+            // Log.trace(`| Average valid sections per result array: ${}`);
+            // Log.trace(`==================================================================================`);
             return parsedData;
         }
     }

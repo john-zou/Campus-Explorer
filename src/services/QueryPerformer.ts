@@ -5,10 +5,17 @@ import { IQueryValidator, QueryValidationResult, QueryValidationResultFlag } fro
 import { Factory } from "./Factory";
 import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
+import { NotImplementedError } from "restify";
+import { whereFilter, orderData } from "./QueryPerformerFunctions";
+import { ISmartQuery } from "../query_schema/ISmartQuery";
+import { SmartQuery } from "../query_schema/SmartQuery";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
     private queryWhere: any;
+    private MCOMPARISON: string[] = ["LT", "GT", "EQ"];
+    private SCOMPARISON: string[] = ["IS"];
+    private LOGIC: string[] = ["AND", "OR"];
 
     public constructor(queryValidator: IQueryValidator = Factory.getQueryValidator()) {
         this.queryValidator = queryValidator;
@@ -24,49 +31,27 @@ export class QueryPerformer implements IQueryPerformer {
         }
         const id: string = validatorResult.ID;
 
-        let query: IQuery = queryIn;
+        const query: ISmartQuery = SmartQuery.fromValidQueryJson(id, queryIn);
+
         // Create dataset given id
         let sortedData: IParsedData = datasets.find((d: IParsedData) => {
             return d.id === id;
         });
 
-        // Sort dataset into given order
-        if (Object.keys(query.OPTIONS).includes("ORDER")) {
-            sortedData = await this.orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
-        }
+        // // Sort dataset into given order
+        // if (Object.keys(query.Columns).includes("ORDER")) {
+        //     sortedData = await orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
+        // }
 
-        // Set field
-        this.queryWhere = query["WHERE"];
+        // // Set field
+        // this.queryWhere = query["WHERE"];
 
         // Return with filtered, ordered data
         return Promise.resolve(sortedData.data.filter(this.filterWhere));
     }
 
-    // Order dataset according to parameter in order
-    private orderData (order: any, dataset: IParsedData): Promise <IParsedData> {
-        let orderKey: string = order.split("_")[1];
-        dataset.data = dataset.data.sort((a: any, b: any) => {
-            // with a little help from https://mzl.la/2ospbkN
-            if (a.orderKey === Number) {
-                return a.orderKey - b.orderKey;
-            } else {
-                return a.orderKey.toUpperCase() - b.orderKey.toUpperCase();
-            }
-        });
-        return Promise.resolve(dataset);
-    }
-
     // Returns if data is in where, wrapper for recursive function
     private filterWhere (parsedData: any): boolean {
-        return this.filterWhereRec(parsedData, this.queryWhere);
-    }
-
-    private filterWhereRec (parsedData: any, where: any): boolean {
-        return true;
-        // pseudo code
-        // if (leaf in where)
-        //  return true or false
-        // else
-        //  some logical combination of filterWhereRec calls on children
+        return whereFilter(parsedData, this.queryWhere);
     }
 }
