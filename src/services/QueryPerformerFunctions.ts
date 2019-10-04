@@ -31,14 +31,9 @@ export function whereScomp(parsedData: any, scomp: string): boolean {
 
 // Order dataset according to parameter in order
 export function orderData(order: any, dataset: IParsedData): Promise <IParsedData> {
-    let orderKey: string = order.split("_")[1];
     dataset.data = dataset.data.sort((a: any, b: any) => {
         // with a little help from https://mzl.la/2ospbkN
-        if (a.orderKey === Number) {
-            return a.orderKey - b.orderKey;
-        } else {
-            return a.orderKey.toUpperCase() - b.orderKey.toUpperCase();
-        }
+        return a.order - b.order;
     });
     return Promise.resolve(dataset);
 }
