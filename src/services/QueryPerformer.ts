@@ -13,7 +13,6 @@ import { ISection } from "../data/ISection";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
-    private queryWhere: ISmartFilter;
     private LIMIT = 5000;
 
     public constructor(queryValidator: IQueryValidator = Factory.getQueryValidator()) {
@@ -46,8 +45,9 @@ export class QueryPerformer implements IQueryPerformer {
 
         // Filter Data
         if (query.HasFilter) {
-            this.queryWhere = query.Filter;
-            processedData = data.filter(this.filterWhere);
+            processedData = data.filter((parsedData: ISection) => {
+                return whereFilter(parsedData, query.Filter);
+            });
         }
 
         // Terminate if dataset too large
@@ -65,10 +65,5 @@ export class QueryPerformer implements IQueryPerformer {
 
         // Return with filtered, ordered data
         return finalData;
-    }
-
-    // Returns if data is in where, wrapper for recursive function
-    private filterWhere (parsedData: ISection): boolean {
-        return whereFilter(parsedData, this.queryWhere);
     }
 }
