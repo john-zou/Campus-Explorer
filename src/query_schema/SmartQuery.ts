@@ -14,8 +14,9 @@ export class SmartQuery implements ISmartQuery {
         //
     }
 
-    public static fromValidQueryJson(q: IQuery): ISmartQuery {
+    public static fromValidQueryJson(id: string, q: IQuery): ISmartQuery {
         const s: SmartQuery = new SmartQuery();
+        s.ID = id;
         // Filter
         if (Object.keys(q.WHERE).length === 0) {
             s.HasFilter = false;
