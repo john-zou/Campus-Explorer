@@ -1,6 +1,10 @@
 import { ISmartFilter, Logic, MComparator, FilterType,
-    ILogicComparison, IMComparison, fieldFromString, MField, ISComparison, SField, INegation } from "./ISmartQuery";
+    ILogicComparison, IMComparison, MField, ISComparison,
+    SField, INegation, Column, mFieldFromString, sFieldFromString } from "./ISmartQuery";
 import { IFilter, IAnd, IOr, IGt, ILt, IEq, IIs, INot } from "./IQuery";
+import { validateColumnString } from "../services/QueryValidationFunctions_Options";
+import { mfields } from "./MFields";
+import { sfields } from "./SFields";
 
 export function buildSmartFilter(f: IFilter): ISmartFilter {
     const key = Object.keys(f)[0];
@@ -33,7 +37,7 @@ export function buildMComparison(mComparator: MComparator, mcomparison: any): IS
     s.Type = FilterType.MComparison;
     let f: IMComparison;
     f.MComparator = mComparator;
-    f.MField = getField(mcomparison) as MField;
+    f.MField = getMField(mcomparison) as MField;
     f.Value = getMValue(mcomparison);
     s.Filter = f;
     return s;
@@ -43,7 +47,7 @@ export function buildSComparison(scomparison: any): ISmartFilter {
     let s: ISmartFilter;
     s.Type = FilterType.SComparison;
     let f: ISComparison;
-    f.SField = getField(scomparison) as SField;
+    f.SField = getSField(scomparison) as SField;
     [f.IDString, f.PostfixAsterisk, f.PostfixAsterisk] = getIdstring(scomparison);
     s.Filter = f;
     return s;
@@ -58,9 +62,14 @@ export function buildNegation(filter: any): ISmartFilter {
     return s;
 }
 
-export function getField(comparison: any) {
-    const key = Object.keys(comparison)[0];
-    return fieldFromString(key.split("_")[1]);
+export function getMField(mcomparison: any): MField {
+    const key = Object.keys(mcomparison)[0];
+    return mFieldFromString(key.split("_")[1]);
+}
+
+export function getSField(scomparison: any): SField {
+    const key = Object.keys(scomparison)[0];
+    return sFieldFromString(key.split("_")[1]);
 }
 
 export function getMValue(mcomparison: any): number {
@@ -89,4 +98,23 @@ export function getIdstring(scomparison: any): [string, boolean, boolean] {
     } else {
         return [svalue.slice(1, svalue.length - 1), true, true];
     }
+}
+
+export function getColumn(col: string): Column {
+    const fieldStr: string = col.split("_")[1];
+    if (mfields.includes(fieldStr)) {
+        return mFieldFromString(fieldStr);
+    }
+    if (sfields.includes(fieldStr)) {
+        return sFieldFromString(fieldStr);
+    }
+    throw new Error("Invalid field encountered while building SmartQuery");
+}
+
+export function getColumns(cols: string[]): Column[] {
+    let columns: Column[] = [];
+    for (const c of cols) {
+        columns.push(getColumn(c));
+    }
+    return columns;
 }

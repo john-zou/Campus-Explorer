@@ -1,5 +1,6 @@
 import { ISmartQuery, Column, ISmartFilter} from "./ISmartQuery";
-import { buildSmartFilter } from "./SmartQueryBuildFunctions";
+import { buildSmartFilter, getColumns, getColumn } from "./SmartQueryBuildFunctions";
+import { IQuery, IOptionsWithOrder } from "./IQuery";
 
 export class SmartQuery implements ISmartQuery {
     public ID: string;
@@ -13,7 +14,7 @@ export class SmartQuery implements ISmartQuery {
         //
     }
 
-    public static fromValidQueryJson(q: any): ISmartQuery {
+    public static fromValidQueryJson(q: IQuery): ISmartQuery {
         const s: SmartQuery = new SmartQuery();
         // Filter
         if (Object.keys(q.WHERE).length === 0) {
@@ -22,8 +23,13 @@ export class SmartQuery implements ISmartQuery {
             s.HasFilter = true;
             s.Filter = buildSmartFilter(q.WHERE);
         }
-
+        s.Columns = getColumns(q.OPTIONS.COLUMNS);
+        if (Object.keys(q.OPTIONS).includes("ORDER")) {
+            s.HasOrder = true;
+            s.Order = getColumn(((q.OPTIONS) as IOptionsWithOrder).ORDER);
+        } else  {
+            s.HasOrder = false;
+        }
         return s;
     }
-
 }
