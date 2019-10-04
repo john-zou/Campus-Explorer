@@ -17,7 +17,7 @@ export class DatasetManager implements IDatasetManager {
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<void> {
-        if (id === null || content === null || id === undefined || content === undefined) {
+        if (id == null || content == null || kind == null) {
             throw new InsightError("Null argument(s)");
         }
         if (this.isInvalidId(id)) {
