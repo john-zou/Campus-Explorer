@@ -9,10 +9,17 @@ import Log from "../Util";
 import { FileParseResult, FileParseResultFlag } from "./FileParseResult";
 
 export class DataParser implements IDataParser {
+
+    /**
+     * @param id a valid id
+     * @param content a non-null string
+     * @param kind a non-null InsightDatasetKind
+     */
     public async parseDatasetZip(id: string, content: string, kind: InsightDatasetKind): Promise<IParsedData> {
-        if (id === null || content === null) {
-            throw new InsightError("Null arguments");
-        }
+        // Unreacheable code
+        // if (id === null || content === null) {
+        //     throw new InsightError("Null arguments");
+        // }
         let zip: JSZip;
         try {
             zip = await JSZip.loadAsync(content, { base64: true });
