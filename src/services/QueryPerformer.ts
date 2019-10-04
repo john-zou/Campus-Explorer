@@ -3,19 +3,18 @@ import { IParsedData } from "../data/IParsedData";
 import { KeyMap } from "../query_schema/KeyMap";
 import { IQueryValidator, QueryValidationResult, QueryValidationResultFlag } from "./IQueryValidator";
 import { Factory } from "./Factory";
-import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightError, ResultTooLargeError } from "../controller/IInsightFacade";
 import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
 import { NotImplementedError } from "restify";
-import { whereFilter, orderData } from "./QueryPerformerFunctions";
-import { ISmartQuery } from "../query_schema/ISmartQuery";
+import { whereFilter, orderData, removeColumns } from "./QueryPerformerFunctions";
+import { ISmartQuery, ISmartFilter } from "../query_schema/ISmartQuery";
 import { SmartQuery } from "../query_schema/SmartQuery";
+import { ISection } from "../data/ISection";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
-    private queryWhere: any;
-    private MCOMPARISON: string[] = ["LT", "GT", "EQ"];
-    private SCOMPARISON: string[] = ["IS"];
-    private LOGIC: string[] = ["AND", "OR"];
+    private queryWhere: ISmartFilter;
+    private LIMIT = 5000;
 
     public constructor(queryValidator: IQueryValidator = Factory.getQueryValidator()) {
         this.queryValidator = queryValidator;
@@ -27,31 +26,49 @@ export class QueryPerformer implements IQueryPerformer {
             this.queryValidator.validate(queryIn, datasetsIDs, InsightDatasetKind.Courses);
         if (validatorResult.Result !== QueryValidationResultFlag.Valid) {
             // Invalid Query
-            return Promise.reject(new InsightError(QueryValidationResultFlag[validatorResult.Result]));
+            throw new InsightError(QueryValidationResultFlag[validatorResult.Result]);
         }
         const id: string = validatorResult.ID;
 
         const query: ISmartQuery = SmartQuery.fromValidQueryJson(id, queryIn);
 
         // Create dataset given id
-        let sortedData: IParsedData = datasets.find((d: IParsedData) => {
+        let data: ISection[] = datasets.find((d: IParsedData) => {
             return d.id === id;
-        });
+        }).data;
 
-        // // Sort dataset into given order
-        // if (Object.keys(query.Columns).includes("ORDER")) {
-        //     sortedData = await orderData((query.OPTIONS as IOptionsWithOrder).ORDER, sortedData);
-        // }
+        // (Early) Terminate if dataset too large
+        if (data.length > this.LIMIT && !query.HasFilter) {
+            throw ResultTooLargeError;
+        }
 
-        // // Set field
-        // this.queryWhere = query["WHERE"];
+        let processedData: ISection[];
+
+        // Filter Data
+        if (query.HasFilter) {
+            this.queryWhere = query.Filter;
+            processedData = data.filter(this.filterWhere);
+        }
+
+        // Terminate if dataset too large
+        if (processedData.length > this.LIMIT) {
+            throw ResultTooLargeError;
+        }
+
+        // Sort dataset into given order
+        if (query.HasOrder) {
+            processedData = orderData(query.Order, processedData);
+        }
+
+        // Remove columns
+        let finalData: any[] = removeColumns(query.Columns, processedData);
 
         // Return with filtered, ordered data
-        return Promise.resolve(sortedData.data.filter(this.filterWhere));
+        return finalData;
     }
 
     // Returns if data is in where, wrapper for recursive function
-    private filterWhere (parsedData: any): boolean {
+    private filterWhere (parsedData: ISection): boolean {
         return whereFilter(parsedData, this.queryWhere);
     }
 }
