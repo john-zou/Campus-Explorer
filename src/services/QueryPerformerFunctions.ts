@@ -9,10 +9,13 @@ export function whereFilter(parsedData: ISection, filter: ISmartFilter): boolean
             return whereLComp(parsedData, filter.Filter as ILogicComparison);
             break;
         case FilterType.MComparison:
+            return whereMcomp(parsedData, filter.Filter as IMComparison);
             break;
         case FilterType.SComparison:
+            return whereScomp(parsedData, filter.Filter as ISComparison);
             break;
         case FilterType.Negation:
+            return whereNeg(parsedData, filter.Filter as INegation);
             break;
         default:
             throw new Error("Invalid Smart Query");
