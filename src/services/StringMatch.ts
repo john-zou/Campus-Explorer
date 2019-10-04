@@ -31,3 +31,21 @@
 //         return stringFromData.includes(inputStringFromQuery);
 //     }
 // }
+
+// const compare: (key: string) => (a: any, b: any) => number =
+//     (key) => {
+//         return (a, b) => {
+//             if (a[key] < b[key]) {
+//                 return -1;
+//             }
+//             if (a[key] > b[key]) {
+//                 return 1;
+//             } else {
+//                 return 0;
+//             }
+//         };
+//     };
+
+// export function sortByKey(key: string, arr: any[]): any[] {
+//     return arr.sort(compare(key));
+// }
