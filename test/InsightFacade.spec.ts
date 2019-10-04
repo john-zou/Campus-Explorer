@@ -22,6 +22,8 @@ export interface ITestQuery {
 describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     // Reference any datasets you've added to test/data here and they will
     // automatically be loaded in the 'before' hook.
+    const coursesNumRows: number = 64612;
+
     const datasetsToLoad: { [id: string]: string } = {
         validOneBadFile: "./test/data/validOneBadFile.zip",
         simpleGood: "./test/data/simpleGood.zip",
@@ -72,7 +74,7 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     });
 
     // This is a unit test. You should create more like this!
-    it("Should add a valid dataset", async function () {
+    it(`Should add the "courses" dataset`, async function () {
         const id: string = "courses";
         const expected: string[] = [id];
         let result;
@@ -272,6 +274,15 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
             const badDatasetId: string = "bad";
             await expectRejected(
                 insightFacade.addDataset(id, datasets[badDatasetId], InsightDatasetKind.Courses), InsightError);
+        }
+    );
+
+    it(`The courses dataset, after added and listed, should have ${coursesNumRows} rows`,
+        async () => {
+            const id: string = "courses";
+            await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), [id]);
+            const dataSets = await insightFacade.listDatasets();
+            expect(dataSets[0].numRows).to.equal(coursesNumRows);
         }
     );
 

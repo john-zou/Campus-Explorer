@@ -34,6 +34,10 @@ export async function parseSectionsFromFile(file: JSZip.JSZipObject, parsedData:
 export function parseSection(json: any, parsedData: ParsedCoursesData): void {
     if (isValidSection(json)) {
         const newSection: ISection = Section.fromValidSectionData(json);
+        // If there is a json.Section === "overall", then set the year to 1900
+        if (json.Section === "overall") {
+            newSection.year = 1900;
+        }
         parsedData.addSection(newSection);
     }
 }
@@ -66,7 +70,7 @@ export function isValidSection(json: any): boolean {
     const year: any = json.Year;
     return isString(dept) && isString(id) && isNumber(avg) && isString(instructor)
         && isString(title) && isNumber(pass) && isNumber (fail) && isNumber(audit)
-        && isStringAndCanBeParsedToInt(year);
+        && isString(year);
 }
 
 export function isString(x: any): boolean {
@@ -77,6 +81,7 @@ export function isNumber(x: any): boolean {
     return x != null && typeof x === "number";
 }
 
-export function isStringAndCanBeParsedToInt(x: any): boolean {
-    return isString(x) && parseInt(x, 10) !== undefined;
-}
+// Unused
+// export function isStringAndCanBeParsedToInt(x: any): boolean {
+//     return isString(x) && parseInt(x, 10) !== undefined;
+// }

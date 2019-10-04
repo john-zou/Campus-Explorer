@@ -17,32 +17,25 @@ export class DatasetManager implements IDatasetManager {
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<void> {
-        // check if id or content is null/undefined
         if (id === null || content === null || id === undefined || content === undefined) {
             throw new InsightError("Null argument(s)");
         }
-        // check if id has underscore or is only whitespace
-        if (id.includes("_") || id.trim().length === 0) {
+        if (this.isInvalidId(id)) {
             throw new InsightError("ID must not contain _ and must not be fully whitespace");
         }
-        // check if dataset is in our list
         if (this.datasetIds.includes(id)) {
             throw new InsightError("There is already a dataset with given ID in the list");
         }
-        // call dataparser
         this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
     }
 
     public async removeDataset(id: string): Promise<string> {
-        // check if id is null or undefined
         if (id  === null || id === undefined) {
             throw new InsightError("Null or undefined argument");
         }
-        // check if valid id
         if (this.isInvalidId(id)) {
             throw new InsightError("Invalid ID");
         }
-        // check if dataset in datasetIDs
         if (!this.datasetIds.includes(id)) {
             throw new NotFoundError("ID not in dataset");
         }
@@ -52,7 +45,7 @@ export class DatasetManager implements IDatasetManager {
         return id;
     }
 
-    // Might be slow because it returns more information than is requested
+    // Causes timeout for autobot d1
     public async listDatasetsOld(): Promise<InsightDataset[]> {
         return this.parsedDatasets;
     }

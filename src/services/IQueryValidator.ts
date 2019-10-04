@@ -26,7 +26,7 @@ export enum QueryValidationResultFlag {
     NoUnderscore,
     NoIdstring,
     NoKeyfield,
-    InvalidMfield,
+    InvalidMField,
     MValueNotANumber,
     TooManyKeys_SComparison,
     InvalidSField,
@@ -38,7 +38,14 @@ export enum QueryValidationResultFlag {
     SValueContainsInternalAsterisk,
     WrongType_Order,
     HasNoKeys_MComparison,
-    HasNoKeys_SComparison
+    HasNoKeys_SComparison,
+    IdStringIsAllWhitespace,
+    SValueIsEmptyString,
+    QueryIsNotAnObject,
+    HasNoKeys_Filter,
+    EmptySField,
+    EmptyMField,
+    EmptyField
 }
 
 export class QueryValidationResult {
