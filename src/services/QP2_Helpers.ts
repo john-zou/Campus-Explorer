@@ -31,8 +31,11 @@ export function isMatch(stringFromData: string, inputStringFromQuery: string,
         return stringFromData.includes(inputStringFromQuery);
     }
 }
-
-const compare: (key: string) => (a: any, b: any) => number =
+/**
+ * Returns custom comparator function based on key
+ * @param key keyString of the property to compare
+ */
+const compareByKey: (key: string) => (a: any, b: any) => number =
     (key) => {
         return (a, b) => {
             if (a[key] < b[key]) {
@@ -47,5 +50,5 @@ const compare: (key: string) => (a: any, b: any) => number =
     };
 
 export function sortByKey(key: string, arr: any[]): any[] {
-    return arr.sort(compare(key));
+    return arr.sort(compareByKey(key));
 }

@@ -9,7 +9,7 @@ import { ISection } from "../data/ISection";
 import { ISmartFilter, FilterType, ILogicComparison, IMComparison,
     ISComparison, INegation, Logic, MField, MComparator, SField,
     ColumnType, ISmartQuery } from "../query_schema/ISmartQuery";
-import { isMatch, sortByKey } from "./StringMatch";
+import { isMatch, sortByKey } from "./QP2_Helpers";
 import { Factory } from "./Factory";
 
 export class QP2 implements IQueryPerformer {
