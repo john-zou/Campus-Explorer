@@ -20,11 +20,8 @@ export class Factory {
         // return Factory.dm;
         return new DatasetManager();
     }
-    public static getQueryPerformer(): import ("./IQueryPerformer").IQueryPerformer {
-        return new QueryPerformer();
-    }
 
-    public static getQueryPerformerAlt(): IQueryPerformer {
-        return new QP2();
+    public static getQueryPerformer(): import ("./IQueryPerformer").IQueryPerformer {
+        return new QP2(); // Set implementation here
     }
 }
