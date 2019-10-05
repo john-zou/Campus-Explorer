@@ -4,8 +4,12 @@ import { DataParser } from "../data/DataParser";
 import { QueryValidator } from "./QueryValidator";
 import { QP2 } from "./QP2";
 import { IQueryPerformer } from "./IQueryPerformer";
+import { DiskManager } from "./DiskManager";
 
 export class Factory {
+    public static getDiskManager() {
+        return new DiskManager();
+    }
     // private static dm: DatasetManager;
     public static getQueryValidator(): import ("./IQueryValidator").IQueryValidator {
         return new QueryValidator();
