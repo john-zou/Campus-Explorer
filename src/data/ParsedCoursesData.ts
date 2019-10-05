@@ -16,7 +16,6 @@ export class ParsedCoursesData implements IParsedData {
     }
 
     public addSection(section: ISection): void {
-        section.setUuid(this.mdata.length.toString());
         this.mdata.push(section);
     }
 }

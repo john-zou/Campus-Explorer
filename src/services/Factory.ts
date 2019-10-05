@@ -6,6 +6,7 @@ import { QP2 } from "./QP2";
 import { IQueryPerformer } from "./IQueryPerformer";
 
 export class Factory {
+    private static dm: DatasetManager;
     public static getQueryValidator(): import ("./IQueryValidator").IQueryValidator {
         return new QueryValidator();
     }
@@ -13,7 +14,10 @@ export class Factory {
         return new DataParser();
     }
     public static getDatasetManager(): import ("./IDatasetManager").IDatasetManager {
-        return new DatasetManager();
+        if (Factory.dm == null) {
+            Factory.dm = new DatasetManager();
+        }
+        return Factory.dm;
     }
     public static getQueryPerformer(): import ("./IQueryPerformer").IQueryPerformer {
         return new QueryPerformer();

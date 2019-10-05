@@ -9,7 +9,7 @@ import { MockDataset } from "./mocks/MockDataset";
 import Log from "../src/Util";
 import { QueryPerformer } from "../src/services/QueryPerformer";
 
-describe("QP2: Leaf Filters (MComparison, SComparison)", () => {
+describe("QueryPerformer: Leaf Filters (MComparison, SComparison)", () => {
     const sections = MockSection.getMockSections(10);
     const id = "test";
     const mockQueryValidator = new MockQueryValidatorValid(id);
@@ -293,7 +293,7 @@ describe("QP2: Leaf Filters (MComparison, SComparison)", () => {
     });
 });
 
-describe("QP2: LogicComparisons (AND, OR, NOT)", () => {
+describe("QueryPerformer: LogicComparisons (AND, OR, NOT)", () => {
     const sections = MockSection.getMockSections(10);
     const id = "test";
     const mockQueryValidator = new MockQueryValidatorValid(id);
@@ -340,6 +340,33 @@ describe("QP2: LogicComparisons (AND, OR, NOT)", () => {
         }
     });
 
+    it ("NOT DEPT IS *yy", async () => {
+        let isDeptyy: MockQuery = MockQuery.IS_Dept_Xyy(id);
+        let notisDeptyy: MockQuery = MockQuery.NOT(id, isDeptyy);
+        const results: any[] = await qp.performQuery(notisDeptyy, datasets, datasetIds);
+        let expected: number[] = [0, 1, 2, 3, 6, 7];
+        expect(results).to.have.lengthOf(expected.length);
+        if (!containsAllUuids(results, expected, id)) {
+            expect.fail();
+        }
+    });
+
+    it("NOT AND2 [GT Avg 95, IS Dept *]", async () => {
+        const gtAvg95: MockQuery = MockQuery.GT_Avg_95(id);
+        const isDeptX: MockQuery = MockQuery.IS_Dept_X(id);
+        const and2: MockQuery = MockQuery.AND2(id, gtAvg95, isDeptX);
+        const notand2: MockQuery = MockQuery.NOT(id, and2);
+        const results: any[] = await qp.performQuery(notand2, datasets, datasetIds);
+        /**
+         * Expected results: [0..5]
+         */
+        expect(results).to.have.lengthOf(6);
+        const expectedUuids = [0, 1, 2, 3, 4, 5];
+        if (!containsAllUuids(results, expectedUuids, id)) {
+            expect.fail();
+        }
+    });
+
     it("AND1 [AVG GT 95]", async () => {
         const gtAvg95: MockQuery = MockQuery.GT_Avg_95(id);
         const and1: MockQuery = MockQuery.AND1(id, gtAvg95);
@@ -349,21 +376,6 @@ describe("QP2: LogicComparisons (AND, OR, NOT)", () => {
          */
         const expectedUuids = [6, 7, 8, 9];
         expect(results).to.have.lengthOf(expectedUuids.length);
-        if (!containsAllUuids(results, expectedUuids, id)) {
-            expect.fail();
-        }
-    });
-
-    it("AND2 [GT Avg 95, IS Dept *]", async () => {
-        const gtAvg95: MockQuery = MockQuery.GT_Avg_95(id);
-        const isDeptX: MockQuery = MockQuery.IS_Dept_X(id);
-        const and2: MockQuery = MockQuery.AND2(id, gtAvg95, isDeptX);
-        const results: any[] = await qp.performQuery(and2, datasets, datasetIds);
-        /**
-         * Expected results: [6,7,8,9]
-         */
-        expect(results).to.have.lengthOf(4);
-        const expectedUuids = [6, 7, 8, 9];
         if (!containsAllUuids(results, expectedUuids, id)) {
             expect.fail();
         }
@@ -427,7 +439,7 @@ describe("QP2: LogicComparisons (AND, OR, NOT)", () => {
     });
 });
 
-describe("QP2: Order", () => {
+describe("QueryPerformer: Order", () => {
     const sections = MockSection.getMockSections(10);
     const id = "test";
     const mockQueryValidator = new MockQueryValidatorValid(id);

@@ -3,9 +3,6 @@ import { IValidSectionFromData } from "./IValidSectionFromData";
 import { KeyMap } from "../query_schema/KeyMap";
 
 export class Section implements ISection {
-    public setUuid(uuid: string): void {
-        this.uuid = uuid;
-    }
     public dept: string;
     public id: string;
     public avg: number;
@@ -32,6 +29,7 @@ export class Section implements ISection {
         transformedSection.fail = data.Fail;
         transformedSection.audit = data.Audit;
         transformedSection.year = parseInt(data.Year, 10);
+        transformedSection.uuid = data.Id.toString();
         // If it's not parseable to a whole number, set it to -1 (since we are treating any Year string value as valid)
         if (transformedSection.year === undefined) {
             transformedSection.year = -1;

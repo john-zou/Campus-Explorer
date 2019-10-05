@@ -9,6 +9,7 @@ export enum InsightDatasetKind {
     Rooms = "rooms",
 }
 
+// tslint:disable-next-line:interface-name
 export interface InsightDataset {
     id: string;
     kind: InsightDatasetKind;

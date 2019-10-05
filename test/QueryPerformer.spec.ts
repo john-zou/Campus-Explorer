@@ -94,7 +94,7 @@ describe("QueryPerformerFunctions : filterWhere", () => {
 
     beforeEach(() => {
         testSection = {
-            setUuid(uuid: string): void { /*none*/},
+            // setUuid(uuid: string): void { /*none*/},
             dept: "math",
             id: "201",
             avg: 97,
@@ -182,7 +182,7 @@ describe("QueryPerformerFunctions : removeColumns", () => {
 
     before(() => {
         testSections = [{
-            setUuid(uuid: string): void { /*none*/},
+            // setUuid(uuid: string): void { /*none*/},
             dept: "math",
             id: "201",
             avg: 97,

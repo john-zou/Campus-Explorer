@@ -339,6 +339,17 @@ describe("QP2: LogicComparisons (AND, OR, NOT)", () => {
         }
     });
 
+    it ("NOT DEPT IS *yy", async () => {
+        let isDeptyy: MockQuery = MockQuery.IS_Dept_Xyy(id);
+        let notisDeptyy: MockQuery = MockQuery.NOT(id, isDeptyy);
+        const results: any[] = await qp2.performQuery(notisDeptyy, datasets, datasetIds);
+        let expected: number[] = [0, 1, 2, 3, 6, 7];
+        expect(results).to.have.lengthOf(expected.length);
+        if (!containsAllUuids(results, expected, id)) {
+            expect.fail();
+        }
+    });
+
     it("AND1 [AVG GT 95]", async () => {
         const gtAvg95: MockQuery = MockQuery.GT_Avg_95(id);
         const and1: MockQuery = MockQuery.AND1(id, gtAvg95);
