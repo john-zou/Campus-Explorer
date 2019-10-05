@@ -29,7 +29,7 @@ export class Section implements ISection {
         transformedSection.fail = data.Fail;
         transformedSection.audit = data.Audit;
         transformedSection.year = parseInt(data.Year, 10);
-        transformedSection.uuid = data.Id.toString();
+        transformedSection.uuid = data.id.toString();
         // If it's not parseable to a whole number, set it to -1 (since we are treating any Year string value as valid)
         if (transformedSection.year === undefined) {
             transformedSection.year = -1;

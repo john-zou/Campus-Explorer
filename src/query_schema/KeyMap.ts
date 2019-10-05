@@ -7,5 +7,6 @@ export const KeyMap: any = {
     pass: "Pass",
     fail: "Fail",
     audit: "Audit",
-    year: "Year"
+    year: "Year",
+    uuid: "id"
 };

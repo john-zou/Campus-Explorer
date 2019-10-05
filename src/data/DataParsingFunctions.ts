@@ -83,9 +83,10 @@ export function isValidSection(json: any): boolean {
     const fail: any = json.Fail;
     const audit: any = json.Audit;
     const year: any = json.Year;
+    const uuid: any = json.id;
     return isString(dept) && isString(id) && isNumber(avg) && isString(instructor)
         && isString(title) && isNumber(pass) && isNumber (fail) && isNumber(audit)
-        && isString(year);
+        && isString(year) && isNumber(uuid);
 }
 
 export function isString(x: any): boolean {

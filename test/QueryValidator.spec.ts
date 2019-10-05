@@ -6,7 +6,7 @@ import { QueryValidationResult as Res, QueryValidationResultFlag as R } from "..
 
 // Import Statements
 
-describe("QueryValidator Tests: Insane Invalid Query", () => {
+describe("QueryValidator Tests: Bad Structure => Invalid Query", () => {
     // Declare common objects as local variables
     // Initialize a QueryValidator. It's stateless so we can just test using this one
     const v: QueryValidator = new QueryValidator();
@@ -141,6 +141,18 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
         t(q, R.WrongType_LogicComparison);
     });
 
+    it("AND array empty", async () => {
+        const q = {
+            WHERE: {
+                AND: new Array(0)
+            },
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
+            }
+        };
+        t(q, R.Empty_LogicComparison);
+    });
+
     it("AND array member contains non-objects", async () => {
         const q = {
             WHERE: {
@@ -175,6 +187,18 @@ describe("QueryValidator Tests: Insane Invalid Query", () => {
             }
         };
         t(q, R.WrongValue_LogicComparison);
+    });
+
+    it("OR array empty", async () => {
+        const q = {
+            WHERE: {
+                OR: new Array(0)
+            },
+            OPTIONS: {
+                COLUMNS: ["test_avg"]
+            }
+        };
+        t(q, R.Empty_LogicComparison);
     });
 
     it("AND array member contains invalid filter", async () => {

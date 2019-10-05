@@ -8,5 +8,5 @@ export interface IValidSectionFromData {
     Fail: number;
     Audit: number;
     Year: string;
-    Id: number;
+    id: number;
 }
