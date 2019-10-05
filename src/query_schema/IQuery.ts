@@ -1,5 +1,5 @@
 export interface IQuery {
-    WHERE: IFilter;
+    WHERE: IFilter | {};
     OPTIONS: IOptions;
 }
 
