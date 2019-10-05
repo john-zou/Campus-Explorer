@@ -1,5 +1,5 @@
 export interface IQuery {
-    WHERE: IFilter;
+    WHERE: IFilter | {};
     OPTIONS: IOptions;
 }
 
@@ -24,7 +24,7 @@ export interface IOr {
 }
 
 export interface INot {
-    NOT: IFilter[];
+    NOT: IFilter;
 }
 
 export interface ILt {

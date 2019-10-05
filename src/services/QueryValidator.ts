@@ -11,22 +11,12 @@ export class QueryValidator implements IQueryValidator {
         if (result !== F.Valid) {
             return new R(result);
         }
-        // WrongType_Body -- BODY in EBNF is property WHERE
-        const where = query.WHERE;
-        if (where == null || typeof where !== "object") {
-            return new R(F.WrongType_Body);
-        }
-        // WrongType_Options
-        const options = query.OPTIONS;
-        if (options == null || typeof options !== "object") {
-            return new R(F.WrongType_Options);
-        }
         let whereMentionsId: boolean = false;
         let id: string = "";
         // if .WHERE is not just empty object { }
-        if (Object.keys(where).length !== 0) {
+        if (Object.keys(query.WHERE).length !== 0) {
             // .WHERE must be a good filter
-            const filterValidationResult: [F, string] = validateFilter(where, datasetIds);
+            const filterValidationResult: [F, string] = validateFilter(query.WHERE, datasetIds);
             const filterValidationFlag: F = filterValidationResult[0];
             if (filterValidationFlag !== F.Valid) {
                 return new R(filterValidationFlag);
@@ -36,7 +26,7 @@ export class QueryValidator implements IQueryValidator {
             whereMentionsId = true; // This ID will then be matched against that from options
         }
         // Validate Options
-        const optionsValidationResult: [F, string] = validateOptions(options, datasetIds);
+        const optionsValidationResult: [F, string] = validateOptions(query.OPTIONS, datasetIds);
         const optionsValidationFlag: F = optionsValidationResult[0];
         if (optionsValidationFlag !== F.Valid) {
             return new R(optionsValidationFlag);

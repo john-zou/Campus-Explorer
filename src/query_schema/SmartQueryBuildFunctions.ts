@@ -5,6 +5,9 @@ import { IFilter, IAnd, IOr, IGt, ILt, IEq, IIs, INot } from "./IQuery";
 import { validateColumnString } from "../services/QueryValidationFunctions_Options";
 import { mfields } from "./MFields";
 import { sfields } from "./SFields";
+import { LogicComparison, SmartFilterLogicComparison,
+    SmartFilterMComparison, MComparison, SmartFilterSComparison, SComparison,
+    SmartFilterNegation, Negation, SmartColumn } from "./SmartClasses";
 
 export function buildSmartFilter(f: IFilter): ISmartFilter {
     const key = Object.keys(f)[0];
@@ -20,9 +23,8 @@ export function buildSmartFilter(f: IFilter): ISmartFilter {
 }
 
 export function buildLogicComparison(logic: Logic, filters: IFilter[]): ISmartFilter {
-    let s: ISmartFilter;
-    s.Type = FilterType.LogicComparison;
-    let f: ILogicComparison;
+    let s: ISmartFilter = new SmartFilterLogicComparison();
+    let f: ILogicComparison = new LogicComparison();
     f.Logic = logic;
     f.FilterArray = [];
     for (const filter of filters) {
@@ -33,9 +35,8 @@ export function buildLogicComparison(logic: Logic, filters: IFilter[]): ISmartFi
 }
 
 export function buildMComparison(mComparator: MComparator, mcomparison: any): ISmartFilter {
-    let s: ISmartFilter;
-    s.Type = FilterType.MComparison;
-    let f: IMComparison;
+    let s: ISmartFilter = new SmartFilterMComparison();
+    let f: IMComparison = new MComparison();
     f.MComparator = mComparator;
     f.MField = getMField(mcomparison) as MField;
     f.Value = getMValue(mcomparison);
@@ -44,19 +45,17 @@ export function buildMComparison(mComparator: MComparator, mcomparison: any): IS
 }
 
 export function buildSComparison(scomparison: any): ISmartFilter {
-    let s: ISmartFilter;
-    s.Type = FilterType.SComparison;
-    let f: ISComparison;
+    let s: ISmartFilter = new SmartFilterSComparison();
+    let f: ISComparison = new SComparison();
     f.SField = getSField(scomparison) as SField;
-    [f.IDString, f.PostfixAsterisk, f.PostfixAsterisk] = getIdstring(scomparison);
+    [f.IDString, f.PrefixAsterisk, f.PostfixAsterisk] = getIdstring(scomparison);
     s.Filter = f;
     return s;
 }
 
 export function buildNegation(filter: any): ISmartFilter {
-    let s: ISmartFilter;
-    s.Type = FilterType.Negation;
-    let f: INegation;
+    let s: ISmartFilter = new SmartFilterNegation();
+    let f: INegation = new Negation();
     f.Filter = buildSmartFilter(filter);
     s.Filter = f;
     return s;
@@ -101,7 +100,7 @@ export function getIdstring(scomparison: any): [string, boolean, boolean] {
 }
 
 export function getColumn(col: string): ISmartColumn {
-    let smartColumn: ISmartColumn;
+    let smartColumn: ISmartColumn = new SmartColumn();
     const fieldStr: string = col.split("_")[1];
     if (mfields.includes(fieldStr)) {
         smartColumn.Type = ColumnType.MField;

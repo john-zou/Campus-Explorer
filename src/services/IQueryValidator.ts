@@ -45,7 +45,8 @@ export enum QueryValidationResultFlag {
     HasNoKeys_Filter,
     EmptySField,
     EmptyMField,
-    EmptyField
+    EmptyField,
+    Empty_LogicComparison
 }
 
 export class QueryValidationResult {

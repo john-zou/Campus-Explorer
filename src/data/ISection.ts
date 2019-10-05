@@ -1,6 +1,4 @@
 export interface ISection {
-    setUuid(uuid: string): void;
-
     dept: string; // cpsc
     id: string; // 310
     avg: number;
