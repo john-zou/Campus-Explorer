@@ -21,11 +21,11 @@ export function whereFilter(parsedData: ISection, filter: ISmartFilter): boolean
 export function whereMcomp(parsedData: ISection, mcomp: IMComparison): boolean {
     switch (mcomp.MComparator) {
         case MComparator.GT:
-            return (parsedData as any)[mcomp.MField] > mcomp.Value;
+            return (parsedData as any)[MField[mcomp.MField].toLowerCase()] > mcomp.Value;
         case MComparator.LT:
-            return (parsedData as any)[mcomp.MField] < mcomp.Value;
+            return (parsedData as any)[MField[mcomp.MField].toLowerCase()] < mcomp.Value;
         case MComparator.EQ:
-            return (parsedData as any)[mcomp.MField] === mcomp.Value;
+            return (parsedData as any)[MField[mcomp.MField].toLowerCase()] === mcomp.Value;
         default:
             break;
     }
@@ -42,7 +42,7 @@ export function whereScomp(parsedData: ISection, scomp: ISComparison): boolean {
     } else {
         reg = new RegExp(scomp.IDString);
     }
-    return reg.test((parsedData as any)[scomp.SField]);
+    return reg.test((parsedData as any)[SField[scomp.SField].toLowerCase()]);
 }
 
 export function whereLComp(parsedData: ISection, lcomp: ILogicComparison): boolean {
@@ -77,10 +77,12 @@ class ISectionMod {
         for (c of columns) {
             switch (c.Type) {
                 case ColumnType.MField:
-                    (this as any)[MField[c.Field]] = (section as any)[MField[c.Field]];
+                    (this as any)["courses_" + String(MField[c.Field]).toLowerCase()]
+                        = (section as any)[MField[c.Field].toLowerCase()];
                     break;
                 case ColumnType.SField:
-                    (this as any)[SField[c.Field]] = (section as any)[SField[c.Field]];
+                    (this as any)["courses_" + String(SField[c.Field]).toLowerCase()]
+                        = (section as any)[SField[c.Field].toLowerCase()];
                     break;
                 default:
                     break;

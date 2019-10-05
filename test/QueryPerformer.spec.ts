@@ -87,18 +87,30 @@ describe("QueryPerformerFunctions : orderData", () => {
 });
 
 describe("QueryPerformerFunctions : filterWhere", () => {
-
+    let testSection: ISection;
     before(() => {
         // Runs once, before any "beforeEach"
     });
 
     beforeEach(() => {
-        // Nothing
+        testSection = {
+            setUuid(uuid: string): void { /*none*/},
+            dept: "math",
+            id: "201",
+            avg: 97,
+            instructor: "Folk",
+            title: "Quantum",
+            pass: 53,
+            fail: 50,
+            audit: 3,
+            year: 2018,
+            uuid: "234"
+        };
     });
 
     // it("Should properly filter using whereFilter for number type, GT", async () => {
     //     // Case 1, accept
-    //     let result: boolean = whereFilter({ courses_dept: "epse", courses_avg: 97.08 }, {GT: {courses_avg: 97}});
+    //     let result: boolean = whereFilter(testSection, {GT: {courses_avg: 97}});
     //     expect(result).to.equal(true);
     //     // Case 2, reject
     //     result = whereFilter({ courses_dept: "epse", courses_avg: 93 }, {GT: {courses_avg: 97}});
@@ -192,6 +204,6 @@ describe("QueryPerformerFunctions : removeColumns", () => {
         let columns: ISmartColumn[];
         columns = [{Type: ColumnType.MField, Field: MField.Avg}, {Type: ColumnType.SField, Field: SField.Dept}];
         let result: any[] = removeColumns(columns, testSections);
-        expect(result).to.deep.equal({dept: "math", avg: 97});
+        expect(result).to.deep.equal([{courses_dept: "math", courses_avg: 97}]);
     });
 });
