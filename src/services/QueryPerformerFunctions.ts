@@ -34,13 +34,13 @@ export function whereMcomp(parsedData: ISection, mcomp: IMComparison): boolean {
 export function whereScomp(parsedData: ISection, scomp: ISComparison): boolean {
     let reg: RegExp;
     if (scomp.PrefixAsterisk && scomp.PostfixAsterisk) {
-        reg = new RegExp("[*]?" + scomp.IDString + "[*]?");
-    } else if (scomp.PrefixAsterisk) {
-        reg = new RegExp("[*]?" + scomp.IDString);
-    } else if (scomp.PostfixAsterisk) {
-        reg = new RegExp(scomp.IDString + "[*]?");
-    } else {
         reg = new RegExp(scomp.IDString);
+    } else if (scomp.PrefixAsterisk) {
+        reg = new RegExp(scomp.IDString + "$");
+    } else if (scomp.PostfixAsterisk) {
+        reg = new RegExp("^" + scomp.IDString);
+    } else {
+        reg = new RegExp("^" + scomp.IDString + "$");
     }
     return reg.test((parsedData as any)[SField[scomp.SField].toLowerCase()]);
 }
@@ -72,16 +72,16 @@ export function whereNeg(parsedData: ISection, neg: INegation): boolean {
 }
 
 class ISectionMod {
-    constructor (columns: ISmartColumn[], section: ISection) {
+    constructor (columns: ISmartColumn[], section: ISection, id: string) {
         let c: ISmartColumn;
         for (c of columns) {
             switch (c.Type) {
                 case ColumnType.MField:
-                    (this as any)["courses_" + String(MField[c.Field]).toLowerCase()]
+                    (this as any)[id + "_"  + String(MField[c.Field]).toLowerCase()]
                         = (section as any)[MField[c.Field].toLowerCase()];
                     break;
                 case ColumnType.SField:
-                    (this as any)["courses_" + String(SField[c.Field]).toLowerCase()]
+                    (this as any)[id + "_" + String(SField[c.Field]).toLowerCase()]
                         = (section as any)[SField[c.Field].toLowerCase()];
                     break;
                 default:
@@ -91,9 +91,9 @@ class ISectionMod {
     }
 }
 
-export function removeColumns(columns: ISmartColumn[], data: ISection[]): any[] {
+export function removeColumns(columns: ISmartColumn[], data: ISection[], id: string): any[] {
     let newData: any[] = data.map((value: ISection) => {
-        return new ISectionMod(columns, value);
+        return new ISectionMod(columns, value, id);
     });
     return newData;
 }

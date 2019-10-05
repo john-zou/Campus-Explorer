@@ -203,7 +203,7 @@ describe("QueryPerformerFunctions : removeColumns", () => {
     it("Should be able to remove columns", async () => {
         let columns: ISmartColumn[];
         columns = [{Type: ColumnType.MField, Field: MField.Avg}, {Type: ColumnType.SField, Field: SField.Dept}];
-        let result: any[] = removeColumns(columns, testSections);
+        let result: any[] = removeColumns(columns, testSections, "courses");
         expect(result).to.deep.equal([{courses_dept: "math", courses_avg: 97}]);
     });
 });

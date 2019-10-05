@@ -61,7 +61,7 @@ export class QueryPerformer implements IQueryPerformer {
         }
 
         // Remove columns
-        let finalData: any[] = removeColumns(query.Columns, processedData);
+        let finalData: any[] = removeColumns(query.Columns, processedData, id);
 
         // Return with filtered, ordered data
         return finalData;
