@@ -12,7 +12,7 @@ export function validateFilterArray(filters: any, datasetIds: string[]): [F, str
     }
     // Check that all the ID strings are the same, then return it along with a "Valid"
     if (filters.length === 0) {
-        return [F.WrongType_LogicComparison, null];
+        return [F.Empty_LogicComparison, null];
     }
     // Essentially, folds the validateFilter results into one, making sure they are
     // all valid and all have the same ID.
