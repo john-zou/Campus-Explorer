@@ -23,8 +23,19 @@ export class DiskManager implements IDiskManager {
         });
     }
 
-    public deleteDataset(id: string): Promise<string> {
-        throw new Error("Method not implemented.");
+    // this may not be the most effecient implmentation
+    public async deleteDataset(id: string): Promise<void[]> {
+        // Open disk datasets
+        let alldatasets: IParsedData[] = await this.getDatasets();
+        // Filter out dataset == to id (same as removeDataset)
+        alldatasets = alldatasets.filter((dataset: IParsedData) => {
+            return dataset.id === id;
+        });
+        const promises: Array<Promise<void>> = [];
+        for (const d of alldatasets) {
+            promises.push(this.saveDataset(d));
+        }
+        return Promise.all(promises);
     }
 
     public getDatasets(): Promise<IParsedData[]> {

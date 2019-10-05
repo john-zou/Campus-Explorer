@@ -17,6 +17,7 @@ export class DatasetManager implements IDatasetManager {
     public constructor (dataparser: IDataParser = Factory.getDataParser(), diskManager = Factory.getDiskManager() ) {
         this.diskManager = diskManager;
         this.dataParser = dataparser;
+        this.syncDatasets();
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<void> {
@@ -51,8 +52,14 @@ export class DatasetManager implements IDatasetManager {
         }
         // remove from parsedData
         this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
-        // return resolved
-        return id;
+        // remove from disk, encapsulate in the correct type of promise
+        return new Promise ((resolve, reject) => {
+            this.diskManager.deleteDataset(id).then ((p: void[]) => {
+                return resolve(id);
+            }).catch ((err: any) => {
+                throw reject(err);
+            });
+        });
     }
 
     // Causes timeout for autobot d1
@@ -82,5 +89,10 @@ export class DatasetManager implements IDatasetManager {
 
     private isInvalidId(id: string): boolean {
         return id.includes("_") || id.trim().length === 0;
+    }
+
+    // Syncs datasets on the disk and locally`
+    public syncDatasets() {
+        this.diskManager.getDatasets();
     }
 }

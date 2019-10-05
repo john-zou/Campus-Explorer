@@ -4,7 +4,7 @@ import { IParsedData } from "../data/IParsedData";
 export interface IDiskManager {
     saveDataset(dataset: IParsedData): Promise<void>;
 
-    deleteDataset(id: string): Promise<string>;
+    deleteDataset(id: string): Promise<void[]>;
 
     // Return all data saved on disk
     // Returns with an empty IParsedData[] when nothing
