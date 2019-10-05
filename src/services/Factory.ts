@@ -3,6 +3,7 @@ import { DatasetManager } from "./DatasetManager";
 import { DataParser } from "../data/DataParser";
 import { QueryValidator } from "./QueryValidator";
 import { QP2 } from "./QP2";
+import { IQueryPerformer } from "./IQueryPerformer";
 
 export class Factory {
     public static getQueryValidator(): import ("./IQueryValidator").IQueryValidator {
@@ -15,6 +16,10 @@ export class Factory {
         return new DatasetManager();
     }
     public static getQueryPerformer(): import ("./IQueryPerformer").IQueryPerformer {
+        return new QueryPerformer();
+    }
+
+    public static getQueryPerformerAlt(): IQueryPerformer {
         return new QP2();
     }
 }
