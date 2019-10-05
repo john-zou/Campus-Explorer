@@ -1,6 +1,7 @@
 import { IDiskManager } from "./IDiskManager";
 import { IParsedData } from "../data/IParsedData";
 import fs = require("fs");
+import { ParsedCoursesData } from "../data/ParsedCoursesData";
 
 export class DiskManager implements IDiskManager {
     // Constant
@@ -15,9 +16,9 @@ export class DiskManager implements IDiskManager {
         return new Promise ((resolve, reject) => {
             fs.writeFile(this.FILE, dataAsJSON, (err: any) => {
                 if (err.isInstanceOf(Error)) {
-                    reject(err);
+                    return reject(err);
                 } else {
-                    resolve();
+                    return resolve();
                 }
             });
         });
@@ -39,6 +40,19 @@ export class DiskManager implements IDiskManager {
     }
 
     public getDatasets(): Promise<IParsedData[]> {
-        throw new Error("Method not implemented.");
+        return new Promise((resolve, reject) => {
+            fs.readFile(this.FILE, (err: any, contents: Buffer) => {
+                if (err.isInstanceOf(Error)) {
+                    return reject(err);
+                } else {
+                    return this.bufferToIParsedData(contents);
+                }
+            });
+        });
+    }
+
+    public bufferToIParsedData (buf: Buffer): IParsedData[] {
+        let dataAsString: any = buf.toJSON();
+        return;
     }
 }
