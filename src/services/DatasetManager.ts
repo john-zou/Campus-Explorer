@@ -91,8 +91,11 @@ export class DatasetManager implements IDatasetManager {
         return id.includes("_") || id.trim().length === 0;
     }
 
-    // Syncs datasets on the disk and locally`
-    public syncDatasets() {
-        this.diskManager.getDatasets();
+    // Syncs datasets on the disk and locally
+    public async syncDatasets() {
+        const diskDataset: IParsedData[] = await this.diskManager.getDatasets();
+        if (this.parsedDatasets.length < diskDataset.length) {
+            this.parsedDatasets = diskDataset;
+        }
     }
 }
