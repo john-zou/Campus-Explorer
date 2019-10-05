@@ -22,6 +22,7 @@ export class DatasetManager implements IDatasetManager {
         }
         if (typeof id !== "string" || typeof content !== "string" || (kind !== InsightDatasetKind.Courses
             && kind !== InsightDatasetKind.Rooms)) {
+                // This is not triggerable in Typescript
                 throw new InsightError("Invalid argument type");
             }
         if (this.isInvalidId(id)) {
@@ -34,8 +35,8 @@ export class DatasetManager implements IDatasetManager {
     }
 
     public async removeDataset(id: string): Promise<string> {
-        if (id  === null || id === undefined) {
-            throw new InsightError("Null or undefined argument");
+        if (id == null) {
+            throw new InsightError("Null argument");
         }
         if (this.isInvalidId(id)) {
             throw new InsightError("Invalid ID");
@@ -50,9 +51,9 @@ export class DatasetManager implements IDatasetManager {
     }
 
     // Causes timeout for autobot d1
-    public async listDatasetsOld(): Promise<InsightDataset[]> {
-        return this.parsedDatasets;
-    }
+    // public async listDatasetsOld(): Promise<InsightDataset[]> {
+    //     return this.parsedDatasets;
+    // }
 
     public async listDatasets(): Promise<InsightDataset[]> {
         let ret: InsightDataset[] = [];
@@ -65,9 +66,10 @@ export class DatasetManager implements IDatasetManager {
         return ret;
     }
 
-    public async getData(id: string): Promise<IParsedData> {
-        return this.parsedDatasets.find((d: IParsedData) => d.id === id);
-    }
+    // Unused
+    // public async getData(id: string): Promise<IParsedData> {
+    //     return this.parsedDatasets.find((d: IParsedData) => d.id === id);
+    // }
 
     public async getAllData(): Promise<IParsedData[]> {
         return this.parsedDatasets;

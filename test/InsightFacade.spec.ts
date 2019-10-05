@@ -99,7 +99,7 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     });
 
     it("Should reject with InsightError on invalid id", async () => {
-        const id: string = "classes";
+        const id: string = "courses";
         const id1: string = "_";
         const id2: string = " ";
         const id3: string = "aaa_";
