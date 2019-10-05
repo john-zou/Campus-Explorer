@@ -20,6 +20,10 @@ export class DatasetManager implements IDatasetManager {
         if (id == null || content == null || kind == null) {
             throw new InsightError("Null argument(s)");
         }
+        if (typeof id !== "string" || typeof content !== "string" || (kind !== InsightDatasetKind.Courses
+            && kind !== InsightDatasetKind.Rooms)) {
+                throw new InsightError("Invalid argument type");
+            }
         if (this.isInvalidId(id)) {
             throw new InsightError("ID must not contain _ and must not be fully whitespace");
         }
