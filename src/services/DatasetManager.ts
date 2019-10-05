@@ -3,16 +3,19 @@ import { InsightDatasetKind, InsightDataset, InsightError, NotFoundError } from 
 import { IParsedData } from "../data/IParsedData";
 import { IDataParser } from "../data/IDataParser";
 import { Factory } from "./Factory";
+import { IDiskManager } from "./IDiskManager";
 
 export class DatasetManager implements IDatasetManager {
     private dataParser: IDataParser;
     private parsedDatasets: IParsedData[] = [];
+    private diskManager: IDiskManager;
 
     public get datasetIds(): string[] {
         return this.parsedDatasets.map((d: IParsedData) => d.id);
     }
 
-    public constructor (dataparser: IDataParser = Factory.getDataParser()) {
+    public constructor (dataparser: IDataParser = Factory.getDataParser(), diskManager = Factory.getDiskManager() ) {
+        this.diskManager = diskManager;
         this.dataParser = dataparser;
     }
 
@@ -31,7 +34,9 @@ export class DatasetManager implements IDatasetManager {
         if (this.datasetIds.includes(id)) {
             throw new InsightError("There is already a dataset with given ID in the list");
         }
-        this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
+        let newData: IParsedData = await this.dataParser.parseDatasetZip(id, content, kind);
+        this.parsedDatasets.push(newData);
+        this.diskManager.saveDataset(newData);
     }
 
     public async removeDataset(id: string): Promise<string> {
