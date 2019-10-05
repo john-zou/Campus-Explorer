@@ -3,6 +3,9 @@ import { mfields as MFields} from "../query_schema/MFields";
 import { sfields as SFields} from "../query_schema/SFields";
 
 export function validateFilterArray(filters: any, datasetIds: string[]): [F, string] {
+    if (filters == null) {
+        return [F.WrongType_LogicComparison, null];
+    }
     // Check that the value is indeed an array
     if (!Array.isArray(filters)) {
         return [F.WrongType_LogicComparison, null];

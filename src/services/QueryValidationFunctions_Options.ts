@@ -27,7 +27,6 @@ export function validateOptions(options: any, datasetIds: string[]): [F, string]
     }
     const columnsValidationResult: [F, string, string[]] =
         validateColumns(options.COLUMNS, datasetIds);
-        // Maggie <3
     const columnsValidationResultFlag: F = columnsValidationResult[0];
     if (columnsValidationResultFlag !== F.Valid) {
         return [columnsValidationResultFlag, null];
