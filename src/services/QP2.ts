@@ -22,7 +22,7 @@ export class QP2 implements IQueryPerformer {
     public async performQuery(query: any, datasets: IParsedData[], datasetIDs: string[]): Promise<any[]> {
         const validationResult = this.queryValidator.validate(query, datasetIDs, InsightDatasetKind.Courses);
         if (validationResult.Result !== QueryValidationResultFlag.Valid) {
-            throw new InsightError(QueryValidationResultFlag[validationResult.Result]);
+            throw new InsightError(validationResult.Result);
         }
         const id = validationResult.ID;
         const q = SmartQuery.fromValidQueryJson(id, query as IQuery);

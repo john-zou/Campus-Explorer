@@ -3,9 +3,6 @@ import { QueryValidationResult as R, QueryValidationResultFlag as F } from "../s
 import { hasTooManyKeys } from "./QueryValidationFunctions_Body";
 
 export function validateQueryPreliminary(query: any, kind: InsightDatasetKind): [F, boolean] {
-    if (query == null || typeof query !== "object") {
-        return [F.QueryIsNotAnObject, false];
-    }
     const keys: string[] = Object.keys(query);
     if (!keys.includes("WHERE")) {
         return [F.MissingBody, false];
