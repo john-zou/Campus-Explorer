@@ -19,7 +19,7 @@ export class DiskManager implements IDiskManager {
         const dirs: string[] =  fs.readdirSync("./");
         if (!dirs.includes(this.DIRNAME)) {
             // Makes new directory if it does not already exist
-            await fs.promises.mkdir(this.FILEDIR);
+            fs.mkdirSync(this.FILEDIR);
             return;
         }
     }
