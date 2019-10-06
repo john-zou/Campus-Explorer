@@ -5,7 +5,7 @@ import { ParsedCoursesData } from "../data/ParsedCoursesData";
 
 export class DiskManager implements IDiskManager {
     // Constant
-    private FILE: string = "./db.txt";
+    private FILEDIR: string = "./Database/";
 
     public saveDataset(dataset: IParsedData): Promise<void> {
         // Convert IParsedData into a nice JSON
@@ -14,7 +14,7 @@ export class DiskManager implements IDiskManager {
         // Note that saveDataset should not be called more than once
         // before promise returns
         return new Promise ((resolve, reject) => {
-            fs.writeFile(this.FILE, dataAsJSON, (err: any) => {
+            fs.writeFile(this.FILEDIR + dataset.id + ".txt", dataAsJSON, (err: any) => {
                 if (err.isInstanceOf(Error)) {
                     return reject(err);
                 } else {
@@ -24,7 +24,7 @@ export class DiskManager implements IDiskManager {
         });
     }
 
-    // this may not be the most effecient implmentation
+    // this may not be the most effecient implementation
     public async deleteDataset(id: string): Promise<void[]> {
         // Open disk datasets
         let alldatasets: IParsedData[] = await this.getDatasets();
@@ -41,7 +41,7 @@ export class DiskManager implements IDiskManager {
 
     public getDatasets(): Promise<IParsedData[]> {
         return new Promise((resolve, reject) => {
-            fs.readFile(this.FILE, (err: any, contents: Buffer) => {
+            fs.readFile(this.FILEDIR, (err: any, contents: Buffer) => {
                 if (err.isInstanceOf(Error)) {
                     return reject(err);
                 } else {
@@ -52,7 +52,7 @@ export class DiskManager implements IDiskManager {
     }
 
     public bufferToIParsedData (buf: Buffer): IParsedData[] {
-        let dataAsString: any = buf.toJSON();
+        let dataAsString: string = buf.toString();
         return;
     }
 }
