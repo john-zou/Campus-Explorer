@@ -8,61 +8,45 @@ export class DiskManager implements IDiskManager {
     private DIRNAME: string = "Database";
     private FILEDIR: string = "./" + this.DIRNAME + "/";
 
-    public constructor() {
+    public async initialize(): Promise<void> {
         // Check if database directory already exists
-        const dirs: string[] = fs.readdirSync("./");
+        const dirs: string[] = await fs.promises.readdir("./");
         if (!dirs.includes(this.DIRNAME)) {
             // Makes new directory if it does not already exist
-            fs.mkdirSync(this.FILEDIR);
+            await fs.promises.mkdir(this.FILEDIR);
         }
     }
 
-    public saveDataset(dataset: IParsedData): Promise<void> {
+    public async saveDataset(dataset: IParsedData): Promise<void> {
         // Convert IParsedData into a nice JSON
         const dataAsJSON: string = JSON.stringify(dataset);
         // Save JSON into a .txt file
         // Note that saveDataset should not be called more than once
         // before promise returns
-        return new Promise ((resolve, reject) => {
-            fs.appendFile(this.FILEDIR + dataset.id + ".txt", dataAsJSON, (err: any) => {
-                if (err.isInstanceOf(Error)) {
-                    return reject(err);
-                } else {
-                    return resolve();
-                }
-            });
-        });
+        await fs.promises.writeFile(this.FILEDIR + dataset.id, dataAsJSON);
     }
 
     // this may not be the most effecient implementation
-    public async deleteDataset(id: string): Promise<void[]> {
-        // Open disk datasets
-        let alldatasets: IParsedData[] = await this.getDatasets();
-        // Filter out dataset == to id (same as removeDataset)
-        alldatasets = alldatasets.filter((dataset: IParsedData) => {
-            return dataset.id === id;
-        });
-        const promises: Array<Promise<void>> = [];
-        for (const d of alldatasets) {
-            promises.push(this.saveDataset(d));
+    public async deleteDataset(id: string): Promise<void> {
+        // Make sure file not already in dataset
+        const fileNames: string[] = await fs.promises.readdir(this.FILEDIR);
+        if (fileNames.includes(id)) {
+            throw new Error("Cannot delete file with id: " + id + " because it does not exist");
         }
-        return Promise.all(promises);
+        // Delete file
+        fs.promises.unlink(this.FILEDIR);
     }
 
-    public getDatasets(): Promise<IParsedData[]> {
-        return new Promise((resolve, reject) => {
-            fs.readFile(this.FILEDIR, (err: any, contents: Buffer) => {
-                if (err.isInstanceOf(Error)) {
-                    return reject(err);
-                } else {
-                    return this.bufferToIParsedData(contents);
-                }
-            });
-        });
-    }
-
-    public bufferToIParsedData (buf: Buffer): IParsedData[] {
-        let dataAsString: string = buf.toString();
-        return;
+    public async getDatasets(): Promise<IParsedData[]> {
+        const fileNames: string[] = await fs.promises.readdir(this.FILEDIR);
+        let foundData: IParsedData[] = [];
+        // Terminate early if no datasets to get
+        if (fileNames === undefined || fileNames.length === 0) {
+            return Promise.resolve([]);
+        }
+        for (const file of fileNames) {
+            foundData.push(JSON.parse((await fs.promises.readFile(this.FILEDIR)).toString()));
+        }
+        return foundData;
     }
 }

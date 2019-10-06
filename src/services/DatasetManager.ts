@@ -53,13 +53,8 @@ export class DatasetManager implements IDatasetManager {
         // remove from parsedData
         this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
         // remove from disk, encapsulate in the correct type of promise
-        return new Promise ((resolve, reject) => {
-            this.diskManager.deleteDataset(id).then ((p: void[]) => {
-                return resolve(id);
-            }).catch ((err: any) => {
-                throw reject(err);
-            });
-        });
+        await this.diskManager.deleteDataset(id);
+        return id;
     }
 
     // Causes timeout for autobot d1
