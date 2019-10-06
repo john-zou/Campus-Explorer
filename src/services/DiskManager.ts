@@ -37,11 +37,11 @@ export class DiskManager implements IDiskManager {
     public async deleteDataset(id: string): Promise<void> {
         // Make sure file not already in dataset
         const fileNames: string[] = await fs.promises.readdir(this.FILEDIR);
-        if (fileNames.includes(id)) {
+        if (!fileNames.includes(id)) {
             throw new Error("Cannot delete file with id: " + id + " because it does not exist");
         }
         // Delete file
-        await fs.promises.unlink(this.FILEDIR);
+        await fs.promises.unlink(this.FILEDIR + id);
     }
 
     public async getDatasets(): Promise<IParsedData[]> {

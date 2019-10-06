@@ -51,9 +51,6 @@ export class DatasetManager implements IDatasetManager {
             throw new InsightError("Invalid ID");
         }
         if (!this.datasetIds.includes(id)) {
-            for (let did of this.datasetIds) {
-                Log.trace(did);
-            }
             throw new NotFoundError("ID not in dataset");
         }
         // remove from parsedData
