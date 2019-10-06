@@ -5,7 +5,17 @@ import { ParsedCoursesData } from "../data/ParsedCoursesData";
 
 export class DiskManager implements IDiskManager {
     // Constant
-    private FILEDIR: string = "./Database/";
+    private DIRNAME: string = "Database";
+    private FILEDIR: string = "./" + this.DIRNAME + "/";
+
+    public constructor() {
+        // Check if database directory already exists
+        const dirs: string[] = fs.readdirSync("./");
+        if (!dirs.includes(this.DIRNAME)) {
+            // Makes new directory if it does not already exist
+            fs.mkdirSync(this.FILEDIR);
+        }
+    }
 
     public saveDataset(dataset: IParsedData): Promise<void> {
         // Convert IParsedData into a nice JSON
@@ -14,7 +24,7 @@ export class DiskManager implements IDiskManager {
         // Note that saveDataset should not be called more than once
         // before promise returns
         return new Promise ((resolve, reject) => {
-            fs.writeFile(this.FILEDIR + dataset.id + ".txt", dataAsJSON, (err: any) => {
+            fs.appendFile(this.FILEDIR + dataset.id + ".txt", dataAsJSON, (err: any) => {
                 if (err.isInstanceOf(Error)) {
                     return reject(err);
                 } else {
