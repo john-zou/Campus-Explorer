@@ -73,19 +73,6 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         Log.test(`AfterTest: ${this.currentTest.title}`);
     });
 
-    // This is a unit test. You should create more like this!
-    it(`Should add the "courses" dataset`, async function () {
-        const id: string = "courses";
-        const expected: string[] = [id];
-        let result;
-        try {
-            result = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        } catch (err) {
-            throw err;
-        }
-        expect(result).to.deep.equal(expected);
-    });
-
     it("Should add the simpleGood dataset", async function () {
         const id: string = "simpleGood";
         const expected: string[] = [id];
@@ -96,6 +83,7 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
             throw err;
         }
         expect(result).to.deep.equal(expected);
+        await insightFacade.removeDataset(id);
     });
 
     it("Should reject with InsightError on invalid id", async () => {
@@ -141,12 +129,16 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
         await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
         await expectFulfilled(insightFacade.addDataset(id3, datasets[id3], InsightDatasetKind.Courses), expected3);
+        await insightFacade.removeDataset(id1);
+        await insightFacade.removeDataset(id2);
+        await insightFacade.removeDataset(id3);
     });
 
     it("Should add a valid dataset with 1 valid section inside a file with invalid sections", async () => {
         const id: string = "simpleGoodWithBadSections";
         const expected: string[] = [id];
         await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+        await insightFacade.removeDataset(id);
     });
 
     it("Should add a valid dataset with 1 valid section inside a file with invalid sections, and one bad file",
@@ -154,12 +146,14 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         const id: string = "validOneBadFile";
         const expected: string[] = [id];
         await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+        await insightFacade.removeDataset(id);
     });
 
     it("Should add a valid dataset despite all flavors of invalid sections because some are valid", async () => {
         const id: string = "invalidSectionsOneValid";
         const expected: string[] = [id];
         await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+        await insightFacade.removeDataset(id);
     });
 
     class MockParsedData implements IParsedData {
@@ -187,9 +181,11 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     });
 
     it("The dataset manager should not add dataset if dataset with id is already added", async () => {
+        // Using mock Data parser!!!
         let dm = new DatasetManager(new MockDataParser());
         await expectFulfilledVoid(dm.addDataset("mock", "blablabla", InsightDatasetKind.Courses));
         await expectRejected(dm.addDataset("mock", "blablabla", InsightDatasetKind.Courses), InsightError);
+        await insightFacade.removeDataset("mock");
     });
 
     it("The dataset manager should remove dataset", async () => {
@@ -225,15 +221,6 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         await expectRejected(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), InsightError);
     });
 
-    it("Should add two datasets successfully", async () => {
-        const id1: string = "courses";
-        const id2: string = "engl";
-        const expected1: string[] = [id1];
-        const expected2: string[] = [id1, id2];
-        await expectFulfilled(insightFacade.addDataset(id1, datasets[id1], InsightDatasetKind.Courses), expected1);
-        await expectFulfilled(insightFacade.addDataset(id2, datasets[id2], InsightDatasetKind.Courses), expected2);
-    });
-
     it("Should list the dataset after adding", async () => {
         const id: string = "courses";
         await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
@@ -241,6 +228,7 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         expect(ds.length).to.equal(1);
         expect(ds[0].kind).to.equal(InsightDatasetKind.Courses);
         expect(ds[0].id).to.equal(id);
+        await insightFacade.removeDataset(id);
     });
 
     it("Should list nothing before adding and after adding then removing", async () => {
@@ -283,46 +271,9 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
             await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), [id]);
             const dataSets = await insightFacade.listDatasets();
             expect(dataSets[0].numRows).to.equal(coursesNumRows);
+            await insightFacade.removeDataset(id);
         }
     );
-
-    // Not applicable for d1:
-    // it("Should reject with InsightError on valid id and dataset, but mismatched InsightDatasetKind",
-    //     async () => {
-    //         const id: string = "courses";
-    //         await expectRejected
-    //               (insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms), InsightError);
-    //     }
-    // );
-
-    it("Should reject with InsightError on valid dataset added twice",
-        async () => {
-            const id: string = "courses";
-            await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-            await expectRejected(insightFacade.addDataset(id,
-                                                          datasets[id], InsightDatasetKind.Courses), InsightError);
-        }
-    );
-
-    it("Should remove a dataset after adding it", async () => {
-        const id: string = "courses";
-        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        await expectFulfilled(insightFacade.removeDataset(id), id);
-    });
-
-    it("Should reject with InsightError on removal of invalid id name after adding a dataset", async () => {
-        const id: string = "courses";
-        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        const id1: string = "_";
-        const id2: string = " ";
-        const id3: string = "courses_";
-        const id4: string = "_courses";
-        await expectRejected(insightFacade.removeDataset(id1), InsightError);
-        await expectRejected(insightFacade.removeDataset(id2), InsightError);
-        await expectRejected(insightFacade.removeDataset(id3), InsightError);
-        await expectRejected(insightFacade.removeDataset(id4), InsightError);
-
-    });
 
     it("Should remove the exact requested dataset after adding two datasets", async () => {
         const id1: string = "courses";
@@ -333,25 +284,36 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         const ds: InsightDataset[] = await insightFacade.listDatasets();
         expect(ds.length).to.equal(1);
         expect(ds[0].id).to.equal(id2);
+        await insightFacade.removeDataset(id2);
     });
 
     it("Should reject with NotFoundError on valid but nonexistent id both before and after adding a valid dataset",
         async () => {
             const validNonexistentId: string = "valid";
-            const existentId: string = "courses";
+            const existentId: string = "simpleGood";
             await expectRejected(insightFacade.removeDataset(validNonexistentId), NotFoundError);
             await insightFacade.addDataset(existentId, datasets[existentId], InsightDatasetKind.Courses);
             await expectRejected(insightFacade.removeDataset(validNonexistentId), NotFoundError);
+            await insightFacade.removeDataset(existentId);
         });
 
     it("Should allow dataset to be added again after removing it",
         async () => {
-            const id: string = "courses";
+            const id: string = "simpleGood";
             const expected: string[] = [id];
             await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
             await insightFacade.removeDataset(id);
             await expectFulfilled(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses), expected);
+            await insightFacade.removeDataset(id);
         });
+
+    it("Simple Good should persist", async () => {
+        const insightFacade2: InsightFacade = new InsightFacade();
+        const id: string = "simpleGood";
+        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        const testId: string = await insightFacade2.removeDataset(id);
+        expect(id).to.equal(testId);
+    });
 
     it("This is just to clear the cache",
         async () => {

@@ -1,19 +1,26 @@
-import { IDiskManager } from "./IDiskManager";
+import { IDiskManager, DiskManagerStatus } from "./IDiskManager";
 import { IParsedData } from "../data/IParsedData";
 import fs = require("fs");
 import { ParsedCoursesData } from "../data/ParsedCoursesData";
+import Log from "../Util";
 
 export class DiskManager implements IDiskManager {
     // Constant
-    private DIRNAME: string = "Database";
+    private DIRNAME: string = "data";
     private FILEDIR: string = "./" + this.DIRNAME + "/";
 
-    public async initialize(): Promise<void> {
+    public Status: DiskManagerStatus = DiskManagerStatus.NewlyBorn;
+
+    public async initializeIfNeeded(): Promise<void> {
+        if (this.Status === DiskManagerStatus.Adult) {
+            return;
+        }
         // Check if database directory already exists
         const dirs: string[] = await fs.promises.readdir("./");
         if (!dirs.includes(this.DIRNAME)) {
             // Makes new directory if it does not already exist
             await fs.promises.mkdir(this.FILEDIR);
+            return;
         }
     }
 
@@ -34,19 +41,24 @@ export class DiskManager implements IDiskManager {
             throw new Error("Cannot delete file with id: " + id + " because it does not exist");
         }
         // Delete file
-        fs.promises.unlink(this.FILEDIR);
+        await fs.promises.unlink(this.FILEDIR);
     }
 
     public async getDatasets(): Promise<IParsedData[]> {
-        const fileNames: string[] = await fs.promises.readdir(this.FILEDIR);
+        let fileNames: string[] = [];
+        fileNames = await fs.promises.readdir(this.FILEDIR);
         let foundData: IParsedData[] = [];
         // Terminate early if no datasets to get
         if (fileNames === undefined || fileNames.length === 0) {
-            return Promise.resolve([]);
+            return foundData;
         }
         for (const file of fileNames) {
-            foundData.push(JSON.parse((await fs.promises.readFile(this.FILEDIR)).toString()));
+            foundData.push(JSON.parse((await fs.promises.readFile(this.FILEDIR + file)).toString()));
         }
+        this.growUp();
         return foundData;
+    }
+    private growUp() {
+        this.Status = DiskManagerStatus.Adult;
     }
 }
