@@ -1,7 +1,8 @@
 import { IQueryPerformer } from "./IQueryPerformer";
 import { IParsedData } from "../data/IParsedData";
 import { QueryValidator } from "./QueryValidator";
-import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightError,
+    ResultTooLargeError } from "../controller/IInsightFacade";
 import { QueryValidationResultFlag, IQueryValidator } from "./IQueryValidator";
 import { SmartQuery } from "../query_schema/SmartQuery";
 import { IQuery } from "../query_schema/IQuery";
@@ -40,7 +41,7 @@ export class QP2 implements IQueryPerformer {
         }
 
         if (sections.length > 5000) {
-            throw new InsightError("Too many results");
+            throw new ResultTooLargeError("Too many results");
         }
 
         if (sections.length === 0) {

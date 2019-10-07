@@ -325,6 +325,18 @@ describe("QP2: LogicComparisons (AND, OR, NOT)", () => {
     datasets.push(dataset);
     const datasetIds = [id];
 
+    it ("NOT NOT GT Avg 95", async () => {
+        const gtAvg95: MockQuery = MockQuery.GT_Avg_95(id);
+        const not1: MockQuery = MockQuery.NOT(id, gtAvg95);
+        const not2: MockQuery = MockQuery.NOT(id, not1);
+        const results: any [] = await qp2.performQuery(not2, datasets, datasetIds);
+        const expectedUuids = [6, 7, 8, 9];
+        expect(results).to.have.lengthOf(expectedUuids.length);
+        if (!containsAllUuids(results, expectedUuids, id)) {
+            expect.fail();
+        }
+    });
+
     it ("NOT AVG GT 95", async () => {
         const gtAvg95: MockQuery = MockQuery.GT_Avg_95(id);
         const not: MockQuery = MockQuery.NOT(id, gtAvg95);

@@ -114,6 +114,7 @@ export function validateColumnStrings(cols: any[], datasetIds: string[]): [F, st
     // The field is guaranteed to be in MFields or SFields
     const firstId: string = firstResult[1];
     let fields: string[] = [firstId];
+    fields.push(firstResult[2]);
     // Iterate through the rest
     for (let i = 1; i < cols.length; ++i) {
         const result: [F, string, string] = validateColumnString(cols[i], datasetIds);
