@@ -5,9 +5,9 @@ import { validateOptions } from "./QueryValidationFunctions_Options";
 
 export class QueryValidator implements IQueryValidator {
     public validate(json: any, datasetIds: string[], kind: InsightDatasetKind): R {
-        // if (json == null || typeof json !== "object") {
-        //     return new R(F.QueryIsNotAnObject);
-        // }
+        if (json == null || typeof json !== "object") {
+            return new R(F.QueryIsNotAnObject);
+        }
         if (isMissingKey(json, "WHERE")) {
             return new R(F.MissingBody);
         }
