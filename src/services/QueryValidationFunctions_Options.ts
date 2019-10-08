@@ -1,9 +1,12 @@
 import { QueryValidationResultFlag as F } from "./IQueryValidator";
-import { mfields as MFields } from "../query_schema/MFields";
-import { sfields as SFields } from "../query_schema/SFields";
+import { MFIELDS_COURSES as MFields } from "../query_schema/MFields";
+import { SFIELDS_COURSES as SFields } from "../query_schema/SFields";
 import { hasTooManyKeys, parseKeystring } from "./QueryValidationFunctions_Body";
+import { InsightDatasetKind } from "../controller/IInsightFacade";
 
-export function validateOptions(options: any, datasetIds: string[]): [F, string] {
+export function validateOptions(options: any,
+                                datasetIds: string[],
+                                kind: InsightDatasetKind): [F, string] {
     // Check that options is an object
     if (options == null || typeof options !== "object") {
         return [F.WrongType_Options, null];

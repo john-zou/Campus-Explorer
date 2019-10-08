@@ -3,8 +3,8 @@ import { ISmartFilter, Logic, MComparator, FilterType,
     SField, INegation, Column, mFieldFromString, sFieldFromString, ISmartColumn, ColumnType } from "./ISmartQuery";
 import { IFilter, IAnd, IOr, IGt, ILt, IEq, IIs, INot } from "./IQuery";
 import { validateColumnString } from "../services/QueryValidationFunctions_Options";
-import { mfields } from "./MFields";
-import { sfields } from "./SFields";
+import { MFIELDS_COURSES } from "./MFields";
+import { SFIELDS_COURSES } from "./SFields";
 import { LogicComparison, SmartFilterLogicComparison,
     SmartFilterMComparison, MComparison, SmartFilterSComparison, SComparison,
     SmartFilterNegation, Negation, SmartColumn } from "./SmartClasses";
@@ -102,12 +102,12 @@ export function getIdstring(scomparison: any): [string, boolean, boolean] {
 export function getColumn(col: string): ISmartColumn {
     let smartColumn: ISmartColumn = new SmartColumn();
     const fieldStr: string = col.split("_")[1];
-    if (mfields.includes(fieldStr)) {
+    if (MFIELDS_COURSES.includes(fieldStr)) {
         smartColumn.Type = ColumnType.MField;
         smartColumn.Field = mFieldFromString(fieldStr);
         return smartColumn;
     }
-    if (sfields.includes(fieldStr)) {
+    if (SFIELDS_COURSES.includes(fieldStr)) {
         smartColumn.Type = ColumnType.SField;
         smartColumn.Field = sFieldFromString(fieldStr);
         return smartColumn;

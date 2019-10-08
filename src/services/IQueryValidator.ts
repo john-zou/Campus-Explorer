@@ -44,7 +44,16 @@ export enum QueryValidationResultFlag {
     EmptySField = "SField cannot be empty",
     EmptyMField = "MField cannot be empty",
     EmptyField = "S/M Field cannot be empty",
-    Empty_LogicComparison = "LogicComparison must be nonempty array"
+    Empty_LogicComparison = "LogicComparison must be nonempty array",
+    TransformationsIsNotAnObject = "TransformationsIsNotAnObject",
+    TransformationsDoesntHaveTwoKeys = "TransformationsDoesntHaveTwoKeys",
+    TransformationsIsMissingGroup = "TransformationsIsMissingGroup",
+    GroupIsNotAnArray = "GroupIsNotAnArray",
+    GroupMustBeNonEmptyArray = "GroupMustBeNonEmptyArray",
+    ApplyIsNotAnArray = "ApplyIsNotAnArray",
+    ApplyMustBeNonEmptyArray = "ApplyMustBeNonEmptyArray",
+    InvalidKey = "InvalidKey",
+    KeystringIsNotAString = "KeystringIsNotAString"
 }
 
 export class QueryValidationResult {

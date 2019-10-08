@@ -1,8 +1,11 @@
 import { QueryValidationResultFlag as F } from "./IQueryValidator";
-import { mfields as MFields} from "../query_schema/MFields";
-import { sfields as SFields} from "../query_schema/SFields";
+import { MFIELDS_COURSES as MFields} from "../query_schema/MFields";
+import { SFIELDS_COURSES as SFields} from "../query_schema/SFields";
+import { InsightDatasetKind } from "../controller/IInsightFacade";
 
-export function validateFilterArray(filters: any, datasetIds: string[]): [F, string] {
+export function validateFilterArray(filters: any,
+                                    datasetIds: string[],
+                                    kind: InsightDatasetKind): [F, string] {
     if (filters == null) {
         return [F.WrongType_LogicComparison, null];
     }
@@ -16,12 +19,12 @@ export function validateFilterArray(filters: any, datasetIds: string[]): [F, str
     }
     // Essentially, folds the validateFilter results into one, making sure they are
     // all valid and all have the same ID.
-    let firstResult: [F, string] = validateFilter(filters[0], datasetIds);
+    let firstResult: [F, string] = validateFilter(filters[0], datasetIds, kind);
     if (firstResult[0] !== F.Valid) {
         return firstResult;
     }
     for (let i = 1; i < filters.length; ++i) {
-        let nextResult: [F, string] = validateFilter(filters[i], datasetIds);
+        let nextResult: [F, string] = validateFilter(filters[i], datasetIds, kind);
         if (nextResult[0] !== F.Valid) {
             return nextResult;
         }
@@ -32,7 +35,9 @@ export function validateFilterArray(filters: any, datasetIds: string[]): [F, str
     return firstResult;
 }
 
-export function validateFilter(filter: any, datasetIds: string[]): [F, string]  {
+export function validateFilter(filter: any, datasetIds: string[],
+                               kind: InsightDatasetKind): [F, string]  {
+
     if (filter == null || typeof filter !== "object") {
         return [F.WrongValue_LogicComparison, null];
     }
@@ -44,18 +49,19 @@ export function validateFilter(filter: any, datasetIds: string[]): [F, string]  
     }
     const key = Object.keys(filter)[0];
     switch (key) {
-        case "AND": return validateFilterArray(filter.AND, datasetIds);
-        case "OR": return validateFilterArray(filter.OR, datasetIds);
-        case "NOT": return validateFilter(filter.NOT, datasetIds);
-        case "LT": return validateMComparison(filter.LT, datasetIds);
-        case "GT": return validateMComparison(filter.GT, datasetIds);
-        case "EQ": return validateMComparison(filter.EQ, datasetIds);
-        case "IS": return validateSComparison(filter.IS, datasetIds);
+        case "AND": return validateFilterArray(filter.AND, datasetIds, kind);
+        case "OR": return validateFilterArray(filter.OR, datasetIds, kind);
+        case "NOT": return validateFilter(filter.NOT, datasetIds, kind);
+        case "LT": return validateMComparison(filter.LT, datasetIds, kind);
+        case "GT": return validateMComparison(filter.GT, datasetIds, kind);
+        case "EQ": return validateMComparison(filter.EQ, datasetIds, kind);
+        case "IS": return validateSComparison(filter.IS, datasetIds, kind);
         default: return [F.WrongKey_Filter, null];
     }
 }
 
-export function validateSComparison(sc: any, datasetIds: string[]): [F, string] {
+export function validateSComparison(sc: any, datasetIds: string[]
+    ,                               kind: InsightDatasetKind): [F, string] {
     if (Array.isArray(sc)) {
         return [F.WrongType_SComparison, null];
     }
@@ -115,7 +121,9 @@ export function validateSValue(value: string): F {
     return F.Valid;
 }
 
-export function validateMComparison(mc: any, datasetIds: string[]): [F, string] {
+export function validateMComparison(mc: any,
+                                    datasetIds: string[],
+                                    kind: InsightDatasetKind): [F, string] {
     if (Array.isArray(mc)) {
         return [F.WrongType_MComparison, null];
     }
@@ -156,6 +164,9 @@ export function validateMComparison(mc: any, datasetIds: string[]): [F, string] 
 
 // idstring_m/sfield
 export function parseKeystring(str: string): [F, string, string] {
+    if (str == null || typeof str !== "string") {
+        return [F.KeystringIsNotAString, null, null];
+    }
     let splitResultArray: string[] = str.split("_");
     // If there is exactly one underscore, then the length of the split will be exactly 2
     if (splitResultArray.length === 1) {
