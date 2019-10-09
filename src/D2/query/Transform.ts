@@ -20,7 +20,7 @@ function group(q: any, t: any[]) {
         how_you_like_my_snake_case_labels:
         for (const ggg of groups) {
             for (const gg of g) {
-                if (ggg[0][gg] !== thing[gg]) {
+                if (ggg[0][gg] !== thing[gg.split("_")[1]]) {
                     continue how_you_like_my_snake_case_labels;
                 }
             }
