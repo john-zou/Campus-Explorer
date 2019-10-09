@@ -4,16 +4,10 @@ import { InsightError, InsightDatasetKind, ResultTooLargeError } from "../../con
 import { f } from "./Filter";
 import { transform } from "./Transform";
 import { dontTransform } from "./DontTransform";
-// import { QueryValidator } from "../../services/QueryValidator";
+import { getIdIfValid } from "./Validate";
 
 export async function realize(q: any, owen: OwensReality): Promise<any[]> {
-    // const vr = new QueryValidator().validate(q, owen);
-    let vr: any = null; // <---delete this
-
-    if (vr.Result !== QueryValidationResultFlag.Valid) {
-        throw new InsightError(vr.Result);
-    }
-    const id = vr.ID;
+    const id = getIdIfValid(q, owen);
     const d = owen.getDataset(id);
     let things;
 

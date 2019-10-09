@@ -34,7 +34,7 @@ export enum QueryValidationResultFlag {
     TooManyKeys_Options = "Options has too many keys",
     ColumnContainsInvalidField = "Column contains invalid field",
     OrderContainsInvalidField = "Order contains invalid field",
-    OrderContainsFieldNotInColumns = "Order contains field not in columns",
+    OrderNotInColumns = "Order contains field not in columns",
     SValueNotAString = "SValue needs to be a string",
     SValueContainsInternalAsterisk = "SValue cannot contain an internal asterisk",
     WrongType_Order = "Order must be a string",
@@ -58,10 +58,21 @@ export enum QueryValidationResultFlag {
     ApplyRuleMustBeAnObject = "ApplyRuleMustBeAnObject",
     ApplyRuleMustHaveExactlyOneKey = "ApplyRuleMustHaveExactlyOneKey",
     ApplyKeysMustBeUnique = "ApplyKeysMustBeUnique",
-    ApplyKeyValueMustBeObject = "ApplyKeyValueMustBeObject",
+    ApplyKeyCoreMustBeObject = "ApplyKeyValueMustBeObject",
     ApplyKeyValueMustHaveOneKey = "ApplyKeyValueMustHaveOneKey",
-    ApplyKeyValueMustHaveApplyTokenKey = "ApplyKeyValueMustHaveApplytokenKey",
-    ApplyKeyKeyTokenHasInvalidKey = "ApplyKeyKeyTokenHasInvalidKey"
+    ApplyKeyCore_Is_Invalid = "ApplyKeyValueMustHaveApplytokenKey",
+    ApplyKeyKeyTokenHasInvalidKey = "ApplyKeyKeyTokenHasInvalidKey",
+    InvalidApplyRule = "InvalidApplyRule",
+    ApplyKeyCoreMustHaveOneKey = "ApplyKeyCoreMustHaveOneKey",
+    ApplyKeyContainsUnderscore = "ApplyKeyContainsUnderscore",
+    ColumnWithoutUnderscoreNotInApplyKeys = "ColumnWithoutUnderscoreNotInApplyKeys",
+    ColumnContainsFieldNotInGroupFields = "ColumnContainsFieldNotInGroupFields",
+    TooManyKeys_Order = "TooManyKeys_Order",
+    OrderMissingDir = "OrderMissingDir",
+    OrderMissingKeys = "OrderMissingKeys",
+    InvalidOrderDir = "InvalidOrderDir",
+    OrderKeysIsNotNonEmptyArray = "OrderKeysIsNotNonEmptyArray",
+    OrderContainsKeyNotInColumns = "OrderContainsKeyNotInColumns"
 }
 
 export class QueryValidationResult {

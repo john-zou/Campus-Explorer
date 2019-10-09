@@ -10,3 +10,9 @@ export default class Insight {
         return Promise.reject(new NotFoundError(msg));
     }
 }
+/**
+ * Throws InsightError
+ */
+export function WT(rock: any) {
+    throw new InsightError(rock);
+}

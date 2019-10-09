@@ -2,18 +2,23 @@ import { QueryValidationResultFlag as F } from "./IQueryValidator";
 import { MFIELDS_COURSES as MFields } from "../query_schema/MFields";
 import { SFIELDS_COURSES as SFields } from "../query_schema/SFields";
 import { hasTooManyKeys, parseKeystring } from "./QueryValidationFunctions_Body";
-import { InsightDatasetKind } from "../controller/IInsightFacade";
+import { OwensReality } from "../data/OwensReality";
+import { WT } from "../util/Insight";
+import { verifyAndGetIdAndField } from "./QueryValidationFunctions_Transformations";
 
 export function validateOptions(options: any,
-                                datasetIds: string[],
-                                kind: InsightDatasetKind): [F, string] {
+                                owen: OwensReality,
+                                transformed: boolean,
+                                idFromTransformations?: string,
+                                groupFields?: string[],
+                                applyKeys?: string[]): string {
     // Check that options is an object
     if (options == null || typeof options !== "object") {
-        return [F.WrongType_Options, null];
+        WT(F.WrongType_Options);
     }
     // Check that options contains column key
     if (!Object.keys(options).includes("COLUMNS")) {
-        return [F.MissingColumns, null];
+        WT(F.MissingColumns);
     }
     // Check whether options contains order key
     const orderExists: boolean = Object.keys(options).includes("ORDER");
@@ -21,140 +26,141 @@ export function validateOptions(options: any,
     if (orderExists) {
         // Ensure there are no more than 2 keys
         if (hasTooManyKeys(options, 2)) {
-            return [F.TooManyKeys_Options, null];
+            WT(F.TooManyKeys_Options);
         }
     } else { // COLUMNS must be the only key
         if (hasTooManyKeys(options, 1)) {
-            return [F.TooManyKeys_Options, null];
+            WT(F.TooManyKeys_Options);
         }
     }
-    const columnsValidationResult: [F, string, string[]] =
-        validateColumns(options.COLUMNS, datasetIds);
-    const columnsValidationResultFlag: F = columnsValidationResult[0];
-    if (columnsValidationResultFlag !== F.Valid) {
-        return [columnsValidationResultFlag, null];
-    }
-    const columnsValidationResultId: string = columnsValidationResult[1];
-    // Check the order if it exists. Otherwise, return the columnsValidationResult.
-    if (orderExists) {
-        const columnFields: string[] = columnsValidationResult[2];
-        const order: any = options.ORDER;
-        const orderValidationResult: F =
-            validateOrder(order, columnsValidationResultId, datasetIds, columnFields);
-        if (orderValidationResult !== F.Valid) {
-            return [orderValidationResult, null];
-        }
-        return [orderValidationResult, columnsValidationResultId];
+
+    let idFromNonTransformedColumns: string;
+    if (transformed) {
+        validateTransformedColumns(options.COLUMNS, owen, idFromTransformations, groupFields, applyKeys);
     } else {
-        return [columnsValidationResultFlag, columnsValidationResultId];
+        idFromNonTransformedColumns = validateColumnsAndGetID(options.COLUMNS, owen);
     }
+
+    const THE_ONE_ID: string = transformed ? idFromNonTransformedColumns : idFromNonTransformedColumns;
+    // Check the order
+    if (orderExists) {
+        const order: any = options.ORDER;
+        validateOrder(order, options.COLUMNS);
+    }
+    // Valid!
+    return THE_ONE_ID;
 }
 
 // the datasetIds are passed for more descriptive invalid result flag
-export function validateOrder(orderValue: any,
-                              idFromColumns: string,
-                              datasetIds: string[],
-                              fieldsFromColumns: string[]): F {
-    if (orderValue == null || typeof orderValue !== "string") {
-        return F.WrongType_Order;
+export function validateOrder(order: any,
+                              columns: string[]) {
+    if (order == null) {
+        WT(F.WrongType_Order);
     }
-    const parseResult: [F, string, string] = parseKeystring(orderValue);
-    const parseResultFlag: F = parseResult[0];
-    if (parseResultFlag !== F.Valid) {
-        return parseResultFlag;
+    if (typeof order === "string") {
+        if (!columns.includes(order)) {
+            WT(F.OrderNotInColumns);
+        }
+    } else if (typeof order === "object") {
+        validateOrderObject(order, columns);
+    } else {
+        WT(F.WrongType_Order);
     }
-    const idString: string = parseResult[1];
-    if (idString.length === 0) {
-        return F.NoIdstring;
-    }
-    if (!datasetIds.includes(idString)) {
-        return F.IdDoesNotExist;
-    }
-    if (idString !== idFromColumns) {
-        return F.MoreThanOneId;
-    }
-    const field: string = parseResult[2];
-    if (field.length === 0) {
-        return F.EmptyField;
-    }
-    if (!(SFields.includes(field) || MFields.includes(field))) {
-        return F.OrderContainsInvalidField;
-    }
-    if (!fieldsFromColumns.includes(field)) {
-        return F.OrderContainsFieldNotInColumns;
-    }
-    // Otherwise, the order is fine
-    return F.Valid;
 }
 
-export function validateColumns(cols: any, datasetIds: string[]): [F, string, string[]] {
-    // Check if columns is an array
+// SORT ::= 'ORDER: ' ('{ dir:'  DIRECTION ', keys: [ ' ORDERKEY (',' ORDERKEY)* ']}') | ORDERKEY
+export function validateOrderObject(order: any, columns: string[]) {
+    const keys = Object.keys(order);
+    if (keys.length !== 2) {
+        WT(F.TooManyKeys_Order);
+    }
+    if (!keys.includes("dir")) {
+        WT(F.OrderMissingDir);
+    }
+    if (!keys.includes("keys")) {
+        WT(F.OrderMissingKeys);
+    }
+    if (order.dir !== "UP" && order.dir !== "DOWN") {
+        WT(F.InvalidOrderDir);
+    }
+    if (!Array.isArray(order.keys)) {
+        WT(F.OrderKeysIsNotNonEmptyArray);
+    }
+    if (order.keys.length === 0) {
+        WT(F.OrderKeysIsNotNonEmptyArray);
+    }
+    for (const item of order.keys) {
+        if (!columns.includes(item)) {
+            WT(F.OrderContainsKeyNotInColumns);
+        }
+    }
+}
+
+function validateTransformedColumns(cols: any, owen: OwensReality,
+                                    id: string,
+                                    groupFields: string[],
+                                    applyFields: string[]) {
     if (!(Array.isArray(cols))) {
-        return [F.ColumnsIsNotNonEmptyArray, null, null];
+        WT(F.ColumnsIsNotNonEmptyArray);
     }
     // Check if columns is empty
     if (cols.length === 0) {
-        return [F.ColumnsIsNotNonEmptyArray, null, null];
+        WT(F.ColumnsIsNotNonEmptyArray);
+    }
+
+    validateTransformedColumnStrings(cols, owen, id, groupFields, applyFields);
+}
+
+export function validateTransformedColumnStrings(cols: any[], owen: OwensReality, id: string, groupFields: string[],
+                                                 applyKeys: string[]) {
+    for (const c of cols) {
+        if (c == null || typeof c !== "string") {
+            WT(F.ColumnsContainsWrongType);
+        }
+        if (!c.includes("_")) {
+            // applyKey
+            if (!applyKeys.includes(c)) {
+                WT(F.ColumnWithoutUnderscoreNotInApplyKeys);
+            }
+        } else {
+            const [idd, field] = verifyAndGetIdAndField(c, owen);
+            if (id !== idd) {
+                WT(F.MoreThanOneId);
+            }
+            if (!groupFields.includes("_" + field)) {
+                WT(F.ColumnContainsFieldNotInGroupFields);
+            }
+        }
+    }
+}
+
+export function validateColumnsAndGetID(cols: any, owen: OwensReality): string {
+    // Check if columns is an array
+    if (!(Array.isArray(cols))) {
+        WT(F.ColumnsIsNotNonEmptyArray);
+    }
+    // Check if columns is empty
+    if (cols.length === 0) {
+        WT(F.ColumnsIsNotNonEmptyArray);
     }
     // Return the result of checking each string
-    return validateColumnStrings(cols, datasetIds);
+    return validateColumnStringsAndGetID(cols, owen);
 }
 
 /**
  * @param cols must be a non-empty array (otherwise it may give wrong invalid flag (but daijoubu))
  */
-export function validateColumnStrings(cols: any[], datasetIds: string[]): [F, string, string[]] {
-    // Check the first item
-    const firstItem: any = cols[0];
-    if (firstItem == null || typeof firstItem !== "string") {
-        return [F.ColumnsContainsWrongType, null, null];
-    }
-    const firstResult: [F, string, string] = validateColumnString(firstItem, datasetIds);
-    const firstResultFlag: F = firstResult[0];
-    if (firstResult[0] !== F.Valid) {
-        return [firstResultFlag, null, null];
-    }
-    // The field is guaranteed to be in MFields or SFields
-    const firstId: string = firstResult[1];
-    let fields: string[] = [firstId];
-    // Iterate through the rest
-    for (let i = 1; i < cols.length; ++i) {
-        const result: [F, string, string] = validateColumnString(cols[i], datasetIds);
-        const resultFlag: F = result[0];
-        if (resultFlag !== F.Valid) {
-            return [resultFlag, null, null];
+export function validateColumnStringsAndGetID(cols: any[], owen: OwensReality): string {
+    let id: string;
+    for (const c of cols) {
+        const [idd, _] = verifyAndGetIdAndField(c, owen);
+        if (id === undefined) {
+            id = idd;
+            break;
         }
-        const resultId: string = result[1];
-        if (firstId !== resultId) {
-            return [F.MoreThanOneId, null, null];
-        }
-        const resultField: string = result[2];
-        if (!fields.includes(resultField)) {
-            fields.push(resultField);
+        if (id !== idd) {
+            WT(F.MoreThanOneId);
         }
     }
-    return [F.Valid, firstId, fields];
-}
-
-export function validateColumnString(str: string, datasetIds: string[]): [F, string, string] {
-    const parseResult: [F, string, string] = parseKeystring(str);
-    const parseResultFlag: F = parseResult[0];
-    if (parseResultFlag !== F.Valid) {
-        return [parseResultFlag, null, null];
-    }
-    const id: string = parseResult[1];
-    if (id.length === 0) {
-        return [F.NoIdstring, null, null];
-    }
-    if (!datasetIds.includes(id)) {
-        return [F.IdDoesNotExist, null, null];
-    }
-    const field: string = parseResult[2];
-    if (field.length === 0) {
-        return [F.EmptyField, null, null];
-    }
-    if (!(SFields.includes(field) || MFields.includes(field))) {
-        return [F.ColumnContainsInvalidField, null, null];
-    }
-    return [F.Valid, id, field];
+    return id;
 }

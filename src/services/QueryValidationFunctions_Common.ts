@@ -1,22 +1,26 @@
-import { InsightDatasetKind } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 import { QueryValidationResult as R, QueryValidationResultFlag as F } from "../services/IQueryValidator";
 import { hasTooManyKeys } from "./QueryValidationFunctions_Body";
+import { WT } from "../util/Insight";
 
-export function validateQueryPreliminary(query: any): [F, boolean] {
+/**
+ * throws InsightError if query is invalid at the highest level (WHERE, OPTIONS, TRANSFORMATIONS)
+ */
+export function hasTransformations(query: any): boolean {
     const keys: string[] = Object.keys(query);
     if (!keys.includes("WHERE")) {
-        return [F.MissingBody, false];
+        WT(F.MissingBody);
     }
     if (!keys.includes("OPTIONS")) {
-        return [F.MissingOptions, false];
+        WT(F.MissingOptions);
     }
-    let hasTransfomations: boolean = keys.includes("TRANSFORMATIONS");
+    let hasT: boolean = keys.includes("TRANSFORMATIONS");
     let maxKeys: number = 2;
-    if (hasTransfomations) {
+    if (hasT) {
         maxKeys = 3;
     }
     if (hasTooManyKeys(query, maxKeys)) {
-        return [F.TooManyKeys_Query, false];
+        WT(F.TooManyKeys_Query);
     }
-    return [F.Valid, hasTransfomations];
+    return hasT;
 }

@@ -1,186 +1,184 @@
 import { QueryValidationResultFlag as F } from "./IQueryValidator";
-import { MFIELDS_COURSES as MFields} from "../query_schema/MFields";
-import { SFIELDS_COURSES as SFields} from "../query_schema/SFields";
+import { MFIELDS_COURSES as MFields, MFIELDS_COURSES, MFIELDS_ROOMS} from "../query_schema/MFields";
+import { SFIELDS_COURSES as SFields, SFIELDS_COURSES, SFIELDS_ROOMS} from "../query_schema/SFields";
 import { InsightDatasetKind } from "../controller/IInsightFacade";
+import { OwensReality } from "../data/OwensReality";
+import { WT } from "../util/Insight";
+import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
 
 export function validateFilterArray(filters: any,
-                                    datasetIds: string[],
-                                    kind: InsightDatasetKind): [F, string] {
+                                    owen: OwensReality): string {
     if (filters == null) {
-        return [F.WrongType_LogicComparison, null];
+        WT(F.WrongType_LogicComparison);
     }
     // Check that the value is indeed an array
     if (!Array.isArray(filters)) {
-        return [F.WrongType_LogicComparison, null];
+        WT(F.WrongType_LogicComparison);
     }
     // Check that all the ID strings are the same, then return it along with a "Valid"
     if (filters.length === 0) {
-        return [F.Empty_LogicComparison, null];
+        WT(F.Empty_LogicComparison);
     }
     // Essentially, folds the validateFilter results into one, making sure they are
     // all valid and all have the same ID.
-    let firstResult: [F, string] = validateFilter(filters[0], datasetIds, kind);
-    if (firstResult[0] !== F.Valid) {
-        return firstResult;
-    }
+    let firstId: string = validateFilter(filters[0], owen);
     for (let i = 1; i < filters.length; ++i) {
-        let nextResult: [F, string] = validateFilter(filters[i], datasetIds, kind);
-        if (nextResult[0] !== F.Valid) {
-            return nextResult;
-        }
-        if (nextResult[1] !== firstResult[1]) { // verify they have the same ID
-            return [F.MoreThanOneId, ""];
+        let nextId: string = validateFilter(filters[i], owen);
+        if (nextId !== firstId) { // verify they have the same ID
+            WT(F.MoreThanOneId);
         }
     }
-    return firstResult;
+    return firstId;
 }
 
-export function validateFilter(filter: any, datasetIds: string[],
-                               kind: InsightDatasetKind): [F, string]  {
+export function validateFilter(filter: any, owen: OwensReality): string  {
 
     if (filter == null || typeof filter !== "object") {
-        return [F.WrongValue_LogicComparison, null];
+        WT(F.WrongValue_LogicComparison);
     }
     if (hasTooManyKeys(filter, 1)) {
-        return [F.TooManyKeys_Filter, null];
+        WT(F.TooManyKeys_Filter);
     }
     if (Object.keys(filter).length === 0) {
-        return [F.HasNoKeys_Filter, null];
+        WT(F.HasNoKeys_Filter);
     }
     const key = Object.keys(filter)[0];
     switch (key) {
-        case "AND": return validateFilterArray(filter.AND, datasetIds, kind);
-        case "OR": return validateFilterArray(filter.OR, datasetIds, kind);
-        case "NOT": return validateFilter(filter.NOT, datasetIds, kind);
-        case "LT": return validateMComparison(filter.LT, datasetIds, kind);
-        case "GT": return validateMComparison(filter.GT, datasetIds, kind);
-        case "EQ": return validateMComparison(filter.EQ, datasetIds, kind);
-        case "IS": return validateSComparison(filter.IS, datasetIds, kind);
-        default: return [F.WrongKey_Filter, null];
+        case "AND": return validateFilterArray(filter.AND, owen);
+        case "OR": return validateFilterArray(filter.OR, owen);
+        case "NOT": return validateFilter(filter.NOT, owen);
+        case "LT": return validateMComparison(filter.LT, owen);
+        case "GT": return validateMComparison(filter.GT, owen);
+        case "EQ": return validateMComparison(filter.EQ, owen);
+        case "IS": return validateSComparison(filter.IS, owen);
+        default: WT(F.WrongKey_Filter);
     }
 }
 
-export function validateSComparison(sc: any, datasetIds: string[]
-    ,                               kind: InsightDatasetKind): [F, string] {
+export function validateSComparison(sc: any, owen: OwensReality): string {
     if (Array.isArray(sc)) {
-        return [F.WrongType_SComparison, null];
+        WT(F.WrongType_SComparison);
     }
     if (sc == null || typeof sc !== "object") {
-        return [F.WrongType_SComparison, null];
+        WT(F.WrongType_SComparison);
     }
     if (hasTooManyKeys(sc, 1)) {
-        return [F.TooManyKeys_SComparison, null];
+        WT(F.TooManyKeys_SComparison);
     }
     if (Object.keys(sc).length === 0) {
-        return [F.HasNoKeys_SComparison, null];
+        WT(F.HasNoKeys_SComparison);
     }
     const key: string = Object.keys(sc)[0];
-    const parseResult: [F, string, string] = parseKeystring(key);
-    const parseResultFlag: F = parseResult[0];
-    // Flag, idstring, sfield
-    if (parseResultFlag !== F.Valid) {
-        return [parseResultFlag, null];
-    }
-    const idstring: string = parseResult[1];
-    if (!datasetIds.includes(idstring)) {
-        return [F.IdDoesNotExist, null];
-    }
-    const sfield: string = parseResult[2];
-    // Ensure it's non-empty;
-    if (sfield.length === 0) {
-        return [F.EmptySField, null];
-    }
-    if (!SFields.includes(sfield)) {
-        return [F.InvalidSField, null];
+    const parseResult: [string, string] = parseKeystring(key);
+    const id: string = parseResult[0];
+    const field: string = parseResult[1];
+    switch (owen.checkID(id)) {
+        case JohnsRealityCheck.Courses:
+            if (!SFIELDS_COURSES.includes(field)) {
+                WT(F.InvalidSField);
+            }
+            break;
+        case JohnsRealityCheck.Rooms:
+            if (!SFIELDS_ROOMS.includes(field)) {
+                WT(F.InvalidMField);
+            }
+            break;
+        case JohnsRealityCheck.NotFound:
+            WT(F.IdDoesNotExist);
+            break;
     }
     // Validate the value -- it must be a string and must have no internal asterisk
     const value: any = Object.values(sc)[0];
     if (value == null || typeof value !== "string") {
-        return [F.SValueNotAString, null];
+        WT(F.SValueNotAString);
     }
     // Finally, validate the value, i.e. check for internal asterisk.
-    // If its length is 0, it is valid.
-    const sValueValidationResult: F = validateSValue(value);
-    if (sValueValidationResult !== F.Valid) {
-        return [sValueValidationResult, null];
-    } else {
-        return [F.Valid, idstring];
-    }
+    // If its length is 0, it is still valid
+    validateSValue(value);
+
+    return id;
 }
 
-export function validateSValue(value: string): F {
+export function validateSValue(value: string) {
     // SValue is (optional *) ++ inputstring ++ (optional *)
     // inputstring ::= [^*]* // Zero or more of any character, except asterisk.
 
     // Check every internal character in sValue
     for (let i = 1; i < value.length - 1; ++i) {
         if (value[i] === "*") {
-            return F.SValueContainsInternalAsterisk;
+            WT(F.SValueContainsInternalAsterisk);
         }
     }
-    return F.Valid;
 }
 
 export function validateMComparison(mc: any,
-                                    datasetIds: string[],
-                                    kind: InsightDatasetKind): [F, string] {
+                                    owen: OwensReality): string {
     if (Array.isArray(mc)) {
-        return [F.WrongType_MComparison, null];
+        WT(F.WrongType_MComparison);
     }
     if (mc == null || typeof mc !== "object") {
-        return [F.WrongType_MComparison, null];
+        WT(F.WrongType_MComparison);
     }
     if (hasTooManyKeys(mc, 1)) {
-        return [F.TooManyKeys_MComparison, null];
+        WT(F.TooManyKeys_MComparison);
     }
     if (Object.keys(mc).length === 0) {
-        return [F.HasNoKeys_MComparison, null];
+        WT(F.HasNoKeys_MComparison);
     }
     const key: string = Object.keys(mc)[0];
-    const parseResult: [F, string, string] = parseKeystring(key);
-    const parseResultFlag: F = parseResult[0];
-    if (parseResultFlag !== F.Valid) {
-        return [parseResultFlag, null];
-    }
-    const id: string = parseResult[1];
-    if (!datasetIds.includes(id)) {
-        return [F.IdDoesNotExist, null];
-    }
-    const mfield: string = parseResult[2];
-    if (mfield.length === 0) {
-        return [F.EmptyMField, null];
-    }
-    if (!MFields.includes(mfield)) {
-        return [F.InvalidMField, null];
+    const parseResult: [string, string] = parseKeystring(key);
+    const id: string = parseResult[0];
+    const field: string = parseResult[1];
+
+    switch (owen.checkID(id)) {
+        case JohnsRealityCheck.Courses:
+            if (!MFIELDS_COURSES.includes(field)) {
+                WT(F.InvalidMField);
+            }
+            break;
+        case JohnsRealityCheck.Rooms:
+            if (!MFIELDS_ROOMS.includes(field)) {
+                WT(F.InvalidMField);
+            }
+            break;
+        case JohnsRealityCheck.NotFound:
+            WT(F.IdDoesNotExist);
+            break;
     }
     // Validate the value -- it must be a number
     const value: any = Object.values(mc)[0];
     if (value == null || typeof value !== "number") {
-        return [F.MValueNotANumber, null];
+        WT(F.MValueNotANumber);
     }
     // It's valid!
-    return [F.Valid, id];
+    return id;
 }
 
-// idstring_m/sfield
-export function parseKeystring(str: string): [F, string, string] {
+/**
+ * splits an id_field into id and field.
+ * Throws if: no underscore, too many underscores, empty ID, empty field
+ */
+export function parseKeystring(str: string): [string, string] {
     if (str == null || typeof str !== "string") {
-        return [F.KeystringIsNotAString, null, null];
+        WT(F.KeystringIsNotAString);
     }
     let splitResultArray: string[] = str.split("_");
     // If there is exactly one underscore, then the length of the split will be exactly 2
     if (splitResultArray.length === 1) {
-        return [F.NoUnderscore, null, null];
+        WT(F.NoUnderscore);
     }
     if (splitResultArray.length > 2) {
-        return [F.TooManyUnderscores, null, null];
+        WT(F.TooManyUnderscores);
     }
     // Idstring must have one or more of any character
     if (splitResultArray[0].length === 0) {
-        return [F.NoIdstring, null, null];
+        WT(F.NoIdstring);
+    }
+    if (splitResultArray[1].length === 0) {
+        WT(F.EmptyField);
     }
     // The m/sfield will be checked in the calling function to return more specific result flag if invalid
-    return [F.Valid, splitResultArray[0], splitResultArray[1]];
+    return [splitResultArray[0], splitResultArray[1]];
 }
 
 export function hasTooManyKeys(json: any, max: number) {
