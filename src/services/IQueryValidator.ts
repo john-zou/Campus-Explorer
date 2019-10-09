@@ -1,5 +1,6 @@
 import { InsightDatasetKind, InsightDataset } from "../controller/IInsightFacade";
 import { OwensReality } from "../data/OwensReality";
+import Insight from "../util/Insight";
 
 export enum QueryValidationResultFlag {
     Valid = "Valid",
