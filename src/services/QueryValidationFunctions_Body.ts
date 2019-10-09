@@ -6,8 +6,8 @@ import { OwensReality } from "../data/OwensReality";
 import { WT } from "../util/Insight";
 import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
 
-export function validateFilterArray(filters: any,
-                                    owen: OwensReality): string {
+export function getIdFromFilterArray(filters: any,
+                                     owen: OwensReality): string {
     if (filters == null) {
         WT(F.WrongType_LogicComparison);
     }
@@ -21,9 +21,9 @@ export function validateFilterArray(filters: any,
     }
     // Essentially, folds the validateFilter results into one, making sure they are
     // all valid and all have the same ID.
-    let firstId: string = validateFilter(filters[0], owen);
+    let firstId: string = getIdFromFilter(filters[0], owen);
     for (let i = 1; i < filters.length; ++i) {
-        let nextId: string = validateFilter(filters[i], owen);
+        let nextId: string = getIdFromFilter(filters[i], owen);
         if (nextId !== firstId) { // verify they have the same ID
             WT(F.MoreThanOneId);
         }
@@ -31,7 +31,7 @@ export function validateFilterArray(filters: any,
     return firstId;
 }
 
-export function validateFilter(filter: any, owen: OwensReality): string  {
+export function getIdFromFilter(filter: any, owen: OwensReality): string  {
 
     if (filter == null || typeof filter !== "object") {
         WT(F.WrongValue_LogicComparison);
@@ -44,18 +44,18 @@ export function validateFilter(filter: any, owen: OwensReality): string  {
     }
     const key = Object.keys(filter)[0];
     switch (key) {
-        case "AND": return validateFilterArray(filter.AND, owen);
-        case "OR": return validateFilterArray(filter.OR, owen);
-        case "NOT": return validateFilter(filter.NOT, owen);
-        case "LT": return validateMComparison(filter.LT, owen);
-        case "GT": return validateMComparison(filter.GT, owen);
-        case "EQ": return validateMComparison(filter.EQ, owen);
-        case "IS": return validateSComparison(filter.IS, owen);
+        case "AND": return getIdFromFilterArray(filter.AND, owen);
+        case "OR": return getIdFromFilterArray(filter.OR, owen);
+        case "NOT": return getIdFromFilter(filter.NOT, owen);
+        case "LT": return getIdFromMComparison(filter.LT, owen);
+        case "GT": return getIdFromMComparison(filter.GT, owen);
+        case "EQ": return getIdFromMComparison(filter.EQ, owen);
+        case "IS": return getIdFromSComparison(filter.IS, owen);
         default: WT(F.WrongKey_Filter);
     }
 }
 
-export function validateSComparison(sc: any, owen: OwensReality): string {
+export function getIdFromSComparison(sc: any, owen: OwensReality): string {
     if (Array.isArray(sc)) {
         WT(F.WrongType_SComparison);
     }
@@ -111,8 +111,8 @@ export function validateSValue(value: string) {
     }
 }
 
-export function validateMComparison(mc: any,
-                                    owen: OwensReality): string {
+export function getIdFromMComparison(mc: any,
+                                     owen: OwensReality): string {
     if (Array.isArray(mc)) {
         WT(F.WrongType_MComparison);
     }

@@ -1,6 +1,6 @@
 import { OwensReality } from "../../data/OwensReality";
 import { hasTransformations } from "../../services/QueryValidationFunctions_Common";
-import { validateFilter } from "../../services/QueryValidationFunctions_Body";
+import { getIdFromFilter } from "../../services/QueryValidationFunctions_Body";
 import { getKeysFromTransformations } from "../../services/QueryValidationFunctions_Transformations";
 import { validateOptions } from "../../services/QueryValidationFunctions_Options";
 import { WT } from "../../util/Insight";
@@ -14,7 +14,7 @@ export function getIdIfValid(q: any, owen: OwensReality): string {
     let id1: string;
 
     if (Object.keys(q.WHERE).length !== 0) {
-        id1 = validateFilter(q.WHERE, owen);
+        id1 = getIdFromFilter(q.WHERE, owen);
     }
 
     let id: string;
