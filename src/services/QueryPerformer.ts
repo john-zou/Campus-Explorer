@@ -8,8 +8,9 @@ import { IQuery, IOptionsWithOrder } from "../query_schema/IQuery";
 import { NotImplementedError } from "restify";
 import { whereFilter, orderData, removeColumns } from "./QueryPerformerFunctions";
 import { ISmartQuery, ISmartFilter } from "../query_schema/ISmartQuery";
-import { SmartQuery } from "../query_schema/SmartQuery";
+// import { SmartQuery } from "../query_schema/SmartQuery";
 import { ISection } from "../data/ISection";
+import { OwensReality } from "../data/OwensReality";
 
 export class QueryPerformer implements IQueryPerformer {
     private queryValidator: IQueryValidator;
@@ -19,22 +20,29 @@ export class QueryPerformer implements IQueryPerformer {
         this.queryValidator = queryValidator;
     }
 
-    public async performQuery (queryIn: any, datasets: IParsedData[], datasetsIDs: string[]): Promise<any[]> {
+    public async performQuery (queryIn: any, owen: OwensReality): Promise<any[]> {
         // Check to make sure valid query and set id equal to result + catch error
         const validatorResult: QueryValidationResult =
-            this.queryValidator.validate(queryIn, datasetsIDs, InsightDatasetKind.Courses);
+            this.queryValidator.validate(queryIn, owen);
         if (validatorResult.Result !== QueryValidationResultFlag.Valid) {
             // Invalid Query
             throw new InsightError(validatorResult.Result);
         }
         const id: string = validatorResult.ID;
 
-        const query: ISmartQuery = SmartQuery.fromValidQueryJson(id, queryIn);
+        const query: ISmartQuery = null; // TODO
 
-        // Create dataset given id
-        let data: ISection[] = datasets.find((d: IParsedData) => {
-            return d.id === id;
-        }).data;
+        // Get the ActualDataset
+        const dataset = owen.getDataset(id);
+        let data;
+        switch (dataset.Kind) {
+            case InsightDatasetKind.Courses:
+                data = dataset.Sections;
+                break;
+            case InsightDatasetKind.Rooms:
+                data = dataset.Rooms;
+                break;
+        }
 
         // (Early) Terminate if dataset too large
         if (data.length > this.LIMIT && !query.HasFilter) {
@@ -44,11 +52,11 @@ export class QueryPerformer implements IQueryPerformer {
         let processedData: ISection[];
 
         // Filter Data
-        if (query.HasFilter) {
-            processedData = data.filter((parsedData: ISection) => {
-                return whereFilter(parsedData, query.Filter);
-            });
-        }
+        // if (query.HasFilter) {
+        //     processedData = data.filter((parsedData: ISection) => {
+        //         return whereFilter(parsedData, query.Filter);
+        //     });
+        // }
 
         // Terminate if dataset too large
         if (processedData.length > this.LIMIT) {

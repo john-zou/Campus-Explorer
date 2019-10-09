@@ -1,4 +1,5 @@
-import { InsightDatasetKind } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightDataset } from "../controller/IInsightFacade";
+import { OwensReality } from "../data/OwensReality";
 
 export enum QueryValidationResultFlag {
     Valid = "Valid",
@@ -18,7 +19,6 @@ export enum QueryValidationResultFlag {
     WrongValue_MComparison = "MComparison value needs to be a number",
     WrongType_SComparison = "SComparison needs to be an object",
     WrongValue_SComparison = "SComparison value needs to be a string",
-    // WrongType_Negation,
     IdDoesNotExist = "ID must be in datasets",
     MoreThanOneId = "Only one ID allowed in query",
     TooManyKeys_MComparison = "MComparison needs to have exactly 1 key",
@@ -53,7 +53,14 @@ export enum QueryValidationResultFlag {
     ApplyIsNotAnArray = "ApplyIsNotAnArray",
     ApplyMustBeNonEmptyArray = "ApplyMustBeNonEmptyArray",
     InvalidKey = "InvalidKey",
-    KeystringIsNotAString = "KeystringIsNotAString"
+    KeystringIsNotAString = "KeystringIsNotAString",
+    ApplyRuleMustBeAnObject = "ApplyRuleMustBeAnObject",
+    ApplyRuleMustHaveExactlyOneKey = "ApplyRuleMustHaveExactlyOneKey",
+    ApplyKeysMustBeUnique = "ApplyKeysMustBeUnique",
+    ApplyKeyValueMustBeObject = "ApplyKeyValueMustBeObject",
+    ApplyKeyValueMustHaveOneKey = "ApplyKeyValueMustHaveOneKey",
+    ApplyKeyValueMustHaveApplyTokenKey = "ApplyKeyValueMustHaveApplytokenKey",
+    ApplyKeyKeyTokenHasInvalidKey = "ApplyKeyKeyTokenHasInvalidKey"
 }
 
 export class QueryValidationResult {
@@ -68,5 +75,5 @@ export class QueryValidationResult {
 
 export interface IQueryValidator {
     // Takes in a JSON and datasetkind and returns a validation result.
-    validate(json: any, datasetIds: string[], kind: InsightDatasetKind): QueryValidationResult;
+    validate(json: any, owen: OwensReality): QueryValidationResult;
 }

@@ -1,6 +1,5 @@
 import { ISection } from "./ISection";
 import { IValidSectionFromData } from "./IValidSectionFromData";
-import { KeyMap } from "../query_schema/KeyMap";
 
 export class Section implements ISection {
     public dept: string;

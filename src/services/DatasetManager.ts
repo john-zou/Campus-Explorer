@@ -20,11 +20,6 @@ export class DatasetManager implements IDatasetManager {
         if (id == null || content == null || kind == null) {
             throw new InsightError("Null argument(s)");
         }
-        if (typeof id !== "string" || typeof content !== "string" || (kind !== InsightDatasetKind.Courses
-            && kind !== InsightDatasetKind.Rooms)) {
-                // This is not triggerable in Typescript
-                throw new InsightError("Invalid argument type");
-            }
         if (this.isInvalidId(id)) {
             throw new InsightError("ID must not contain _ and must not be fully whitespace");
         }
@@ -49,11 +44,6 @@ export class DatasetManager implements IDatasetManager {
         // return resolved
         return id;
     }
-
-    // Causes timeout for autobot d1
-    // public async listDatasetsOld(): Promise<InsightDataset[]> {
-    //     return this.parsedDatasets;
-    // }
 
     public async listDatasets(): Promise<InsightDataset[]> {
         let ret: InsightDataset[] = [];

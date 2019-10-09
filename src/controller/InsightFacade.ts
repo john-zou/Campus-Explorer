@@ -38,10 +38,12 @@ export default class InsightFacade implements IInsightFacade {
 
     public async performQuery(query: any): Promise <any[]> {
         try {
-            return await this.queryPerformer.performQuery(query,
-                await this.datasetManager.getAllData(), this.datasetManager.datasetIds);
+            return await
+                this.queryPerformer.
+                    performQuery(query,
+                                null); // TODO
         } catch (err) {
-            Log.trace(`Query deemed invalid: ${err}`);
+            Log.trace(`Invalid Query: ${err}`);
             throw err;
         }
     }
