@@ -11,7 +11,7 @@ export class DatasetManager {
     public Owen: OwensReality;
     private diskManager: DiskManager;
 
-    public constructor (dataparser = new DataParser(), diskManager = new DiskManager()) {
+    public constructor(dataparser = new DataParser(), diskManager = new DiskManager()) {
         this.diskManager = diskManager;
         this.dataParser = dataparser;
     }

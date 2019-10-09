@@ -52,7 +52,9 @@ export class OwensReality {
     }
 
     public getDataset(id: string): ActualDataset {
-        return this.ActualDatasets.find((d) => d.ID === id);
+        return this.ActualDatasets.find((d) => {
+            return d.ID === id;
+        });
     }
 
     public addDataset(dataset: ActualDataset) {
@@ -62,9 +64,15 @@ export class OwensReality {
     }
 
     public removeDataset(id: string) {
-        this.ActualDatasets = this.ActualDatasets.filter((d) => d.ID !== id);
-        this.InsightDatasets = this.InsightDatasets.filter((d) => d.id !== id);
-        this.IDs = this.IDs.filter((ID) => ID !== id);
+        this.ActualDatasets = this.ActualDatasets.filter((d) => {
+            return d.ID !== id;
+        });
+        this.InsightDatasets = this.InsightDatasets.filter((d) => {
+            return d.id !== id;
+        });
+        this.IDs = this.IDs.filter((ID) => {
+            return ID !== id;
+        });
     }
 
     /**
