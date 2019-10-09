@@ -1,7 +1,7 @@
 D2:
 # TODO
     * rooms parsing (Owen) -- see src/D2/data/
-    * standalone query functions (John)
+    * good luck -john
 
 
 From D1:
