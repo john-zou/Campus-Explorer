@@ -67,7 +67,6 @@ module.exports = {
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
-        "arrow-body-style": ["error", "always"],
         "arrow-parens": ["error", "always"],
         "brace-style": ["error", "1tbs"],
         "complexity": "off",
