@@ -39,9 +39,9 @@
 //             sections = filteredSections;
 //         }
 
-//         if (sections.length > 5000) {
-//             throw new InsightError("Too many results");
-//         }
+        // if (sections.length > 5000) {
+        //     throw new ResultTooLargeError("Too many results");
+        // }
 
 //         if (sections.length === 0) {
 //             return [];

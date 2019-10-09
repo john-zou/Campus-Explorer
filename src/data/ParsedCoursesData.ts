@@ -4,18 +4,17 @@ import { InsightDatasetKind } from "../controller/IInsightFacade";
 import Log from "../Util";
 
 export class ParsedCoursesData implements IParsedData {
-    private mdata: ISection[] = [];
-    public get data(): ISection[] { return this.mdata; }
-    private mid: string;
-    public get id(): string { return this.mid; }
-    public get kind(): InsightDatasetKind { return InsightDatasetKind.Courses; }
-    public get numRows(): number { return this.data.length; }
+    public data: ISection[] = [];
+    public id: string;
+    public kind: InsightDatasetKind = InsightDatasetKind.Courses;
+    public numRows: number = 0;
 
     public constructor(id: string) {
-        this.mid = id;
+        this.id = id;
     }
 
     public addSection(section: ISection): void {
-        this.mdata.push(section);
+        this.data.push(section);
+        this.numRows++;
     }
 }

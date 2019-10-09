@@ -3,20 +3,26 @@ import { InsightDatasetKind, InsightDataset, InsightError, NotFoundError } from 
 import { IParsedData } from "../data/IParsedData";
 import { IDataParser } from "../data/IDataParser";
 import { Factory } from "./Factory";
+import { IDiskManager, DiskManagerStatus } from "./IDiskManager";
+import { DiskManager } from "./DiskManager";
+import Log from "../Util";
 
 export class DatasetManager implements IDatasetManager {
     private dataParser: IDataParser;
     private parsedDatasets: IParsedData[] = [];
+    private diskManager: IDiskManager;
 
     public get datasetIds(): string[] {
-        return this.parsedDatasets.map((d: IParsedData) => d.id);
+        return this.parsedDatasets.map((d: IParsedData) => d.id );
     }
 
-    public constructor (dataparser: IDataParser = Factory.getDataParser()) {
+    public constructor (dataparser: IDataParser = Factory.getDataParser(), diskManager = Factory.getDiskManager() ) {
+        this.diskManager = diskManager;
         this.dataParser = dataparser;
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<void> {
+        await this.getDataFromDiskIfNeeded();
         if (id == null || content == null || kind == null) {
             throw new InsightError("Null argument(s)");
         }
@@ -26,10 +32,13 @@ export class DatasetManager implements IDatasetManager {
         if (this.datasetIds.includes(id)) {
             throw new InsightError("There is already a dataset with given ID in the list");
         }
-        this.parsedDatasets.push(await this.dataParser.parseDatasetZip(id, content, kind));
+        let newData: IParsedData = await this.dataParser.parseDatasetZip(id, content, kind);
+        this.parsedDatasets.push(newData);
+        await this.diskManager.saveDataset(newData);
     }
 
     public async removeDataset(id: string): Promise<string> {
+        await this.getDataFromDiskIfNeeded();
         if (id == null) {
             throw new InsightError("Null argument");
         }
@@ -41,11 +50,13 @@ export class DatasetManager implements IDatasetManager {
         }
         // remove from parsedData
         this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
-        // return resolved
+        // remove from disk, encapsulate in the correct type of promise
+        await this.diskManager.deleteDataset(id);
         return id;
     }
 
     public async listDatasets(): Promise<InsightDataset[]> {
+        await this.getDataFromDiskIfNeeded();
         let ret: InsightDataset[] = [];
         for (const dataset of this.parsedDatasets) {
             const strictlyInsightDataset: InsightDataset = {
@@ -68,4 +79,19 @@ export class DatasetManager implements IDatasetManager {
     private isInvalidId(id: string): boolean {
         return id.includes("_") || id.trim().length === 0;
     }
+
+    private async getDataFromDiskIfNeeded(): Promise<void> {
+        await this.diskManager.initializeIfNeeded();
+        if  (this.diskManager.Status === DiskManagerStatus.NewlyBorn) {
+            this.parsedDatasets = await this.diskManager.getDatasets();
+        }
+    }
+
+    // // Syncs datasets on the disk and locally
+    // public async syncDatasets() {
+    //     const diskDataset: IParsedData[] = await this.diskManager.getDatasets();
+    //     if (this.parsedDatasets.length < diskDataset.length) {
+    //         this.parsedDatasets = diskDataset;
+    //     }
+    // }
 }
