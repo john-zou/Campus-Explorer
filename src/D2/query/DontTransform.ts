@@ -12,7 +12,7 @@ function makeNewThings(q: any, things: any[]) {
         const newThing: any = {};
         for (const c of columns) {
             const key = c.split("_")[1];
-            newThing[c] = oldThing[key];
+            newThing[c] = oldThing[key]; // e.g. Section { avg: 100 } to new thing { courses_avg: 100 }
         }
         newThings.push(newThing);
     }
