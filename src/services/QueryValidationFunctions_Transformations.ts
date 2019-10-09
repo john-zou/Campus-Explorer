@@ -4,11 +4,13 @@
 // import { parseKeystring } from "./QueryValidationFunctions_Body";
 // import { SFIELDS_COURSES, SFIELDS_ROOMS } from "../query_schema/SFields";
 // import { IParsedData } from "../data/IParsedData";
+// import { OwensReality } from "../data/OwensReality";
+// import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
 
 // /**
 //  * @returns [ResultFlag, string array of applykeys if valid, and the ID of the query]
 //  */
-// export function validateTransformations(t: any, datasets: InsightDataset[]): [F, string[], string] {
+// export function validateTransformations(t: any, owen: OwensReality): [F, string[], string] {
 //     // Always has a group, always has an apply
 //     if (t == null || typeof t !== "object") {
 //         return [F.TransformationsIsNotAnObject, null, null];
@@ -23,11 +25,11 @@
 //     if (keys.length !== 2) {
 //         return [F.TransformationsDoesntHaveTwoKeys, null, null];
 //     }
-//     const [gRes, id]: [F, string] = validateGroup(t.GROUP, datasets);
+//     const [gRes, id, groupKeys]: [F, string, string[]] = validateGroup(t.GROUP, owen);
 //     if (gRes !== F.Valid) {
 //         return [gRes, null, null];
 //     }
-//     const [aRes, applyKeys, idFromApplykeys]: [F, string[], string] = validateApply(t.APPLY, id, kind);
+//     const [aRes, applyKeys, idFromApplykeys]: [F, string, string[]] = validateApply(t.APPLY, id);
 //     if (aRes !== F.Valid) {
 //         return [aRes, null, null];
 //     }
@@ -39,34 +41,55 @@
 //     return [F.Valid, applyKeys, id];
 // }
 
-// export function validateGroup(g: any, ds: InsightDataset[]): F {
+// export function validateGroup(g: any, owen: OwensReality): [F, string, string[]] {
 //     if (!Array.isArray(g)) {
-//         return F.GroupIsNotAnArray;
+//         return [F.GroupIsNotAnArray, null, null];
 //     }
 //     if (g.length === 0) {
-//         return F.GroupMustBeNonEmptyArray;
+//         return [F.GroupMustBeNonEmptyArray, null, null];
 //     }
 //     let id: string;
+//     const fields: string[] = [];
 //     for (const k of g) {
-//         if (!validateKey(k, ds)) {
-//             return F.InvalidKey;
+//         const [b, nextId, field] = validateKey(k, owen);
+//         if (!b) {
+//             return [F.InvalidKey, null, null];
+//         }
+//         if (id === undefined) {
+//             id = nextId;
+//         } else {
+//             if (id !== nextId) {
+//                 return [F.MoreThanOneId, null, null];
+//             }
+//         }
+//         if (!fields.includes("_" + field)) {
+//             fields.push("_" + field); // add underscore to prevent collion with applykey
 //         }
 //     }
-//     return F.Valid;
+//     return [F.Valid, id, fields];
 // }
 
-// export function validateKey(k: any, ds: InsightDataset[]): boolean {
+// export function validateKey(k: any, owen: OwensReality): [boolean, string, string] {
 //     const res: [F, string, string] = parseKeystring(k);
 //     if (res[0] !== F.Valid) {
-//         return false;
+//         return [false, null, null];
 //     }
 //     const parsedId = res[1];
 //     const field = res[2];
-//     switch (kind) {
-//         case InsightDatasetKind.Courses:
-//             return MFIELDS_COURSES.includes(field) || SFIELDS_COURSES.includes(field);
-//         case InsightDatasetKind.Rooms:
-//             return MFIELDS_ROOMS.includes(field) || SFIELDS_ROOMS.includes(field);
+//     switch (owen.checkID(parsedId)) {
+//         case JohnsRealityCheck.NotFound: return [false, null, null];
+//         case JohnsRealityCheck.Courses:
+//             if (MFIELDS_COURSES.includes(field) || SFIELDS_COURSES.includes(field)) {
+//                 return [true, parsedId, field];
+//             } else {
+//                 return [false, null, null];
+//             }
+//         case JohnsRealityCheck.Rooms:
+//             if (MFIELDS_ROOMS.includes(field) || SFIELDS_ROOMS.includes(field)) {
+//                 return [true, parsedId, field];
+//             } else {
+//                 return [false, null, null];
+//             }
 //     }
 // }
 
@@ -125,8 +148,10 @@
 //     return [F.Valid, applyKeys];
 // }
 
-// export function validateKeyForApplyToken(key: any, id: string, kind: InsightDatasetKind, token: string) {
-//     if (!validateKey(key, id, kind)) {
+// export function validateKeyForApplyToken(key: any, id: string,
+//                                          kind: InsightDatasetKind, token: string, owen: OwensReality) {
+//     const [yes, parsedId, theField] = validateKey(key, owen);
+//     if (!yes) { // CONTINUE HERE
 //         return false;
 //     }
 //     // COUNT works for both SFields and MFields, but the rest only work for MFields
