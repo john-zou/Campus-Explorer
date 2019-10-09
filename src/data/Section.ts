@@ -17,8 +17,8 @@ export class Section implements ISection {
         //
     }
 
-    public static fromValidSectionData(data: IValidSectionFromData): ISection {
-        const transformedSection: ISection = new Section();
+    public static fromValidSectionData(data: IValidSectionFromData): Section {
+        const transformedSection: Section = new Section();
         transformedSection.dept = data.Subject;
         transformedSection.id = data.Course;
         transformedSection.avg = data.Avg;

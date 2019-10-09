@@ -5,9 +5,10 @@ import { ISection } from "./ISection";
 import JSZip = require("jszip");
 import Log from "../Util";
 import { FileParseResult, FileParseResultFlag, SectionParseResult } from "./FileParseResult";
+import { ActualDataset } from "./ActualDataset";
 
 export async function parseSectionsFromFile(file: JSZip.JSZipObject,
-                                            parsedData: ParsedCoursesData):
+                                            actualDataset: ActualDataset):
                                             Promise<FileParseResult> {
     const jsonString: string = await file.async("text");
     const json: any = JSON.parse(jsonString);
@@ -30,7 +31,7 @@ export async function parseSectionsFromFile(file: JSZip.JSZipObject,
     // For each item in the array, try to parse it as a section
     for (const potentialSection of json.result) {
         // Log.trace(JSON.stringify(potentialSection));
-        let sectionResult: SectionParseResult = parseSection(potentialSection, parsedData);
+        let sectionResult: SectionParseResult = parseSection(potentialSection, actualDataset);
         switch (sectionResult) {
             case SectionParseResult.Valid:
                 ++fileParseResult.ValidSections;
@@ -43,14 +44,14 @@ export async function parseSectionsFromFile(file: JSZip.JSZipObject,
     return fileParseResult;
 }
 
-export function parseSection(json: any, parsedData: ParsedCoursesData): SectionParseResult {
+export function parseSection(json: any, actualDataset: ActualDataset): SectionParseResult {
     if (isValidSection(json)) {
-        const newSection: ISection = Section.fromValidSectionData(json);
+        const newSection: Section = Section.fromValidSectionData(json);
         // If there is a json.Section === "overall", then set the year to 1900
         if (json.Section === "overall") {
             newSection.year = 1900;
         }
-        parsedData.addSection(newSection);
+        actualDataset.Sections.push(newSection);
         return SectionParseResult.Valid;
     } else {
         return SectionParseResult.Invalid;

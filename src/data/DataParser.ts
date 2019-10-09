@@ -1,5 +1,4 @@
-import { IDataParser } from "./IDataParser";
-import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
+import { InsightDatasetKind as InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 import { IParsedData } from "./IParsedData";
 import JSZip = require("jszip");
 import Insight from "../util/Insight";
@@ -7,15 +6,16 @@ import { ParsedCoursesData } from "./ParsedCoursesData";
 import { parseSectionsFromFile } from "./DataParsingFunctions";
 import Log from "../Util";
 import { FileParseResult, FileParseResultFlag } from "./FileParseResult";
+import { ActualDataset } from "./ActualDataset";
+import { roomService } from "../D2/data/Owen TODO";
 
-export class DataParser implements IDataParser {
-
+export class DataParser {
     /**
      * @param id a valid id
      * @param content a non-null string
      * @param kind a non-null InsightDatasetKind
      */
-    public async parseDatasetZip(id: string, content: string, kind: InsightDatasetKind): Promise<IParsedData> {
+    public async parseDatasetZip(id: string, content: string, kind: InsightDatasetKind): Promise<ActualDataset> {
         // Unreacheable code
         // if (id === null || content === null) {
         //     throw new InsightError("Null arguments");
@@ -26,17 +26,24 @@ export class DataParser implements IDataParser {
         } catch (err) {
             throw new InsightError(`Zip file failed to load: ${id}`);
         }
-        const courses: JSZip = zip.folder("courses");
-        let files: JSZip.JSZipObject[] = Object.values(courses.files);
-        if (files.length === 0) {
-            throw new InsightError("No files in courses folder");
+        let folder: JSZip;
+        switch (kind) {
+            case InsightDatasetKind.Courses: folder = zip.folder("courses");
+            case InsightDatasetKind.Rooms: folder = zip.folder("rooms");
         }
-        const [parsedData, summary]: [IParsedData, ParseSummary] = await this.parseFiles(id, files);
-        if (parsedData.numRows === 0) {
+        let files: JSZip.JSZipObject[] = Object.values(folder.files);
+        if (files.length === 0) {
+            throw new InsightError("No files in the necessary folder");
+        }
+        if (kind === InsightDatasetKind.Rooms) {
+            return await roomService(id, files); // D2 TODO -- can change it if you want
+        }
+        const [ad, summary]: [ActualDataset, ParseSummary] = await this.parseCoursesFiles(id, files);
+        if (ad.Sections.length === 0) {
             throw new InsightError("No valid sections");
         } else {
             Log.trace(`==================================================================================`);
-            Log.trace(`| SUCCESSFULLY ADDED DATASET: ID: ${parsedData.id}, numRows: ${parsedData.numRows}`);
+            Log.trace(`| SUCCESSFULLY ADDED DATASET: ID: ${ad.ID}, numRows: ${ad.Sections.length}`);
             Log.trace(`---------------------------------------------------------------------------------`);
             Log.trace(`| Total files in courses folder: ${files.length}`);
             Log.trace(`| JSON files with result array: ${summary.JsonFilesWithResultArray}`);
@@ -47,17 +54,20 @@ export class DataParser implements IDataParser {
             Log.trace(`| Average items (any type) per result array: ${summary.AverageAnyPerArray}`);
             Log.trace(`| Average valid sections per result array: ${summary.AverageValidSectionsPerArray}`);
             Log.trace(`==================================================================================`);
-            return parsedData;
+            return ad;
         }
     }
 
-    private async parseFiles(id: string, files: JSZip.JSZipObject[]): Promise<[IParsedData, ParseSummary]> {
-        const parsedData: ParsedCoursesData = new ParsedCoursesData(id);
+    private async parseCoursesFiles(id: string, files: JSZip.JSZipObject[]): Promise<[ActualDataset, ParseSummary]> {
+        const actualDataset: ActualDataset = new ActualDataset(id, InsightDatasetKind.Courses);
+        actualDataset.ID = id;
+        actualDataset.Kind = InsightDatasetKind.Courses;
+        actualDataset.Sections = [];
         let summary: ParseSummary = new ParseSummary();
         let totalValidSections: number = 0;
         for (const file of files) {
             try {
-                const result: FileParseResult = await parseSectionsFromFile(file, parsedData);
+                const result: FileParseResult = await parseSectionsFromFile(file, actualDataset);
                 switch (result.Flag) {
                     case FileParseResultFlag.HasResultArray:
                         totalValidSections += result.ValidSections;
@@ -79,7 +89,7 @@ export class DataParser implements IDataParser {
                 (totalValidSections + summary.TotalInvalidSections) / summary.JsonFilesWithResultArray;
             summary.AverageValidSectionsPerArray = totalValidSections / summary.JsonFilesWithResultArray;
         }
-        return [parsedData, summary];
+        return [actualDataset, summary];
     }
 }
 

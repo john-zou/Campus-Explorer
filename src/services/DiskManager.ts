@@ -3,6 +3,7 @@ import { IParsedData } from "../data/IParsedData";
 import fs = require("fs");
 import { ParsedCoursesData } from "../data/ParsedCoursesData";
 import Log from "../Util";
+import { ActualDataset } from "../data/ActualDataset";
 
 export class DiskManager implements IDiskManager {
     // Constant
@@ -11,6 +12,9 @@ export class DiskManager implements IDiskManager {
 
     public Status: DiskManagerStatus = DiskManagerStatus.NewlyBorn;
 
+    /**
+     * Creates the data folder if it's not already there
+     */
     public async initializeIfNeeded(): Promise<void> {
         if (this.Status === DiskManagerStatus.Adult) {
             return;
@@ -24,13 +28,13 @@ export class DiskManager implements IDiskManager {
         }
     }
 
-    public async saveDataset(dataset: IParsedData): Promise<void> {
+    public async saveDataset(dataset: ActualDataset): Promise<void> {
         // Convert IParsedData into a nice JSON
         const dataAsJSON: string = JSON.stringify(dataset);
         // Save JSON into a .txt file
         // Note that saveDataset should not be called more than once
         // before promise returns
-        fs.writeFileSync(this.FILEDIR + dataset.id, dataAsJSON);
+        fs.writeFileSync(this.FILEDIR + dataset.ID, dataAsJSON);
     }
 
     // this may not be the most effecient implementation
@@ -44,10 +48,10 @@ export class DiskManager implements IDiskManager {
         fs.unlinkSync(this.FILEDIR + id);
     }
 
-    public async getDatasets(): Promise<IParsedData[]> {
+    public async getDatasets(): Promise<ActualDataset[]> {
         let fileNames: string[] = [];
         fileNames = fs.readdirSync(this.FILEDIR);
-        let foundData: IParsedData[] = [];
+        let foundData: ActualDataset[] = [];
         // Terminate early if no datasets to get
         if (fileNames === undefined || fileNames.length === 0) {
             return foundData;
@@ -58,6 +62,7 @@ export class DiskManager implements IDiskManager {
         this.growUp();
         return foundData;
     }
+
     private growUp() {
         this.Status = DiskManagerStatus.Adult;
     }

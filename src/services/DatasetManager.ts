@@ -1,22 +1,17 @@
-import { IDatasetManager } from "./IDatasetManager";
 import { InsightDatasetKind, InsightDataset, InsightError, NotFoundError } from "../controller/IInsightFacade";
-import { IParsedData } from "../data/IParsedData";
-import { IDataParser } from "../data/IDataParser";
-import { Factory } from "./Factory";
-import { IDiskManager, DiskManagerStatus } from "./IDiskManager";
 import { DiskManager } from "./DiskManager";
-import Log from "../Util";
+import { OwensReality } from "../data/OwensReality";
+import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
+import { ActualDataset } from "../data/ActualDataset";
+import { DataParser } from "../data/DataParser";
+import { DiskManagerStatus } from "./IDiskManager";
 
-export class DatasetManager implements IDatasetManager {
-    private dataParser: IDataParser;
-    private parsedDatasets: IParsedData[] = [];
-    private diskManager: IDiskManager;
+export class DatasetManager {
+    private dataParser: DataParser;
+    public Owen: OwensReality;
+    private diskManager: DiskManager;
 
-    public get datasetIds(): string[] {
-        return this.parsedDatasets.map((d: IParsedData) => d.id );
-    }
-
-    public constructor (dataparser: IDataParser = Factory.getDataParser(), diskManager = Factory.getDiskManager() ) {
+    public constructor (dataparser = new DataParser(), diskManager = new DiskManager()) {
         this.diskManager = diskManager;
         this.dataParser = dataparser;
     }
@@ -29,11 +24,11 @@ export class DatasetManager implements IDatasetManager {
         if (this.isInvalidId(id)) {
             throw new InsightError("ID must not contain _ and must not be fully whitespace");
         }
-        if (this.datasetIds.includes(id)) {
+        if (this.Owen.checkID(id) !== JohnsRealityCheck.NotFound) {
             throw new InsightError("There is already a dataset with given ID in the list");
         }
-        let newData: IParsedData = await this.dataParser.parseDatasetZip(id, content, kind);
-        this.parsedDatasets.push(newData);
+        let newData: ActualDataset = await this.dataParser.parseDatasetZip(id, content, kind);
+        this.Owen.addDataset(newData);
         await this.diskManager.saveDataset(newData);
     }
 
@@ -45,11 +40,11 @@ export class DatasetManager implements IDatasetManager {
         if (this.isInvalidId(id)) {
             throw new InsightError("Invalid ID");
         }
-        if (!this.datasetIds.includes(id)) {
+        if (this.Owen.checkID(id) === JohnsRealityCheck.NotFound) {
             throw new NotFoundError("ID not in dataset");
         }
         // remove from parsedData
-        this.parsedDatasets = this.parsedDatasets.filter((d: IParsedData) => d.id !== id);
+        this.Owen.removeDataset(id);
         // remove from disk, encapsulate in the correct type of promise
         await this.diskManager.deleteDataset(id);
         return id;
@@ -57,23 +52,7 @@ export class DatasetManager implements IDatasetManager {
 
     public async listDatasets(): Promise<InsightDataset[]> {
         await this.getDataFromDiskIfNeeded();
-        let ret: InsightDataset[] = [];
-        for (const dataset of this.parsedDatasets) {
-            const strictlyInsightDataset: InsightDataset = {
-                id: dataset.id, kind: dataset.kind, numRows: dataset.numRows
-            };
-            ret.push(strictlyInsightDataset);
-        }
-        return ret;
-    }
-
-    // Unused
-    // public async getData(id: string): Promise<IParsedData> {
-    //     return this.parsedDatasets.find((d: IParsedData) => d.id === id);
-    // }
-
-    public async getAllData(): Promise<IParsedData[]> {
-        return this.parsedDatasets;
+        return this.Owen.InsightDatasets;
     }
 
     private isInvalidId(id: string): boolean {
@@ -83,15 +62,11 @@ export class DatasetManager implements IDatasetManager {
     private async getDataFromDiskIfNeeded(): Promise<void> {
         await this.diskManager.initializeIfNeeded();
         if  (this.diskManager.Status === DiskManagerStatus.NewlyBorn) {
-            this.parsedDatasets = await this.diskManager.getDatasets();
+            this.Owen = OwensReality.fromDatasetArray(await this.diskManager.getDatasets());
         }
     }
 
-    // // Syncs datasets on the disk and locally
-    // public async syncDatasets() {
-    //     const diskDataset: IParsedData[] = await this.diskManager.getDatasets();
-    //     if (this.parsedDatasets.length < diskDataset.length) {
-    //         this.parsedDatasets = diskDataset;
-    //     }
-    // }
+    public getIDs() {
+        return this.Owen.IDs;
+    }
 }

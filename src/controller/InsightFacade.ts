@@ -1,31 +1,22 @@
 import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError} from "./IInsightFacade";
-import * as JSZip from "jszip";
-import { IDatasetManager } from "../services/IDatasetManager";
-import { IQueryPerformer } from "../services/IQueryPerformer";
-import { Factory } from "../services/Factory";
+import { DatasetManager } from "../services/DatasetManager";
+import { realize } from "../D2/query/Realize";
 
 /**
- * This is the main programmatic entry point for the project.
- * Method documentation is in IInsightFacade
- *
+ * DONE for d2
  */
 export default class InsightFacade implements IInsightFacade {
-    private datasetManager: IDatasetManager;
-    private queryPerformer: IQueryPerformer;
+    private datasetManager: DatasetManager;
 
     constructor() {
-        // Log.trace("InsightFacadeImpl::init()");
-        this.datasetManager = Factory.getDatasetManager();
-        this.queryPerformer = Factory.getQueryPerformer();
-        // Log.trace("InsightFacade constructor: dependencies injected.");
+        this.datasetManager = new DatasetManager();
     }
 
     public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
         try {
             await this.datasetManager.addDataset(id, content, kind);
-            return this.datasetManager.datasetIds;
+            return this.datasetManager.getIDs();
         } catch (err) {
             Log.trace(`FAILED TO ADD DATASET: ID: ${id}, ${err}`);
             throw err;
@@ -38,10 +29,7 @@ export default class InsightFacade implements IInsightFacade {
 
     public async performQuery(query: any): Promise <any[]> {
         try {
-            return await
-                this.queryPerformer.
-                    performQuery(query,
-                                null); // TODO
+            return await realize(query, this.datasetManager.Owen);
         } catch (err) {
             Log.trace(`Invalid Query: ${err}`);
             throw err;

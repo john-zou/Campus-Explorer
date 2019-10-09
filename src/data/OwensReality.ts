@@ -1,12 +1,18 @@
 import { InsightDataset, InsightDatasetKind } from "../controller/IInsightFacade";
-import { ActualDataset as ActualDataset } from "./ActualDataset";
 import { JohnsRealityCheck } from "./JohnsRealityCheck";
+import { ActualDataset } from "./ActualDataset";
 
 /**
  * Physical data class
  *
  * Key features:
- * - Each Dataset can be easily parsed to and from a JSON string (and ultimately, file on SSD)
+ * - Each Dataset can be directly parsed to and from a JSON string (and ultimately, file on SSD)
+ * - Given an ID, can immeditely check whether it exists and what kind of dataset it is
+ * - Directly supplies all the needs of InsightFacade other than performQuery
+ * - A single Dataset can be served up by ID
+ * - DataManager can add/remove/list
+ * - DiskManager can create an OwensReality using fromDatasetArray
+ *
  * The reality behind the facade
  */
 export class OwensReality {

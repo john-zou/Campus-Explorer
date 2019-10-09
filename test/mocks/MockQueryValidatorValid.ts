@@ -1,4 +1,5 @@
-// import { IQueryValidator, QueryValidationResult, QueryValidationResultFlag } from "../../src/services/IQueryValidator";
+// import { IQueryValidator, QueryValidationResult, QueryValidationResultFlag }
+//              from "../../src/services/IQueryValidator";
 // import { InsightDatasetKind } from "../../src/controller/IInsightFacade";
 
 // export class MockQueryValidatorValid implements IQueryValidator {

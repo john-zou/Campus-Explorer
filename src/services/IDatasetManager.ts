@@ -20,5 +20,5 @@ export interface IDatasetManager {
     // getData(id: string): Promise<IParsedData>;
 
     // Returns all Datasets as an IParsedData array
-    getAllData(): Promise<IParsedData[]>;
+    getOwen(): Promise<IParsedData[]>;
 }
