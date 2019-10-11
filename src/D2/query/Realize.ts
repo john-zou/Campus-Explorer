@@ -20,22 +20,24 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
         if (things.length > 5000) {
             throw new ResultTooLargeError("IT'S OVER 5000!!!");
         }
-    }
-
-    const ff = [];
-    for (const thing of things) {
-        if (f(thing, q.WHERE)) {
-            ff.push(thing);
+    } else {
+        const ff = [];
+        for (const thing of things) {
+            if (f(thing, q.WHERE)) {
+                ff.push(thing);
+            }
         }
-    }
 
-    if (ff.length > 5000) {
-        throw new ResultTooLargeError("IT'S OVER 5000!!!");
+        if (ff.length > 5000) {
+            throw new ResultTooLargeError("IT'S OVER 5000!!!");
+        }
+
+        things = ff;
     }
 
     if (q.TRANSFORMATIONS !== undefined) {
-        return transform(q, ff);
+        return transform(q, things);
     } else {
-        return dontTransform(q, ff);
+        return dontTransform(q, things);
     }
 }

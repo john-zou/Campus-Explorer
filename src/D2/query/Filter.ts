@@ -43,7 +43,7 @@ export function fAND(thing: any, arr: any[]): boolean {
 export function fOR(thing: any, arr: any[]): boolean {
     for (const filt of arr) {
         if (f(thing, filt)) {
-            return false;
+            return true;
         }
     }
     return false;
