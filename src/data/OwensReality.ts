@@ -1,6 +1,7 @@
 import { InsightDataset, InsightDatasetKind } from "../controller/IInsightFacade";
 import { JohnsRealityCheck } from "./JohnsRealityCheck";
 import { ActualDataset } from "./ActualDataset";
+import Log from "../Util";
 
 /**
  * Physical data class
@@ -33,7 +34,12 @@ export class OwensReality {
         ir.InsightDatasets = [];
         ir.IDs = [];
         for (const d of datasets) {
-            ir.InsightDatasets.push(d.toInsightDataset());
+            try {
+                ir.InsightDatasets.push(d.toInsightDataset());
+            } catch (err) {
+                Log.error(err);
+            }
+
             ir.IDs.push(d.ID);
         }
         return ir;

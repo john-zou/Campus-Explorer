@@ -1,17 +1,19 @@
 import { QueryValidationResultFlag as F } from "./IQueryValidator";
 import { MFIELDS_COURSES, MFIELDS_ROOMS } from "../query_schema/MFields";
-import { InsightDatasetKind, InsightDataset } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightDataset, InsightError } from "../controller/IInsightFacade";
 import { parseKeystring as splitOn_ } from "./QueryValidationFunctions_Body";
 import { SFIELDS_COURSES, SFIELDS_ROOMS } from "../query_schema/SFields";
 import { IParsedData } from "../data/IParsedData";
 import { OwensReality } from "../data/OwensReality";
 import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
 import Insight, { WT } from "../util/Insight";
+import { APPLYTOKENS } from "../query_schema/ApplyTokens";
 
 /**
  * @returns [ID, groups, applyKeys]
  */
-export function getKeysFromTransformations(t: any, owen: OwensReality): [string, string[], string[]] {
+export function getKeysFromTransformations(q: any, owen: OwensReality): [string, string[], string[]] {
+    const t = q.TRANSFORMATIONS;
     // Always has a group, always has an apply
     if (t == null || typeof t !== "object") {
         WT(F.TransformationsIsNotAnObject);
@@ -21,7 +23,7 @@ export function getKeysFromTransformations(t: any, owen: OwensReality): [string,
         WT(F.TransformationsIsMissingGroup);
     }
     if (!keys.includes("APPLY")) {
-        WT(F.TransformationsIsMissingGroup);
+        WT(F.TransformationsIsMissingApply);
     }
     if (keys.length !== 2) {
         WT(F.TransformationsDoesntHaveTwoKeys);
@@ -144,7 +146,7 @@ export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: Owens
         WT(F.ApplyKeyContainsUnderscore);
     }
 
-    // call { APPLYTOKEN: key } the core
+    // The "core" = { APPLYTOKEN: key }
     const core: any = applyRule[applyKey];
     if (core == null || typeof core !== "object") {
         WT(F.ApplyKeyCoreMustBeObject);
@@ -159,7 +161,7 @@ export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: Owens
     }
     const key = core[applyToken];
     validateKeyForApplyToken(key, id, owen, applyToken);
-    return key;
+    return applyKey;
 }
 
 export function validateKeyForApplyToken(key: any, id: string, owen: OwensReality, token: string) {
@@ -169,9 +171,13 @@ export function validateKeyForApplyToken(key: any, id: string, owen: OwensRealit
     }
     // COUNT works for both SFields and MFields, but the rest only work for MFields
     if (token === "COUNT") {
-        return true;
+        return;
     } else {
         // Don't need to check whether it belongs to courses or rooms because validateKey already does that
-        return MFIELDS_COURSES.includes(field) || MFIELDS_ROOMS.includes(field);
+        if (MFIELDS_COURSES.includes(field) || MFIELDS_ROOMS.includes(field)) {
+            return;
+        } else {
+            WT(F.ApplyTokenCannotBeAppliedToSField);
+        }
     }
 }

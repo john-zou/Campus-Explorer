@@ -5,6 +5,7 @@ import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
 import { ActualDataset } from "../data/ActualDataset";
 import { DataParser } from "../data/DataParser";
 import { DiskManagerStatus } from "./IDiskManager";
+import Log from "../Util";
 
 export class DatasetManager {
     private dataParser: DataParser;
@@ -29,7 +30,7 @@ export class DatasetManager {
         }
         let newData: ActualDataset = await this.dataParser.parseDatasetZip(id, content, kind);
         this.Owen.addDataset(newData);
-        await this.diskManager.saveDataset(newData);
+        this.diskManager.saveDatasetSync(newData);
     }
 
     public async removeDataset(id: string): Promise<string> {
@@ -46,7 +47,7 @@ export class DatasetManager {
         // remove from parsedData
         this.Owen.removeDataset(id);
         // remove from disk, encapsulate in the correct type of promise
-        await this.diskManager.deleteDataset(id);
+        this.diskManager.deleteDatasetSync(id);
         return id;
     }
 
@@ -61,7 +62,8 @@ export class DatasetManager {
 
     private async getDataFromDiskIfNeeded(): Promise<void> {
         await this.diskManager.initializeIfNeeded();
-        if  (this.diskManager.Status === DiskManagerStatus.NewlyBorn) {
+        if (this.diskManager.Status === DiskManagerStatus.NewlyBorn) {
+            Log.trace("DiskManager: I am grown up now!");
             this.Owen = OwensReality.fromDatasetArray(await this.diskManager.getDatasets());
         }
     }

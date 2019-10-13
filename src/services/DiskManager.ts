@@ -8,7 +8,7 @@ import { ActualDataset } from "../data/ActualDataset";
 export class DiskManager implements IDiskManager {
     // Constant
     private DIRNAME: string = "data";
-    private FILEDIR: string = "./" + this.DIRNAME + "/";
+    private FILEDIR: string = ".\\" + this.DIRNAME + "\\";
 
     public Status: DiskManagerStatus = DiskManagerStatus.NewlyBorn;
 
@@ -20,7 +20,7 @@ export class DiskManager implements IDiskManager {
             return;
         }
         // Check if database directory already exists
-        const dirs: string[] =  fs.readdirSync("./");
+        const dirs: string[] =  fs.readdirSync(".\\");
         if (!dirs.includes(this.DIRNAME)) {
             // Makes new directory if it does not already exist
             fs.mkdirSync(this.FILEDIR);
@@ -28,7 +28,7 @@ export class DiskManager implements IDiskManager {
         }
     }
 
-    public async saveDataset(dataset: ActualDataset): Promise<void> {
+    public saveDatasetSync(dataset: ActualDataset): void {
         // Convert IParsedData into a nice JSON
         const dataAsJSON: string = JSON.stringify(dataset);
         // Save JSON into a .txt file
@@ -38,7 +38,7 @@ export class DiskManager implements IDiskManager {
     }
 
     // this may not be the most effecient implementation
-    public async deleteDataset(id: string): Promise<void> {
+    public deleteDatasetSync(id: string): void {
         // Make sure file not already in dataset
         const fileNames: string[] = fs.readdirSync(this.FILEDIR);
         if (!fileNames.includes(id)) {

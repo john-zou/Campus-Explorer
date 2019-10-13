@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Query {
     constructor(id, kind) {
-        this._ = {};
+        this._ = { WHERE: {}, OPTIONS: {} };
         this.ID = id;
         this.Kind = kind;
     }

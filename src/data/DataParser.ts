@@ -60,8 +60,6 @@ export class DataParser {
 
     private async parseCoursesFiles(id: string, files: JSZip.JSZipObject[]): Promise<[ActualDataset, ParseSummary]> {
         const actualDataset: ActualDataset = new ActualDataset(id, InsightDatasetKind.Courses);
-        actualDataset.ID = id;
-        actualDataset.Kind = InsightDatasetKind.Courses;
         actualDataset.Sections = [];
         let summary: ParseSummary = new ParseSummary();
         let totalValidSections: number = 0;

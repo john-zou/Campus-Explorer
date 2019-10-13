@@ -4,7 +4,7 @@ import { InsightDatasetKind } from "../../src/controller/IInsightFacade";
 export class Query {
     public ID: string;
     public Kind: InsightDatasetKind;
-    public _: any = {};
+    public _: any = { WHERE: {}, OPTIONS: {} };
 
     public constructor(id: string, kind: InsightDatasetKind) {
         this.ID = id;

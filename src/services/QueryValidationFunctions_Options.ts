@@ -6,13 +6,14 @@ import { OwensReality } from "../data/OwensReality";
 import { WT } from "../util/Insight";
 import { verifyAndGetIdAndField } from "./QueryValidationFunctions_Transformations";
 
-export function validateOptions(options: any,
+export function validateOptions(query: any,
                                 owen: OwensReality,
                                 transformed: boolean,
                                 idFromTransformations?: string,
                                 groupFields?: string[],
                                 applyKeys?: string[]): string {
     // Check that options is an object
+    const options = query.OPTIONS;
     if (options == null || typeof options !== "object") {
         WT(F.WrongType_Options);
     }

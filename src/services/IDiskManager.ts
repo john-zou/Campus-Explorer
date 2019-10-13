@@ -8,9 +8,9 @@ export interface IDiskManager {
 
     initializeIfNeeded(): Promise<void>;
 
-    saveDataset(dataset: ActualDataset): Promise<void>;
+    saveDatasetSync(dataset: ActualDataset): void;
 
-    deleteDataset(id: string): Promise<void>;
+    deleteDatasetSync(id: string): void;
 
     // Return all data saved on disk
     getDatasets(): Promise<ActualDataset[]>;
