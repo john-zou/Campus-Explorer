@@ -5,6 +5,7 @@ import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
 import { ActualDataset } from "../data/ActualDataset";
 import { DataParser } from "../data/DataParser";
 import { DiskManagerStatus } from "./IDiskManager";
+import { ULTRAINSTINCT } from "../D2/query/Ultra Instinct/UltraInstinct";
 import Log from "../Util";
 
 export class DatasetManager {

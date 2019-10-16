@@ -37,7 +37,8 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         oneBadValidJsonFile: "./test/data/oneBadValidJsonFile.zip",
         noSections: "./test/data/noSections.zip",
         oneBadValidJsonFileKey: "./test/data/oneBadValidJsonFileKey.zip",
-        invalidSectionsOneValid: "./test/data/invalidSectionsOneValid.zip"
+        invalidSectionsOneValid: "./test/data/invalidSectionsOneValid.zip",
+        rooms: "./test/data/rooms/roomsIndexIsNotHTML.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -84,6 +85,11 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
         }
         expect(result).to.deep.equal(expected);
         await insightFacade.removeDataset(id);
+    });
+
+    it("TESTING PARSE5", async function () {
+        const id = "rooms";
+        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms);
     });
 
     // it("Should reject with InsightError on invalid id", async () => {

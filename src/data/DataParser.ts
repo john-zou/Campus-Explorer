@@ -8,6 +8,7 @@ import Log from "../Util";
 import { FileParseResult, FileParseResultFlag } from "./FileParseResult";
 import { ActualDataset } from "./ActualDataset";
 import { roomService } from "../D2/data/Owen TODO";
+import { ULTRAINSTINCT } from "../D2/query/Ultra Instinct/UltraInstinct";
 
 export class DataParser {
     /**
@@ -36,7 +37,7 @@ export class DataParser {
             throw new InsightError("No files in the necessary folder");
         }
         if (kind === InsightDatasetKind.Rooms) {
-            return await roomService(id, files); // D2 TODO -- can change it if you want
+            return await ULTRAINSTINCT(id, files); // D2 TODO -- can change it if you want
         }
         const [ad, summary]: [ActualDataset, ParseSummary] = await this.parseCoursesFiles(id, files);
         if (ad.Sections.length === 0) {
