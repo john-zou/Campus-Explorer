@@ -26,11 +26,11 @@ export const searchHarderForRooms = (body: Node, id: string): any[] => {
     q.EnQ(body);
     while (q.StillHasStuff()) {
         const n = q.DQ();
-        if (n.nodeName === "div") {
+        if (n.nodeName === "tbody") {
             if (n.childNodes == null) {
                 continue;
             }
-            const rooms = tryToGetRoomsFromDiv(n, id);
+            const rooms = reallyTryToGetRoomsFromTableBody(n, id);
             if (rooms.length > 0) {
                 return rooms;
             }
@@ -46,19 +46,12 @@ export const searchHarderForRooms = (body: Node, id: string): any[] => {
     return [];
 };
 
-export const tryToGetRoomsFromDiv = (div: Node, datasetId: string): any[] => {
-    // See if it has attr id
-    const id = getAttrByName(div, "id");
-    if (id == null) {
+export const reallyTryToGetRoomsFromTableBody = (tbody: Node, id: string): any[] => {
+    const rooms = [];
+    if (tbody.childNodes == null) {
         return [];
     }
-    if (id.includes("room-data")) {
-        return [];
-    }
-    if (id !== "room-data") {
-        return [];
-    }
-    return [];
+    // TODO
 };
 
 export const getFileByLink = (link: string, files: JSZip.JSZipObject[]): JSZip.JSZipObject => {
