@@ -20,17 +20,17 @@ export class ActualDataset {
         }
     }
 
-    public toInsightDataset(): InsightDataset {
+    public static toInsightDataset(ad: ActualDataset): InsightDataset {
         let numRows: number;
-        switch (this.Kind) {
+        switch (ad.Kind) {
             case InsightDatasetKind.Courses:
-                numRows = this.Sections.length;
+                numRows = ad.Sections.length;
             case InsightDatasetKind.Rooms:
-                numRows = this.Rooms.length;
+                numRows = ad.Rooms.length;
         }
         return {
-            id: this.ID,
-            kind: this.Kind,
+            id: ad.ID,
+            kind: ad.Kind,
             numRows: numRows
         };
     }

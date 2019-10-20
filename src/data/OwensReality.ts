@@ -35,7 +35,7 @@ export class OwensReality {
         ir.IDs = [];
         for (const d of datasets) {
             try {
-                ir.InsightDatasets.push(d.toInsightDataset());
+                ir.InsightDatasets.push(ActualDataset.toInsightDataset(d));
             } catch (err) {
                 Log.error(err);
             }
@@ -65,7 +65,7 @@ export class OwensReality {
 
     public addDataset(dataset: ActualDataset) {
         this.ActualDatasets.push(dataset);
-        this.InsightDatasets.push(dataset.toInsightDataset());
+        this.InsightDatasets.push(ActualDataset.toInsightDataset(dataset));
         this.IDs.push(dataset.ID);
     }
 

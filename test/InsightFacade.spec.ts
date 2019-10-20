@@ -19,78 +19,78 @@ export interface ITestQuery {
     filename: string;  // This is injected when reading the file
 }
 
-describe("InsightFacade Add/Remove/List Dataset(s)", function () {
-    // Reference any datasets you've added to test/data here and they will
-    // automatically be loaded in the 'before' hook.
-    const coursesNumRows: number = 64612;
+// describe("InsightFacade Add/Remove/List Dataset(s)", function () {
+//     // Reference any datasets you've added to test/data here and they will
+//     // automatically be loaded in the 'before' hook.
+//     const coursesNumRows: number = 64612;
 
-    const datasetsToLoad: { [id: string]: string } = {
-        validOneBadFile: "./test/data/validOneBadFile.zip",
-        simpleGood: "./test/data/simpleGood.zip",
-        simpleGoodWithBadSections: "./test/data/simpleGoodWithBadSections.zip",
-        courses: "./test/data/courses.zip",
-        engl: "./test/data/engl.zip",
-        bad: "./test/data/bad.zip",
-        goodButHasInvalidFiles: "./test/data/goodButHasInvalidFiles.zip",
-        noCoursesFolder: "./test/data/noCoursesFolder.zip",
-        noFilesInCoursesFolder: "./test/data/noFilesInCoursesFolder.zip",
-        oneBadValidJsonFile: "./test/data/oneBadValidJsonFile.zip",
-        noSections: "./test/data/noSections.zip",
-        oneBadValidJsonFileKey: "./test/data/oneBadValidJsonFileKey.zip",
-        invalidSectionsOneValid: "./test/data/invalidSectionsOneValid.zip",
-        rooms: "./test/data/rooms/roomsIndexIsNotHTML.zip"
-    };
-    let datasets: { [id: string]: string } = {};
-    let insightFacade: InsightFacade;
-    const cacheDir = __dirname + "/../data";
+//     const datasetsToLoad: { [id: string]: string } = {
+//         validOneBadFile: "./test/data/validOneBadFile.zip",
+//         simpleGood: "./test/data/simpleGood.zip",
+//         simpleGoodWithBadSections: "./test/data/simpleGoodWithBadSections.zip",
+//         courses: "./test/data/courses.zip",
+//         engl: "./test/data/engl.zip",
+//         bad: "./test/data/bad.zip",
+//         goodButHasInvalidFiles: "./test/data/goodButHasInvalidFiles.zip",
+//         noCoursesFolder: "./test/data/noCoursesFolder.zip",
+//         noFilesInCoursesFolder: "./test/data/noFilesInCoursesFolder.zip",
+//         oneBadValidJsonFile: "./test/data/oneBadValidJsonFile.zip",
+//         noSections: "./test/data/noSections.zip",
+//         oneBadValidJsonFileKey: "./test/data/oneBadValidJsonFileKey.zip",
+//         invalidSectionsOneValid: "./test/data/invalidSectionsOneValid.zip",
+//         rooms: "./test/data/rooms/roomsIndexIsNotHTML.zip"
+//     };
+//     let datasets: { [id: string]: string } = {};
+//     let insightFacade: InsightFacade;
+//     const cacheDir = __dirname + "/../data";
 
-    before(function () {
-        // This section runs once and loads all datasets specified in the datasetsToLoad object
-        // into the datasets object
-        Log.test(`Before all`);
-        for (const id of Object.keys(datasetsToLoad)) {
-            datasets[id] = fs.readFileSync(datasetsToLoad[id]).toString("base64");
-        }
-    });
+//     before(function () {
+//         // This section runs once and loads all datasets specified in the datasetsToLoad object
+//         // into the datasets object
+//         Log.test(`Before all`);
+//         for (const id of Object.keys(datasetsToLoad)) {
+//             datasets[id] = fs.readFileSync(datasetsToLoad[id]).toString("base64");
+//         }
+//     });
 
-    beforeEach(function () {
-        // This section resets the data directory (removing any cached data) and resets the InsightFacade instance
-        // This runs before each test, which should make each test independent from the previous one
-        Log.test(`BeforeTest: ${this.currentTest.title}`);
-        try {
-            fs.removeSync(cacheDir);
-            fs.mkdirSync(cacheDir);
-            insightFacade = new InsightFacade();
-        } catch (err) {
-            Log.error(err);
-        }
-    });
+//     beforeEach(function () {
+//         // This section resets the data directory (removing any cached data) and resets the InsightFacade instance
+//         // This runs before each test, which should make each test independent from the previous one
+//         Log.test(`BeforeTest: ${this.currentTest.title}`);
+//         try {
+//             fs.removeSync(cacheDir);
+//             fs.mkdirSync(cacheDir);
+//             insightFacade = new InsightFacade();
+//         } catch (err) {
+//             Log.error(err);
+//         }
+//     });
 
-    after(function () {
-        Log.test(`After: ${this.test.parent.title}`);
-    });
+//     after(function () {
+//         Log.test(`After: ${this.test.parent.title}`);
+//     });
 
-    afterEach(function () {
-        Log.test(`AfterTest: ${this.currentTest.title}`);
-    });
+//     afterEach(function () {
+//         Log.test(`AfterTest: ${this.currentTest.title}`);
+//     });
 
-    it("Should add the simpleGood dataset", async function () {
-        const id: string = "simpleGood";
-        const expected: string[] = [id];
-        let result;
-        try {
-            result = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        } catch (err) {
-            throw err;
-        }
-        expect(result).to.deep.equal(expected);
-        await insightFacade.removeDataset(id);
-    });
+//     it("Should add the simpleGood dataset", async function () {
+//         const id: string = "simpleGood";
+//         const expected: string[] = [id];
+//         let result;
+//         try {
+//             result = await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+//         } catch (err) {
+//             throw err;
+//         }
+//         expect(result).to.deep.equal(expected);
+//         await insightFacade.removeDataset(id);
+//     });
 
-    it("TESTING PARSE5", async function () {
-        const id = "rooms";
-        await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms);
-    });
+//     it("TESTING PARSE5", async function () {
+//         const id = "rooms";
+//         await insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms);
+//     });
 
     // it("Should reject with InsightError on invalid id", async () => {
     //     const id: string = "courses";
@@ -318,7 +318,7 @@ describe("InsightFacade Add/Remove/List Dataset(s)", function () {
     //     async () => {
     //         return;
     //     });
-});
+// });
 
 /*
  * This test suite dynamically generates tests from the JSON files in test/queries.

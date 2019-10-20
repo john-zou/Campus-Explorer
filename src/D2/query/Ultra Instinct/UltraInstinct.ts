@@ -4,7 +4,7 @@ import { InsightError, InsightDatasetKind } from "../../../controller/IInsightFa
 import Log from "../../../Util";
 const parse5 = require("parse5");
 
-export async function ULTRAINSTINCT(id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> {
+export function ULTRAINSTINCT(id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> {
     let index = null; // index.htm
     for (const f of files) {
         if (f.name === "rooms/index.htm") {
@@ -15,11 +15,12 @@ export async function ULTRAINSTINCT(id: string, files: JSZip.JSZipObject[]): Pro
     if (index == null) {
         throw new InsightError("There is no index.htm!");
     }
-    // try to parse5
-    const indexStr = await index.async("text");
-    const document: Document = parse5.parse(indexStr);
-
-    return new ActualDataset(id, InsightDatasetKind.Rooms);
+    let promise = index.async("text").then((res) => {
+        let document = parse5.parse(res);
+        // Do things
+        return new ActualDataset(id, InsightDatasetKind.Rooms);
+    });
+    return promise;
 }
 
 export function searchForTable(node: Node): Node {
