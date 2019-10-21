@@ -8,11 +8,12 @@ export class IndexValidator {
     public async validate(index: JSZip.JSZipObject): Promise<Room[]> {
         const parsedDoc: Document = Parse5.parse(await index.async("text"));
         // traverse document recursively looking for a table element
-        const table: Document = tablesearch(document);
-        if (table === null) {
+        const tables: Document[] = tablesearch(document);
+        if (tables === null) {
             // fail
-            throw new InsightError("No table in index.htm");
+            throw new InsightError("No table found in index.htm");
         }
+        // parse table to find rooms
         return []; // stub
     }
 
