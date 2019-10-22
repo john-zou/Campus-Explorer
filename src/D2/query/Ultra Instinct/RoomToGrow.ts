@@ -68,7 +68,13 @@ export const findFullnameAndAddress = (node: any): [boolean, string, string] => 
 };
 
 export const makeRooms = (fullname: string, address: string, rooms: any[]): any[] => {
-    return [];
+    const result = [];
+    for (const room of rooms) {
+        result.push ({
+            // TODO
+        });
+    }
+    return result;
 };
 
 export const searchHarderForRooms = (body: Node): any[] => {
