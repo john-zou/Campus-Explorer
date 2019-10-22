@@ -32,6 +32,20 @@ export function getBodyFromDocument(document: Document) {
     return getChildNodeByName(htmlNode.childNodes, "body");
 }
 
+export function getChildrenNodesByName(nodes: any, str: string): any[] {
+    if (nodes == null) {
+        return [];
+    }
+    let children: any[] = [];
+    for (let i = 0; i < nodes.length; ++i) {
+        let j = i;
+        if (nodes[i].nodeName === str) {
+            children.push(nodes[i]);
+        }
+    }
+    return children;
+}
+
 export function getChildNodeByName(nodes: any, str: string) {
     if (nodes == null) {
         return null;

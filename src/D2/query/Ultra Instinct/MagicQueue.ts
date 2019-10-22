@@ -1,8 +1,17 @@
 
 export class MagicQueue<T> {
-    private data: T[] = [];
-    public left: number = 0;
-    public right: number = 0;
+    private data: T[];
+    public left: number;
+    public right: number; // unnecessary now but wait until this becomes a MagicDeque magically
+
+    public constructor(initial: T[] = []) {
+        this.data = [];
+        this.left = 0;
+        this.right = 0;
+        for (const e of initial) {
+            this.enqueue(e);
+        }
+    }
 
     public enqueue = (item: T): void => {
         if (this.left === 0 && this.right === 0) {
