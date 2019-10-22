@@ -4,28 +4,47 @@ import { MagicQueue } from "./MagicQueue";
 import { getBodyFromDocument, getAttrByName, getChildrenNodesByName, getChildNodeByName } from "./UltraInstinct";
 const parse5 = require("parse5");
 
-export const getRoomsFromLink = async (link: string, id: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
+export const getRoomsFromLink = async (link: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
     const file = getFileByLink(link, files);
     if (file != null) {
         Log.trace("Wow found: " + file.name);
         const str = await file.async("text");
-        return getRoomsFromHtmlStr(str, id, files);
+        return getRoomsFromHtmlStr(str, files);
     }
     return [];
 };
 
-export const getRoomsFromHtmlStr = (str: string, id: string, files: JSZip.JSZipObject[]): any[] => {
+export const getRoomsFromHtmlStr = (str: string, files: JSZip.JSZipObject[]): any[] => {
     const doc: Document = parse5.parse(str);
-    // BFS
     const body = getBodyFromDocument(doc);
-    return searchHarderForRooms(body, id);
+    return searchHarderForRooms(body);
 };
 
 const notFound: [boolean, string, string] = [false, null, null];
 
-const getDescendentValues = (possibleAncestors: Node[], ancestors: string[]): string[] => {
-    // DFS
-    return [];
+const getDescendentValues = (nodes: Node[], lineage: string[], level = 0): string[] => {
+    const result: string[] = [];
+    // Base case: get the value of everything that matches the only item left in lineage
+    if (lineage.length === level + 1) {
+        const descendents = getChildrenNodesByName(nodes, lineage[level]);
+        for (const descendent of descendents) {
+            if (descendent.value != null && typeof descendent.value === "string") {
+                result.push(descendent.value);
+            }
+        }
+        return result;
+    }
+
+    // General case, recurse down the tree with the lineage list shortening as depth increases
+    const ancestors = getChildrenNodesByName(nodes, lineage[level]);
+
+    for (const ancestor of ancestors) {
+        const values = getDescendentValues(ancestor.childNodes, lineage, level + 1);
+        for (const value of values) {
+            result.push(value);
+        }
+    }
+    return result;
 };
 
 export const findFullnameAndAddress = (node: any): [boolean, string, string] => {
@@ -39,19 +58,24 @@ export const findFullnameAndAddress = (node: any): [boolean, string, string] => 
 
     // Fullname
     let fullname = getDescendentValues(node.childNodes, ["h2", "span", "#text"]);
-    if (fullname == null) {
+    if (fullname.length === 0) {
         return notFound;
     }
 
     // Address
-    // Assume good structure
+    // TODO
 
 };
 
-export const searchHarderForRooms = (body: Node, id: string): any[] => {
+export const makeRooms = (fullname: string, address: string, rooms: any[]): any[] => {
+    return [];
+};
+
+export const searchHarderForRooms = (body: Node): any[] => {
     const q = new MagicQueue<Node>();
     q.enqueue(body);
     let foundFullnameAndAddress = false;
+    let foundRooms = false;
     let fullname = null;
     let address = null;
     while (q.StillHasStuff()) {
@@ -69,9 +93,14 @@ export const searchHarderForRooms = (body: Node, id: string): any[] => {
             if (node.childNodes == null) {
                 continue;
             }
-            const rooms = reallyTryToGetRoomsFromTableBody(node, id);
+            const rooms = reallyTryToGetRoomsFromTableBody(node);
             if (rooms.length > 0) {
-                return rooms;
+                foundRooms = true;
+                if (foundFullnameAndAddress) {
+                    return makeRooms(fullname, address, rooms);
+                } else {
+                    continue;
+                }
             }
         }
         if (node.childNodes == null) {
@@ -85,7 +114,7 @@ export const searchHarderForRooms = (body: Node, id: string): any[] => {
     return [];
 };
 
-export const reallyTryToGetRoomsFromTableBody = (tbody: Node, id: string): any[] => {
+export const reallyTryToGetRoomsFromTableBody = (tbody: Node): any[] => {
     const rooms = [];
     if (tbody.childNodes == null) {
         return [];

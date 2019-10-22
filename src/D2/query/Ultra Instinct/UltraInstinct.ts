@@ -120,7 +120,7 @@ export const getRoomsFromTableRow =
             const link: string = getAddressFromTd(c);
             if (link != null && !visited.includes(link)) {
                 visited.push(link);
-                const roomsFromLink = await getRoomsFromLink(link, id, files);
+                const roomsFromLink = await getRoomsFromLink(link, files);
                 for (const r of roomsFromLink) {
                     ret.push(r);
                 }
