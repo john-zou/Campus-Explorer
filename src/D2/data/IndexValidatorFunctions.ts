@@ -1,22 +1,35 @@
-// Needs to be restructured to return a list of tables
+import { IRoom } from "./IRoom";
+import { NotFoundError, InsightError } from "../../controller/IInsightFacade";
+
 // May be a good idea to do some actual parsing on the table
-export function tablesearch(doc: Document): Document[] {
-    if (doc.nodeName === "table") {
-        return [doc];
+export function tablesearch(doc: Document): ChildNode[] {
+    let tables: ChildNode[] = [];
+    tables = tablesearchrec(doc.childNodes);
+    if (tables === []) {
+        throw new InsightError("No tables found");
     }
-    let docs: Document[] = [];
-    for (const i in doc.childNodes) {
-        const cnode = doc.childNodes[i];
-        // Call table search recursively
-        const possibleTable: Document = this.tablesearch(cnode);
-        // Check if table found in recursive call
-        if (possibleTable !== null) {
-            docs.push(possibleTable);
+    return tables;
+}
+
+function tablesearchrec(cnodes: NodeListOf<ChildNode>): ChildNode[] {
+    if (cnodes === null || cnodes === undefined) {
+        return [];
+    }
+    let found: ChildNode[] = [];
+    const len: number = cnodes.length;
+    for (let i = 0; i < len; i++) {
+        if (cnodes[i].nodeName === "table") {
+            found.push(cnodes[i]);
+        } else {
+            found = found.concat(tablesearchrec(cnodes[i].childNodes));
         }
     }
-    if (docs !== []) {
-        return docs;
+    return found;
+}
+
+export function validateTables(tables: ChildNode[]): ChildNode {
+    for (const table of tables) {
+        // stub
     }
-    // Nothing found
-    return null;
+    return null; // stub
 }
