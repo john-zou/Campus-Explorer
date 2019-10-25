@@ -1,5 +1,6 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 
+// CRITICAL SECTION
 export function sort(q: any, realGs: any[]) {
     if (q.OPTIONS.ORDER === undefined) {
         return realGs;
