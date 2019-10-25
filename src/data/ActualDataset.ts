@@ -25,8 +25,10 @@ export class ActualDataset {
         switch (ad.Kind) {
             case InsightDatasetKind.Courses:
                 numRows = ad.Sections.length;
+                break;
             case InsightDatasetKind.Rooms:
                 numRows = ad.Rooms.length;
+                break;
         }
         return {
             id: ad.ID,

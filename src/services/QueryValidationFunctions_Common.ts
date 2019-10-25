@@ -11,6 +11,9 @@ export function hasTransformations(query: any): boolean {
     if (!keys.includes("WHERE")) {
         WT(F.MissingBody);
     }
+    if (typeof query.WHERE !== "object") {
+        WT(F.WrongType_Body);
+    }
     if (!keys.includes("OPTIONS")) {
         WT(F.MissingOptions);
     }

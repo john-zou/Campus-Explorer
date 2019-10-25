@@ -12,8 +12,12 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
     let things;
 
     switch (d.Kind) {
-        case InsightDatasetKind.Courses: things = d.Sections;
-        case InsightDatasetKind.Rooms: things = d.Rooms;
+        case InsightDatasetKind.Courses:
+            things = d.Sections;
+            break;
+        case InsightDatasetKind.Rooms:
+            things = d.Rooms;
+            break;
     }
 
     if (Object.keys(q.WHERE).length === 0) {

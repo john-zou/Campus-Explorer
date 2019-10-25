@@ -22,5 +22,6 @@ describe("Messing around with parse5", () => {
 
     it("Comp Sci is awesome", async () => {
         const rooms = await insight.addDataset("rooms", rooms364zip, InsightDatasetKind.Rooms);
+        await insight.removeDataset("rooms");
     });
 });

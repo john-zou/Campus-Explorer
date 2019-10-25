@@ -16,3 +16,4 @@ test/*.map
 .env
 test/Sandbox.ts
 src/services/Database/*.txt
+data/*

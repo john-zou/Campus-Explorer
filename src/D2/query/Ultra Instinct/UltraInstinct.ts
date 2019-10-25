@@ -20,7 +20,7 @@ export async function ULTRAINSTINCT(id: string, files: JSZip.JSZipObject[]): Pro
     const str = await index.async("text");
     const document = parse5.parse(str);
     const body = getBodyFromDocument(document);
-    return searchForRooms(body, id, files);
+    return await searchForRooms(body, id, files);
 }
 
 export function getBodyFromDocument(document: Document) {
@@ -72,9 +72,9 @@ export const searchForRooms =
     async (htmlBody: Node, id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> => {
     // BFS
     const q = new MagicQueue<Node>();
-    q.EnQ(htmlBody);
+    q.enqueue(htmlBody);
     while (q.StillHasStuff()) {
-        const n = q.DQ();
+        const n = q.dequeue();
         if (n.nodeName === "tbody") {
             if (n.childNodes == null) {
                 continue;
@@ -89,10 +89,10 @@ export const searchForRooms =
         }
         for (let i = 0; i < n.childNodes.length; ++i) {
             let j = i;
-            q.EnQ(n.childNodes[i]);
+            q.enqueue(n.childNodes[i]);
         }
     }
-    throw new InsightError("No valid rooms!");
+    throw new InsightError("No valid rooms!!!");
 };
 
 export const tryToGetRoomsFromTableBody =
