@@ -63,8 +63,49 @@ export const findFullnameAndAddress = (node: any): [boolean, string, string] => 
     }
 
     // Address
-    // TODO
+    const divs = getChildrenNodesByName(node.childNodes, "div");
+    const addr = getAddressFromDivs(divs);
+    if (addr == null) {
+        return notFound;
+    }
 
+    return [true, fullname[0], addr];
+};
+
+export const getAddressFromDivs = (divs: any[]): string => {
+    const buildingFields = divs.filter((node) => hasClass(node, "building-field"));
+    if (buildingFields.length < 1) {
+        return null;
+    }
+    // Take the index = 0 one
+    const theOneWithTheAddress = buildingFields[0];
+    const fieldContentChild = getChildNodeByName(theOneWithTheAddress.childNodes, "div");
+    if (fieldContentChild == null) {
+        return null;
+    }
+    if (hasClass(fieldContentChild, "field-content")) {
+        // Check the text child
+        const textChild = getChildNodeByName(fieldContentChild.childNodes, "#text");
+        if (textChild == null) {
+            return null;
+        } else {
+            return textChild.value;
+        }
+    } else {
+        return null;
+    }
+};
+
+export const hasClass = (node: any, classy: string): boolean => {
+    if (node.attrs == null) {
+        return false;
+    }
+    for (const attr of node.attrs) {
+        if (attr.name === "class" && attr.value === classy) {
+            return true;
+        }
+    }
+    return false;
 };
 
 export const makeRooms = (fullname: string, address: string, rooms: any[]): any[] => {
@@ -78,12 +119,14 @@ export const makeRooms = (fullname: string, address: string, rooms: any[]): any[
 };
 
 export const searchHarderForRooms = (body: Node): any[] => {
-    const q = new MagicQueue<Node>();
-    q.enqueue(body);
     let foundFullnameAndAddress = false;
     let foundRooms = false;
     let fullname = null;
     let address = null;
+
+    // BFS
+    const q = new MagicQueue<Node>();
+    q.enqueue(body);
     while (q.StillHasStuff()) {
         const node = q.dequeue();
         if (!foundFullnameAndAddress) {
@@ -114,7 +157,7 @@ export const searchHarderForRooms = (body: Node): any[] => {
         }
         for (let i = 0; i < node.childNodes.length; ++i) {
             let j = i;
-            q.EnQ(node.childNodes[i]);
+            q.enqueue(node.childNodes[i]);
         }
     }
     return [];
@@ -125,7 +168,96 @@ export const reallyTryToGetRoomsFromTableBody = (tbody: Node): any[] => {
     if (tbody.childNodes == null) {
         return [];
     }
-    // TODO
+    const tableRows = getChildrenNodesByName(tbody.childNodes, "tr");
+    //
+    for (const tr of tableRows) {
+        const room = getRoomFromTableRow(tr);
+        if (room != null) {
+            rooms.push(room);
+        }
+    }
+    return rooms;
+};
+
+export const getText = (node: any): string => {
+    if (node.childNodes == null) {
+        return null;
+    }
+    const text = getChildNodeByName(node.childNodes, "#text");
+    if (text == null) {
+        return null;
+    }
+    return text.value;
+};
+
+export const getRoomNumber = (td: any): string => {
+    return getDescendentValues(td.childNodes, ["a", "#text"])[0];
+};
+
+export const getHref = (td: any): string => {
+    const a = getChildNodeByName(td.childNodes, "a");
+    if (a == null) {
+        return null;
+    }
+    if (a.attrs == null) {
+        return null;
+    }
+    for (const attr of a.attrs) {
+        if (attr.name === "href") {
+            return attr.value;
+        }
+    }
+    return null;
+};
+
+export const getRoomFromTableRow = (tr: Node): any => {
+    const tds = getChildrenNodesByName(tr.childNodes, "td");
+    let foundRoomNumber = false;
+    let foundSeats = false;
+    let foundType = false;
+    let foundFurniture = false;
+    let foundHref = false;
+    const room: any = {};
+    for (const td of tds) {
+        if (hasClass(td, "views-field views-field-field-room-number")) {
+            const numbery = getRoomNumber(td);
+            if (numbery != null) {
+                room.number = numbery;
+                foundRoomNumber = true;
+            }
+        } else if (hasClass(td, "views-field views-field-field-room-capacity")) {
+            const seats = getText(td).trim();
+            if (seats != null) {
+                const seatsInt = parseInt(seats, 10);
+                if (seatsInt != null) {
+                    room.seats = seatsInt;
+                    foundSeats = true;
+                }
+            }
+        } else if (hasClass(td, "views-field views-field-field-room-type")) {
+            const typey = getText(td).trim();
+            if (typey != null) {
+                room.type = typey;
+                foundType = true;
+            }
+        } else if (hasClass(td, "views-field views-field-field-room-furniture")) {
+            const furn = getText(td).trim();
+            if (furn != null) {
+                room.furniture = furn;
+                foundFurniture = true;
+            }
+        } else if (hasClass(td, "views-field views-field-nothing")) {
+            const href = getHref(td);
+            if (href != null) {
+                room.href = href;
+                foundHref = true;
+            }
+        }
+    }
+    if (foundRoomNumber && foundSeats && foundType && foundFurniture && foundHref) {
+        return room;
+    }
+    return null;
 };
 
 export const getFileByLink = (link: string, files: JSZip.JSZipObject[]): JSZip.JSZipObject => {

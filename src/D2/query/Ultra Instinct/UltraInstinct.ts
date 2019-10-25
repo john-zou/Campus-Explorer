@@ -32,7 +32,12 @@ export function getBodyFromDocument(document: Document) {
     return getChildNodeByName(htmlNode.childNodes, "body");
 }
 
-export function getChildrenNodesByName(nodes: any, str: string): any[] {
+/**
+ * @returns the subset of nodes with the correct name
+ * @param nodes the children nodes to search in (these ARE the children)
+ * @param str the nodeName to check
+ */
+export const getChildrenNodesByName = (nodes: any, str: string): any[] => {
     if (nodes == null) {
         return [];
     }
@@ -44,8 +49,12 @@ export function getChildrenNodesByName(nodes: any, str: string): any[] {
         }
     }
     return children;
-}
+};
 
+/**
+ * @param nodes IMPORTANT: childNodes
+ * @param str nodeName to match
+ */
 export function getChildNodeByName(nodes: any, str: string) {
     if (nodes == null) {
         return null;
