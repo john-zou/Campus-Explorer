@@ -2,6 +2,7 @@ import JSZip = require("jszip");
 import Log from "../../../Util";
 import { MagicQueue } from "./MagicQueue";
 import { getBodyFromDocument, getAttrByName, getChildrenNodesByName, getChildNodeByName } from "./UltraInstinct";
+import { getLatLonFromAddress } from "./GPS";
 const parse5 = require("parse5");
 
 export const getRoomsFromLink = async (link: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
@@ -14,13 +15,13 @@ export const getRoomsFromLink = async (link: string, files: JSZip.JSZipObject[])
     return [];
 };
 
-export const getRoomsFromHtmlStr = (str: string, files: JSZip.JSZipObject[]): any[] => {
+export const getRoomsFromHtmlStr = async (str: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
     const doc: Document = parse5.parse(str);
     const body = getBodyFromDocument(doc);
-    return searchHarderForRooms(body);
+    return await searchHarderForRooms(body);
 };
 
-const notFound: [boolean, string, string] = [false, null, null];
+const notFound: [boolean, string, string, number, number] = [false, null, null, null, null];
 
 const getDescendentValues = (nodes: Node[], lineage: string[], level = 0): string[] => {
     const result: string[] = [];
@@ -47,7 +48,8 @@ const getDescendentValues = (nodes: Node[], lineage: string[], level = 0): strin
     return result;
 };
 
-export const findFullnameAndAddress = (node: any): [boolean, string, string] => {
+export const findFullnameAndAddressAndLatLon =
+async (node: any): Promise<[boolean, string, string, number, number]> => {
     if (node.nodeName !== "div" || node.attrs === undefined) {
         return notFound;
     }
@@ -68,8 +70,12 @@ export const findFullnameAndAddress = (node: any): [boolean, string, string] => 
     if (addr == null) {
         return notFound;
     }
-
-    return [true, fullname[0], addr];
+    const gr = await getLatLonFromAddress(addr);
+    if (gr.error) {
+        Log.trace("GPS Error lol");
+        return notFound;
+    }
+    return [true, fullname[0], addr, gr.lat, gr.lon];
 };
 
 export const getAddressFromDivs = (divs: any[]): string => {
@@ -108,48 +114,55 @@ export const hasClass = (node: any, classy: string): boolean => {
     return false;
 };
 
-export const makeRooms = (fullname: string, address: string, rooms: any[]): any[] => {
+export const makeRooms = (fullname: string, address: string, lat: number, lon: number, rooms: any[]): any[] => {
     const result = [];
     for (const room of rooms) {
+        const shortname = getShortnameFromHref(room.href);
         result.push ({
-            // TODO
+            fullname: fullname, address: address, shortname: shortname, number: room.number,
+            name: shortname + "_" + room.number, seats: room.seats, type: room.type,
+            furniture: room.furniture, href: room.href, lat: lat, lon: lon
         });
     }
     return result;
 };
 
-export const searchHarderForRooms = (body: Node): any[] => {
-    let foundFullnameAndAddress = false;
+export const getShortnameFromHref = (href: string): string => {
+    const split = href.split("/");
+    return split[split.length - 1].split("-")[0];
+};
+
+export const searchHarderForRooms = async (body: Node): Promise<any[]> => {
+    let foundFullnameAddressLatLon = false;
     let foundRooms = false;
     let fullname = null;
     let address = null;
-
+    let lat = 9000;
+    let lon = 9000;
+    let rooms = [];
     // BFS
     const q = new MagicQueue<Node>();
     q.enqueue(body);
     while (q.StillHasStuff()) {
         const node = q.dequeue();
-        if (!foundFullnameAndAddress) {
-            const [foundIt, fullnameObtained, addressObtained] = findFullnameAndAddress(node);
+        if (!foundFullnameAddressLatLon) {
+            const [foundIt, fullnameObtained, addressObtained, la, lo] = await findFullnameAndAddressAndLatLon(node);
             if (foundIt) {
-                foundFullnameAndAddress = true;
+                foundFullnameAddressLatLon = true;
                 fullname = fullnameObtained;
                 address = addressObtained;
+                lat = la;
+                lon = lo;
                 continue;
             }
         }
-        if (node.nodeName === "tbody") {
+        if (!foundRooms && node.nodeName === "tbody") {
             if (node.childNodes == null) {
                 continue;
             }
-            const rooms = reallyTryToGetRoomsFromTableBody(node);
+            rooms = reallyTryToGetRoomsFromTableBody(node);
             if (rooms.length > 0) {
                 foundRooms = true;
-                if (foundFullnameAndAddress) {
-                    return makeRooms(fullname, address, rooms);
-                } else {
-                    continue;
-                }
             }
         }
         if (node.childNodes == null) {
@@ -159,6 +172,9 @@ export const searchHarderForRooms = (body: Node): any[] => {
             let j = i;
             q.enqueue(node.childNodes[i]);
         }
+    }
+    if (foundFullnameAddressLatLon && foundRooms) {
+        return makeRooms(fullname, address, lat, lon, rooms);
     }
     return [];
 };
