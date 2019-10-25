@@ -1,4 +1,6 @@
-export class Room {
+import { IRoom } from "./IRoom";
+
+export class Room implements IRoom {
     public fullname: string;
     public shortname: string;
     public number: string;
@@ -10,4 +12,13 @@ export class Room {
     public type: string;
     public furniture: string;
     public href: string;
+
+    private constructor() {
+        // Doesn't do anything
+    }
+
+    // Should get the room from the href
+    public getRoomFromFile(href: any) {
+        // stub
+    }
 }
