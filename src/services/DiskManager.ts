@@ -8,7 +8,8 @@ import { ActualDataset } from "../data/ActualDataset";
 export class DiskManager implements IDiskManager {
     // Constant
     private DIRNAME: string = "data";
-    private FILEDIR: string = ".\\" + this.DIRNAME + "\\";
+    // private FILEDIR: string = ".\\" + this.DIRNAME + "\\";
+    private FILEDIR: string = "./data/";
 
     public Status: DiskManagerStatus = DiskManagerStatus.NewlyBorn;
 
@@ -20,7 +21,7 @@ export class DiskManager implements IDiskManager {
             return;
         }
         // Check if database directory already exists
-        const dirs: string[] =  fs.readdirSync(".\\");
+        const dirs: string[] =  fs.readdirSync("./");
         if (!dirs.includes(this.DIRNAME)) {
             // Makes new directory if it does not already exist
             fs.mkdirSync(this.FILEDIR);
