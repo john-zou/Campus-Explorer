@@ -1,33 +1,40 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 
-// CRITICAL SECTION
-export function sort(q: any, realGs: any[]) {
+export function sort(transformed: boolean, q: any, realGs: any[]) {
     if (q.OPTIONS.ORDER === undefined) {
         return realGs;
     }
     const o = q.OPTIONS.ORDER;
-    if (typeof o === "string") {
-        // realG's keys for fields start with _
-        if (o.includes("_")) {
-            return sortByKey("_" + o.split("_")[1], realGs);
+    if (typeof o === "string") { // simple sort
+        if (transformed) {
+            // group's keys for fields start with _
+            if (o.includes("_")) {
+                return sortByKey("_" + o.split("_")[1], realGs);
+            } else {
+                return sortByKey(o, realGs);
+            }
         } else {
-            return sortByKey(o, realGs);
+            return sortByKey(o.split("_")[1], realGs);
         }
     }
-    return complicatedSort(o, realGs);
+    return complicatedSort(transformed, o, realGs);
 }
 
 /**
  * Returns custom comparator function based on keys and direction
  * @param key keyString of the property to compare
  */
-const complicatedComparer: (keys: string[], up: boolean) => (a: any, b: any) => number =
-    (keys, up) => {
+const complicatedComparer: (transformed: boolean, keys: string[], up: boolean) => (a: any, b: any) => number =
+    (transformed, keys, up) => {
         return (a, b) => {
             for (const k of keys) {
                 let key = k;
-                if (key.includes("_")) {
-                    key = "_" + key.split("_")[1];
+                if (transformed) {
+                    if (key.includes("_")) {
+                        key = "_" + key.split("_")[1];
+                    }
+                } else {
+                    key = key.split("_")[1];
                 }
                 if (a[key] > b[key]) {
                     return up ? 1 : -1;
@@ -40,6 +47,6 @@ const complicatedComparer: (keys: string[], up: boolean) => (a: any, b: any) => 
         };
     };
 
-export function complicatedSort(o: any, realGs: any[]) {
-    return realGs.sort(complicatedComparer(o.keys, o.dir === "UP"));
+export function complicatedSort(transformed: boolean, o: any, realGs: any[]) {
+    return realGs.sort(complicatedComparer(transformed, o.keys, o.dir === "UP"));
 }

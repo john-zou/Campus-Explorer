@@ -4,7 +4,7 @@ import { complicatedSort, sort } from "./Sort";
 export function transform(q: any, t: any[]): any[] {
     const groups = group(q, t);
     const realGs = apply(q, groups);
-    const sortedGs = sort(q, realGs);
+    const sortedGs = sort(true, q, realGs);
     const realestGs = change(q, sortedGs);
     return realestGs;
 }

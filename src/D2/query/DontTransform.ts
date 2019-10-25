@@ -1,7 +1,7 @@
 import { complicatedSort, sort } from "./Sort";
 
 export function dontTransform(q: any, things: any[]): any[] {
-    const sortedThings = sort(q, things);
+    const sortedThings = sort(false, q, things);
     return makeNewThings(q, sortedThings);
 }
 
