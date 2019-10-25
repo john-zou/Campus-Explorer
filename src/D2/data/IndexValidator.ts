@@ -14,6 +14,7 @@ export class IndexValidator {
             throw new InsightError("No table found in index.htm");
         }
         // parse table to find rooms
+        // Follow links in table (href) to find more data about the rooms
         return []; // stub
     }
 
