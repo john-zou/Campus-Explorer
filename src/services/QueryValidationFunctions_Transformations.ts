@@ -108,7 +108,7 @@ export function getApplyKeys(a: any, id: string, owen: OwensReality): string[] {
         WT(F.ApplyIsNotAnArray);
     }
     if (a.length === 0) {
-        WT(F.ApplyMustBeNonEmptyArray);
+        return [];
     }
     const applyKeys: string[] = [];
 

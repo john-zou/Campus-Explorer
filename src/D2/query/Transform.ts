@@ -1,95 +1,106 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 import { complicatedSort, sort } from "./Sort";
 
-export function transform(q: any, t: any[]): any[] {
-    const groups = group(q, t);
+export function transform(q: any, objects: any[]): any[] {
+    const groups = makeGroups(q, objects);
     const realGs = apply(q, groups);
     const sortedGs = sort(true, q, realGs);
-    const realestGs = change(q, sortedGs);
+    const realestGs = formatResult(q, sortedGs);
     return realestGs;
 }
 
-function group(q: any, t: any[]) {
+function makeGroups(q: any, objects: any[]) {
     const g = q.TRANSFORM.GROUP;
     const groups: any[][] = [];
 
     // tl;dr either join a group or make a new one
+    if (q === undefined || q === null) {
+        throw new Error("q should not be null or undefined");
+    }
 
-    hi_es_lint:
-    for (const thing of t) {
-        how_you_like_my_snake_case_labels:
+    if (objects === undefined || objects === null) {
+        throw new Error("t should not be null or undefined");
+    }
+
+    objectsloop:
+    for (const thing of objects) {
+        groupsloop:
         for (const ggg of groups) {
+            // keys loop
             for (const gg of g) {
+                // Check to make sures keys are the same as first thing in the group
                 if (ggg[0][gg] !== thing[gg.split("_")[1]]) {
-                    continue how_you_like_my_snake_case_labels;
+                    continue groupsloop;
                 }
             }
             ggg.push(thing);
-            continue hi_es_lint;
+            continue objectsloop;
         }
+        // Make a new group
         groups.push([thing]);
     }
-
     return groups;
 }
 
-function change(q: any, realGs: any[]) {
+export function formatResult(q: any, groups: any[]) {
     const cols: string[] = q.OPTIONS.COLUMNS;
 
-    const realestGs: any[] = [];
-    for (const realG of realGs) {
-        const realestG: any = {};
+    const formattedResults: any[] = [];
+    for (const group of groups) {
+        const formattedResult: any = {};
         for (const c of cols) {
             if (c.includes("_")) {
-                const realGKey = "_" + c.split("_")[1];
-                realestG[c] = realG[realGKey];
+                const groupKey = "_" + c.split("_")[1];
+                formattedResult[c] = group[groupKey];
             } else {
-                realestG[c] = realG[c];
+                formattedResult[c] = group[c];
             }
         }
-        realestGs.push(realestG);
+        formattedResults.push(formattedResult);
     }
-    return realestGs;
+    return formattedResults;
 }
 
 /**
  * the transform apply stuff
  */
-function apply(q: any, groups: any[]) {
-    const g = q.TRANSFORM.GROUP;
-    const a = q.TRANSFORM.APPLY;
-    const realGs: any[] = [];
-    for (const ggg of groups) {
-        const realGsMoveInSilenceLikeLasagna: any = {};
-        for (const gg of g) {
-            realGsMoveInSilenceLikeLasagna["_" + gg] = ggg[0][gg]; // aadded _ to prevent collision with applykey
+function apply(query: any, groups: any[]) {
+    const groupkeys: string[]  = query.TRANSFORM.GROUP;
+    const applyrules: any[] = query.TRANSFORM.APPLY;
+    const groupObjects: any[] = [];
+    for (const group of groups) {
+        const groupObject: any = {};
+        for (const groupkey of groupkeys) {
+            // Adding _ to distinguish from applyKeys. Later, we check for _
+            // to see if it's a key or an applykey
+            groupObject["_" + groupkey.split("_")[1]] = group[0][groupkey];
         }
-        for (const aa of a) {
-            const ak = Object.keys(aa)[0]; // applyKey e.g. "imESLintIMSOCOOL"
-            const av = Object.values(aa)[0]; // abstract object
-            const avk = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
-            const avv = Object.values(av)[0].split("_")[1]; // field e.g. avg, year, lon, lat
-            switch (avk) {
+        for (const applyrule of applyrules) {
+            const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "imESLintIMSOCOOL"
+            const av: any = Object.values(applyrule)[0]; // abstract object
+            const applyToken: string = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
+            const field = (Object.values(av)[0] as string).split("_")[1]; // field e.g. avg, year, lon, lat
+            switch (applyToken) {
                 case "MAX":
-                    realGsMoveInSilenceLikeLasagna[ak] = max(ggg, avv);
+                    groupObject[applyKey] = max(group, field);
                     break;
                 case "MIN":
-                    realGsMoveInSilenceLikeLasagna[ak] = min(ggg, avv);
+                    groupObject[applyKey] = min(group, field);
                     break;
                 case "AVG":
-                    realGsMoveInSilenceLikeLasagna[ak] = sum(ggg, avv) / ggg.length;
+                    groupObject[applyKey] = sum(group, field) / group.length;
                     break;
                 case "SUM":
-                    realGsMoveInSilenceLikeLasagna[ak] = sum(ggg, avv);
+                    groupObject[applyKey] = sum(group, field);
                     break;
                 case "COUNT":
-                    realGsMoveInSilenceLikeLasagna[ak] = ggg.length;
+                    groupObject[applyKey] = group.length;
                     break;
             }
         }
-        realGs.push(realGsMoveInSilenceLikeLasagna);
+        groupObjects.push(groupObject);
     }
-    return realGs;
+    return groupObjects;
 }
 
 function min(g: any[], key: string) {
