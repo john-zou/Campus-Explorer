@@ -74,7 +74,8 @@ export enum QueryValidationResultFlag {
     OrderKeysIsNotNonEmptyArray = "OrderKeysIsNotNonEmptyArray",
     OrderContainsKeyNotInColumns = "OrderContainsKeyNotInColumns",
     TransformationsIsMissingApply = "TransformationsIsMissingApply",
-    ApplyTokenCannotBeAppliedToSField = "ApplyTokenCannotBeAppliedToSField"
+    ApplyTokenCannotBeAppliedToSField = "ApplyTokenCannotBeAppliedToSField",
+    ApplyKeyMustBeNonEmptyString = "ApplyKeyMustBeNonEmptyString"
 }
 
 export class QueryValidationResult {

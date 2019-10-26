@@ -140,6 +140,10 @@ export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: Owens
     // it cannot have underscore!
     const applyKey = Object.keys(applyRule)[0];
 
+    if (applyKey.length === 0) {
+        WT(F.ApplyKeyMustBeNonEmptyString);
+    }
+
     if (applyKey.includes("_")) {
         WT(F.ApplyKeyContainsUnderscore);
     }
