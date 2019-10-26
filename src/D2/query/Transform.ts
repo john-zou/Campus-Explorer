@@ -10,7 +10,7 @@ export function transform(q: any, objects: any[]): any[] {
 }
 
 function makeGroups(q: any, objects: any[]) {
-    const g = q.TRANSFORM.GROUP;
+    const groupKeys = q.TRANSFORMATIONS.GROUP;
     const groups: any[][] = [];
 
     // tl;dr either join a group or make a new one
@@ -25,15 +25,15 @@ function makeGroups(q: any, objects: any[]) {
     objectsloop:
     for (const thing of objects) {
         groupsloop:
-        for (const ggg of groups) {
+        for (const group of groups) {
             // keys loop
-            for (const gg of g) {
+            for (const groupKey of groupKeys) {
                 // Check to make sures keys are the same as first thing in the group
-                if (ggg[0][gg] !== thing[gg.split("_")[1]]) {
+                if (group[0][groupKey.split("_")[1]] !== thing[groupKey.split("_")[1]]) {
                     continue groupsloop;
                 }
             }
-            ggg.push(thing);
+            group.push(thing);
             continue objectsloop;
         }
         // Make a new group
@@ -65,8 +65,8 @@ export function formatResult(q: any, groups: any[]) {
  * the transform apply stuff
  */
 function apply(query: any, groups: any[]) {
-    const groupkeys: string[]  = query.TRANSFORM.GROUP;
-    const applyrules: any[] = query.TRANSFORM.APPLY;
+    const groupkeys: string[]  = query.TRANSFORMATIONS.GROUP;
+    const applyrules: any[] = query.TRANSFORMATIONS.APPLY;
     const groupObjects: any[] = [];
     for (const group of groups) {
         const groupObject: any = {};
