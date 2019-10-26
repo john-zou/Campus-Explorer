@@ -1,5 +1,5 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import { DatasetManager } from "../services/DatasetManager";
 import { realize } from "../D2/query/Realize";
 
@@ -28,6 +28,9 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public async performQuery(query: any): Promise <any[]> {
+        if (query == null || typeof query !== "object") {
+            throw new InsightError("null or non-object query!");
+        }
         try {
             return await realize(query, this.datasetManager.Owen);
         } catch (err) {
