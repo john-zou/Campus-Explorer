@@ -32,11 +32,7 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
             break;
     }
 
-    if (Object.keys(q.WHERE).length === 0) {
-        if (things.length > 5000) {
-            throw new ResultTooLargeError("IT'S OVER 5000!!!");
-        }
-    } else {
+    if (Object.keys(q.WHERE).length !== 0)  {
         const ff = [];
         for (const thing of things) {
             if (f(thing, q.WHERE)) {
