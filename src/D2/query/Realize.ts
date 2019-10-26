@@ -32,7 +32,7 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
             break;
     }
 
-    if (q.TRNASFORMATIONS === undefined && Object.keys(q.WHERE).length === 0) {
+    if (q.TRANSFORMATIONS === undefined && Object.keys(q.WHERE).length === 0) {
         if (things.length > 5000) {
             throw new ResultTooLargeError("WHERE {}, no transformations, and over 5000");
         }
@@ -47,7 +47,7 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
         }
 
         if (q.TRANSFORMATIONS === undefined && ff.length > 5000) {
-            throw new ResultTooLargeError("IT'S OVER 5000!!!");
+            throw new ResultTooLargeError("no transformations, over 5000 after filtering");
         }
 
         things = ff;
@@ -56,7 +56,7 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
     if (q.TRANSFORMATIONS !== undefined) {
         let res = transform(q, things);
         if (res.length > 5000) {
-            throw new ResultTooLargeError("OVER 5k groups!");
+            throw new ResultTooLargeError("yes transformations, over 5000 groups");
         }
         return res;
     } else {
