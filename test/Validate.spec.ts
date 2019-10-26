@@ -8,7 +8,7 @@ import { getIdIfValid } from "../src/D2/query/Validate";
 import { Query } from "./D2/QueryBuilder";
 import Log from "../src/Util";
 
-const shouldRun: boolean = false; // turn this on for coverage :^)
+const shouldRun: boolean = true;
 
 if (shouldRun) {
     describe("getIdIfValid: Bad Structure => Invalid Query", () => {
