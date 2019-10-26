@@ -1,23 +1,23 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 
-export function sort(transformed: boolean, q: any, realGs: any[]) {
+export function sort(transformed: boolean, q: any, thingsToSort: any[]) {
     if (q.OPTIONS.ORDER === undefined) {
-        return realGs;
+        return thingsToSort;
     }
-    const o = q.OPTIONS.ORDER;
-    if (typeof o === "string") { // simple sort
+    const order = q.OPTIONS.ORDER;
+    if (typeof order === "string") { // simple sort
         if (transformed) {
             // group's keys for fields start with _
-            if (o.includes("_")) {
-                return sortByKey("_" + o.split("_")[1], realGs);
+            if (order.includes("_")) {
+                return sortByKey("_" + order.split("_")[1], thingsToSort);
             } else {
-                return sortByKey(o, realGs);
+                return sortByKey(order, thingsToSort);
             }
         } else {
-            return sortByKey(o.split("_")[1], realGs);
+            return sortByKey(order.split("_")[1], thingsToSort);
         }
     }
-    return complicatedSort(transformed, o, realGs);
+    return complicatedSort(transformed, order, thingsToSort);
 }
 
 /**
@@ -37,11 +37,20 @@ const complicatedComparer: (transformed: boolean, keys: string[], up: boolean) =
                     key = key.split("_")[1];
                 }
                 if (a[key] > b[key]) {
-                    return up ? 1 : -1;
+                    if (up) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
                 }
                 if (a[key] < b[key]) {
-                    return up ? -1 : 1;
+                    if (up) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
                 }
+                // Else compare by next key
             }
             return 0;
         };

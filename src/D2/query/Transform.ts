@@ -1,6 +1,8 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 import { complicatedSort, sort } from "./Sort";
 
+const Decimal = require("decimal.js");
+
 export function transform(q: any, objects: any[]): any[] {
     const groups = makeGroups(q, objects);
     const groupObjects = apply(q, groups);
@@ -88,13 +90,11 @@ function apply(query: any, groups: any[]) {
                     groupObject[applyKey] = min(group, field);
                     break;
                 case "AVG":
-                    const avg = sum(group, field) / group.length;
-                    // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-                    groupObject[applyKey] = Math.round(avg * 100 + Number.EPSILON) / 100;
+                    groupObject[applyKey] = ave(group, field);
                     break;
                 case "SUM":
                     const summ = sum(group, field);
-                    groupObject[applyKey] = Math.round(summ * 100 + Number.EPSILON) / 100;
+                    groupObject[applyKey] = Number(summ.toFixed(2));
                     break;
                 case "COUNT":
                     groupObject[applyKey] = count(group, field);
@@ -106,39 +106,49 @@ function apply(query: any, groups: any[]) {
     return groupObjects;
 }
 
-function min(g: any[], key: string) {
-    let minn = g[0][key];
-    for (const lasagna of g) {
-        if (lasagna[key] < minn) {
-            minn = lasagna[key];
+function ave(groupMembers: any[], field: string) {
+    let total = new Decimal(0);
+    for (const member of groupMembers) {
+        const num = new Decimal(member[field]);
+        total = Decimal.add(num, total);
+    }
+    const avg = total.toNumber() / groupMembers.length;
+    return Number(avg.toFixed(2));
+}
+
+function min(groupMembers: any[], field: string) {
+    let minn = groupMembers[0][field];
+    for (const member of groupMembers) {
+        if (member[field] < minn) {
+            minn = member[field];
         }
     }
     return minn;
 }
 
-function max(g: any[], key: string) {
-    let maxx = g[0][key];
-    for (const lasagna of g) {
-        if (lasagna[key] > maxx) {
-            maxx = lasagna[key];
+function max(groupMembers: any[], field: string) {
+    let maxx = groupMembers[0][field];
+    for (const member of groupMembers) {
+        if (member[field] > maxx) {
+            maxx = member[field];
         }
     }
     return maxx;
 }
 
-function sum(g: any[], key: string) {
+function sum(groupMembers: any[], key: string) {
     let summ = 0;
-    for (const lasagna of g) {
-        summ += lasagna[key];
+    for (const member of groupMembers) {
+        summ += member[key];
     }
     return summ;
 }
 
-function count(groups: any[], key: string) {
+function count(groupMembers: any[], key: string) {
     let uniques: any[] = [];
-    for ( const group of groups) {
-        if (!uniques.includes(group[key])) {
-            uniques.push(group[key]);
+    for ( const member of groupMembers) {
+        if (!uniques.includes(member[key])) {
+            uniques.push(member[key]);
         }
     }
     return uniques.length;
