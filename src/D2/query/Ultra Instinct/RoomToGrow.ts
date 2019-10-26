@@ -72,7 +72,7 @@ async (node: any): Promise<[boolean, string, string, number, number]> => {
     }
     const gr = await getLatLonFromAddress(addr);
     if (gr.error) {
-        Log.trace("GPS Error lol");
+        Log.trace("GPS Error (likely 404)");
         return notFound;
     }
     return [true, fullname[0], addr, gr.lat, gr.lon];
