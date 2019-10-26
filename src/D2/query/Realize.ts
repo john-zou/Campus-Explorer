@@ -32,6 +32,12 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
             break;
     }
 
+    if (q.TRNASFORMATIONS === undefined && Object.keys(q.WHERE).length === 0) {
+        if (things.length > 5000) {
+            throw new ResultTooLargeError("WHERE {}, no transformations, and over 5000");
+        }
+    }
+
     if (Object.keys(q.WHERE).length !== 0)  {
         const ff = [];
         for (const thing of things) {
