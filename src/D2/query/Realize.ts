@@ -52,7 +52,8 @@ export async function realize(q: any, owen: OwensReality): Promise<any[]> {
     }
 
     if (q.TRANSFORMATIONS !== undefined) {
-        return transform(q, things);
+        let res = transform(q, things);
+        return res;
     } else {
         return dontTransform(q, things);
     }

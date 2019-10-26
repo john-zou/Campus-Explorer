@@ -47,6 +47,6 @@ const complicatedComparer: (transformed: boolean, keys: string[], up: boolean) =
         };
     };
 
-export function complicatedSort(transformed: boolean, o: any, realGs: any[]) {
-    return realGs.sort(complicatedComparer(transformed, o.keys, o.dir === "UP"));
+export function complicatedSort(transformed: boolean, o: any, groups: any[]) {
+    return groups.sort(complicatedComparer(transformed, o.keys, o.dir === "UP"));
 }

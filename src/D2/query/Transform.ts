@@ -3,10 +3,10 @@ import { complicatedSort, sort } from "./Sort";
 
 export function transform(q: any, objects: any[]): any[] {
     const groups = makeGroups(q, objects);
-    const realGs = apply(q, groups);
-    const sortedGs = sort(true, q, realGs);
-    const realestGs = formatResult(q, sortedGs);
-    return realestGs;
+    const groupObjects = apply(q, groups);
+    const sortedGroupObjects = sort(true, q, groupObjects);
+    const formattedResults = formatResult(q, sortedGroupObjects);
+    return formattedResults;
 }
 
 function makeGroups(q: any, objects: any[]) {
@@ -73,7 +73,7 @@ function apply(query: any, groups: any[]) {
         for (const groupkey of groupkeys) {
             // Adding _ to distinguish from applyKeys. Later, we check for _
             // to see if it's a key or an applykey
-            groupObject["_" + groupkey.split("_")[1]] = group[0][groupkey];
+            groupObject["_" + groupkey.split("_")[1]] = group[0][groupkey.split("_")[1]];
         }
         for (const applyrule of applyrules) {
             const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "imESLintIMSOCOOL"
@@ -88,13 +88,16 @@ function apply(query: any, groups: any[]) {
                     groupObject[applyKey] = min(group, field);
                     break;
                 case "AVG":
-                    groupObject[applyKey] = sum(group, field) / group.length;
+                    const avg = sum(group, field) / group.length;
+                    // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+                    groupObject[applyKey] = Math.round(avg * 100 + Number.EPSILON) / 100;
                     break;
                 case "SUM":
-                    groupObject[applyKey] = sum(group, field);
+                    const summ = sum(group, field);
+                    groupObject[applyKey] = Math.round(summ * 100 + Number.EPSILON) / 100;
                     break;
                 case "COUNT":
-                    groupObject[applyKey] = group.length;
+                    groupObject[applyKey] = count(group, field);
                     break;
             }
         }
@@ -106,7 +109,9 @@ function apply(query: any, groups: any[]) {
 function min(g: any[], key: string) {
     let minn = g[0][key];
     for (const lasagna of g) {
-        minn = lasagna[key] > minn ? minn : lasagna[key];
+        if (lasagna[key] < minn) {
+            minn = lasagna[key];
+        }
     }
     return minn;
 }
@@ -114,7 +119,9 @@ function min(g: any[], key: string) {
 function max(g: any[], key: string) {
     let maxx = g[0][key];
     for (const lasagna of g) {
-        maxx = lasagna[key] > maxx ? lasagna[key] : max;
+        if (lasagna[key] > maxx) {
+            maxx = lasagna[key];
+        }
     }
     return maxx;
 }
@@ -125,4 +132,14 @@ function sum(g: any[], key: string) {
         summ += lasagna[key];
     }
     return summ;
+}
+
+function count(groups: any[], key: string) {
+    let uniques: any[] = [];
+    for ( const group of groups) {
+        if (!uniques.includes(group[key])) {
+            uniques.push(group[key]);
+        }
+    }
+    return uniques.length;
 }
