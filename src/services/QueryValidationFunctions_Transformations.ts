@@ -41,17 +41,17 @@ export function getKeysFromTransformations(q: any, owen: OwensReality): [string,
 /**
  * @returns [id, fields] the fields have a prepended _ to prevent collision with applykeys
  */
-export function getGroupFields(g: any, owen: OwensReality): [string, string[]] {
-    if (!Array.isArray(g)) {
+export function getGroupFields(group: any, owen: OwensReality): [string, string[]] {
+    if (!Array.isArray(group)) {
         WT(F.GroupIsNotAnArray);
     }
-    if (g.length === 0) {
+    if (group.length === 0) {
         WT(F.GroupMustBeNonEmptyArray);
     }
     let id: string;
     const fields: string[] = [];
-    for (const k of g) {
-        const [nextId, field] = verifyAndGetIdAndField(k, owen);
+    for (const key of group) {
+        const [nextId, field] = verifyAndGetIdAndField(key, owen);
         if (id === undefined) {
             id = nextId;
         } else {
@@ -114,8 +114,6 @@ export function getApplyKeys(a: any, id: string, owen: OwensReality): string[] {
 
     // Iterate through the ApplyRules array
     for (const applyRule of a) {
-        // check if it's an object
-        // APPLYRULE
         const applyKey = getApplyKeyFromApplyRule(applyRule, id, owen);
         if (applyKeys.includes(applyKey)) {
             WT(F.ApplyKeysMustBeUnique);

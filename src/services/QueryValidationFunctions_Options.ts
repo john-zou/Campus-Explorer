@@ -17,7 +17,7 @@ export function validateOptions(query: any,
     if (options == null || typeof options !== "object") {
         WT(F.WrongType_Options);
     }
-    // Check that options contains column key
+    // Check that options contains COLUMNS key
     if (!Object.keys(options).includes("COLUMNS")) {
         WT(F.MissingColumns);
     }
@@ -41,15 +41,19 @@ export function validateOptions(query: any,
     } else {
         idFromNonTransformedColumns = validateColumnsAndGetID(options.COLUMNS, owen);
     }
-
-    const THE_ONE_ID: string = transformed ? idFromNonTransformedColumns : idFromNonTransformedColumns;
+    let finalId: string;
+    if (transformed) {
+        finalId = idFromTransformations;
+    } else {
+        finalId = idFromNonTransformedColumns;
+    }
     // Check the order
     if (orderExists) {
         const order: any = options.ORDER;
         validateOrder(order, options.COLUMNS);
     }
     // Valid!
-    return THE_ONE_ID;
+    return finalId;
 }
 
 // the datasetIds are passed for more descriptive invalid result flag
@@ -112,19 +116,19 @@ function validateTransformedColumns(cols: any, owen: OwensReality,
     validateTransformedColumnStrings(cols, owen, id, groupFields, applyFields);
 }
 
-export function validateTransformedColumnStrings(cols: any[], owen: OwensReality, id: string, groupFields: string[],
+export function validateTransformedColumnStrings(columns: any[], owen: OwensReality, id: string, groupFields: string[],
                                                  applyKeys: string[]) {
-    for (const c of cols) {
-        if (c == null || typeof c !== "string") {
+    for (const columnKey of columns) {
+        if (columnKey == null || typeof columnKey !== "string") {
             WT(F.ColumnsContainsWrongType);
         }
-        if (!c.includes("_")) {
+        if (!columnKey.includes("_")) {
             // applyKey
-            if (!applyKeys.includes(c)) {
+            if (!applyKeys.includes(columnKey)) {
                 WT(F.ColumnWithoutUnderscoreNotInApplyKeys);
             }
         } else {
-            const [idd, field] = verifyAndGetIdAndField(c, owen);
+            const [idd, field] = verifyAndGetIdAndField(columnKey, owen);
             if (id !== idd) {
                 WT(F.MoreThanOneId);
             }
@@ -135,29 +139,29 @@ export function validateTransformedColumnStrings(cols: any[], owen: OwensReality
     }
 }
 
-export function validateColumnsAndGetID(cols: any, owen: OwensReality): string {
+export function validateColumnsAndGetID(columns: any, owen: OwensReality): string {
     // Check if columns is an array
-    if (!(Array.isArray(cols))) {
+    if (!(Array.isArray(columns))) {
         WT(F.ColumnsIsNotNonEmptyArray);
     }
     // Check if columns is empty
-    if (cols.length === 0) {
+    if (columns.length === 0) {
         WT(F.ColumnsIsNotNonEmptyArray);
     }
     // Return the result of checking each string
-    return validateColumnStringsAndGetID(cols, owen);
+    return validateColumnStringsAndGetID(columns, owen);
 }
 
 /**
- * @param cols must be a non-empty array (otherwise it may give wrong invalid flag (but daijoubu))
+ * @param columns must be a non-empty array (otherwise it may give wrong invalid flag (but daijoubu))
  */
-export function validateColumnStringsAndGetID(cols: any[], owen: OwensReality): string {
+export function validateColumnStringsAndGetID(columns: any[], owen: OwensReality): string {
     let id: string;
-    for (const c of cols) {
-        const [idd, _] = verifyAndGetIdAndField(c, owen);
+    for (const column of columns) {
+        const [idd, _] = verifyAndGetIdAndField(column, owen);
         if (id === undefined) {
             id = idd;
-            break;
+            continue;
         }
         if (id !== idd) {
             WT(F.MoreThanOneId);
