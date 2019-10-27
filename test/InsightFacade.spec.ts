@@ -20,7 +20,6 @@ export interface ITestQuery {
 }
 
 describe("InsightFacade Add/Remove/List Dataset(s)", function () {
-    this.timeout(5000);
     // Reference any datasets you've added to test/data here and they will
     // automatically be loaded in the 'before' hook.
     const coursesNumRows: number = 64612;
