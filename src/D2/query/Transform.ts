@@ -7,9 +7,6 @@ const Decimal = require("decimal.js");
 export function transform(q: any, objects: any[]): any[] {
     const groups = makeGroups(q, objects);
     const groupObjects = apply(q, groups);
-    if (groupObjects.length > 5000) {
-        throw new ResultTooLargeError("Group objects > 5000");
-    }
     const sortedGroupObjects = sort(true, q, groupObjects);
     const formattedResults = formatResult(q, sortedGroupObjects);
     return formattedResults;
@@ -44,6 +41,9 @@ function makeGroups(q: any, objects: any[]) {
         }
         // Make a new group
         groups.push([thing]);
+        if (groups.length > 5000) {
+            throw new ResultTooLargeError("Over 5000 groups");
+        }
     }
     return groups;
 }
