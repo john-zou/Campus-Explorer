@@ -28,9 +28,6 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public async performQuery(query: any): Promise <any[]> {
-        if (query == null || typeof query !== "object") {
-            throw new InsightError("null or non-object query!");
-        }
         try {
             return await realize(query, this.datasetManager.Owen);
         } catch (err) {
