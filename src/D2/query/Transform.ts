@@ -1,11 +1,15 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 import { complicatedSort, sort } from "./Sort";
+import { ResultTooLargeError } from "../../controller/IInsightFacade";
 
 const Decimal = require("decimal.js");
 
 export function transform(q: any, objects: any[]): any[] {
     const groups = makeGroups(q, objects);
     const groupObjects = apply(q, groups);
+    if (groupObjects.length > 5000) {
+        throw new ResultTooLargeError("Group objects > 5000");
+    }
     const sortedGroupObjects = sort(true, q, groupObjects);
     const formattedResults = formatResult(q, sortedGroupObjects);
     return formattedResults;

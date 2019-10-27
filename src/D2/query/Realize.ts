@@ -15,51 +15,49 @@ import { getIdIfValid } from "./Validate";
  *   (depending on whether TRANSFORMATIONS exists)
  *  4. sort (Sort.ts) via transform || dontTransform
  *
- * @param q query json object
+ * @param query query json object
  * @param owen the super saiyan of data
  */
-export async function realize(q: any, owen: OwensReality): Promise<any[]> {
-    const id = getIdIfValid(q, owen);
-    const d = owen.getDataset(id);
-    let things;
+export async function realize(query: any, owen: OwensReality): Promise<any[]> {
+    const id = getIdIfValid(query, owen);
+    const dataset = owen.getDataset(id);
+    let things; // will be Rooms or Sections depending on the query's ID
 
-    switch (d.Kind) {
+    // Set things to either Sections or Rooms
+    switch (dataset.Kind) {
         case InsightDatasetKind.Courses:
-            things = d.Sections;
+            things = dataset.Sections;
             break;
         case InsightDatasetKind.Rooms:
-            things = d.Rooms;
+            things = dataset.Rooms;
             break;
     }
 
-    if (q.TRANSFORMATIONS === undefined && Object.keys(q.WHERE).length === 0) {
-        if (things.length > 5000) {
-            throw new ResultTooLargeError("WHERE {}, no transformations, and over 5000");
+    if (Object.keys(query.WHERE).length === 0) {
+        if (query.TRANSFORMATIONS === undefined) {
+            if (things.length > 5000) {
+                throw new ResultTooLargeError("WHERE {}, no transformations, and over 5000");
+            }
         }
-    }
-
-    if (Object.keys(q.WHERE).length !== 0)  {
-        const ff = [];
+    } else {
+        const filteredThings = [];
         for (const thing of things) {
-            if (f(thing, q.WHERE)) {
-                ff.push(thing);
+            if (f(thing, query.WHERE)) {
+                filteredThings.push(thing);
             }
         }
 
-        if (q.TRANSFORMATIONS === undefined && ff.length > 5000) {
+        if (query.TRANSFORMATIONS === undefined && filteredThings.length > 5000) {
             throw new ResultTooLargeError("no transformations, over 5000 after filtering");
         }
 
-        things = ff;
+        things = filteredThings;
     }
 
-    if (q.TRANSFORMATIONS !== undefined) {
-        let res = transform(q, things);
-        if (res.length > 5000) {
-            throw new ResultTooLargeError("yes transformations, over 5000 groups");
-        }
+    if (query.TRANSFORMATIONS !== undefined) {
+        let res = transform(query, things);
         return res;
     } else {
-        return dontTransform(q, things);
+        return dontTransform(query, things);
     }
 }
