@@ -75,7 +75,7 @@
 //     return Object.values(mcomparison)[0] as number;
 // }
 
-export function getIdstring(scomparison: any): [string, boolean, boolean] {
+export function getInputstring(scomparison: any): [string, boolean, boolean] {
     let svalue: string = Object.values(scomparison)[0] as string;
     if (svalue.length === 0) {
         return [svalue, false, false];

@@ -423,17 +423,6 @@ if (shouldRun) {
             e(q._);
         });
 
-        it ("TRANSFORMATIONS.APPLY must be non-empty array (but is empty)", async () => {
-            const q = nq();
-            q.Columns(["cc_avg", "max"]);
-            const transform: any = {
-                GROUP: ["cc_dept"],
-                APPLY: []
-            };
-            q.Transform(transform);
-            e(q._);
-        });
-
         it ("TRANSFORMATIONS.APPLY must be non-empty array (but is not an array)", async () => {
             const q = nq();
             q.Columns(["cc_avg", "max"]);
@@ -471,6 +460,32 @@ if (shouldRun) {
                 };
                 q.Transform(transform);
                 e(q._);
+        });
+
+        it ("TRANSFORMATIONS.APPLY's APPLYRULE must have one key"
+        , async () => {
+            const q = nq();
+            q.Columns(["cc_avg", "max"]);
+            const invalidApplyRule = { min: {MIN: "cc_avg"}, max: {MAX: "cc_avg"}};
+            const transform: any = {
+                GROUP: ["cc_dept"],
+                APPLY: [invalidApplyRule]
+            };
+            q.Transform(transform);
+            e(q._);
+        });
+
+        it ("TRANSFORMATIONS.APPLY's APPLYRULE must have a field from the correct Kind"
+        , async () => {
+            const q = nq();
+            q.Columns(["cc_avg", "max"]);
+            const invalidApplyRule = { min: {MIN: "cc_seats"}};
+            const transform: any = {
+                GROUP: ["cc_dept"],
+                APPLY: [invalidApplyRule]
+            };
+            q.Transform(transform);
+            e(q._);
         });
 
         it("Transformations applykey should be unique", async () => {

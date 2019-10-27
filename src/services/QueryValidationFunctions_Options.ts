@@ -22,9 +22,9 @@ export function validateOptions(query: any,
         WT(F.MissingColumns);
     }
     // Check whether options contains order key
-    const orderExists: boolean = Object.keys(options).includes("ORDER");
+    const hasOrder: boolean = Object.keys(options).includes("ORDER");
     // Check for too many keys in options
-    if (orderExists) {
+    if (hasOrder) {
         // Ensure there are no more than 2 keys
         if (hasTooManyKeys(options, 2)) {
             WT(F.TooManyKeys_Options);
@@ -48,7 +48,7 @@ export function validateOptions(query: any,
         finalId = idFromNonTransformedColumns;
     }
     // Check the order
-    if (orderExists) {
+    if (hasOrder) {
         const order: any = options.ORDER;
         validateOrder(order, options.COLUMNS);
     }
