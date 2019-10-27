@@ -82,7 +82,7 @@ function apply(query: any, groups: any[]) {
             groupObject["_" + groupkey.split("_")[1]] = group[0][groupkey.split("_")[1]];
         }
         for (const applyrule of applyrules) {
-            const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "imESLintIMSOCOOL"
+            const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "sumLat"
             const av: any = Object.values(applyrule)[0]; // abstract object
             const applyToken: string = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
             const field = (Object.values(av)[0] as string).split("_")[1]; // field e.g. avg, year, lon, lat

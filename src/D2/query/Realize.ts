@@ -33,13 +33,17 @@ export async function realize(query: any, owen: OwensReality): Promise<any[]> {
             break;
     }
 
-    if (Object.keys(query.WHERE).length === 0) {
-        if (query.TRANSFORMATIONS === undefined) {
+    const hasTransformations: boolean = query.TRANSFORMATIONS != null;
+    const hasFilter: boolean = Object.keys(query.WHERE).length !== 0;
+
+    // If there is no filter and no transformations, then we can check the size now for ResultTooLarge
+    if (!hasFilter) {
+        if (!hasTransformations) {
             if (things.length > 5000) {
                 throw new ResultTooLargeError("WHERE {}, no transformations, and over 5000");
             }
         }
-    } else {
+    } else { // has filter. So, filter the things
         const filteredThings = [];
         for (const thing of things) {
             if (f(thing, query.WHERE)) {
@@ -47,14 +51,16 @@ export async function realize(query: any, owen: OwensReality): Promise<any[]> {
             }
         }
 
-        if (query.TRANSFORMATIONS === undefined && filteredThings.length > 5000) {
-            throw new ResultTooLargeError("no transformations, over 5000 after filtering");
+        if (!hasTransformations) { // If there aren't transformations, check the size for ResultTooLarge
+            if (filteredThings.length > 5000) {
+                throw new ResultTooLargeError("no transformations, over 5000 after filtering");
+            }
         }
 
         things = filteredThings;
     }
 
-    if (query.TRANSFORMATIONS !== undefined) {
+    if (hasTransformations) {
         let res = transform(query, things);
         return res;
     } else {

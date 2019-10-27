@@ -17,3 +17,9 @@ test/*.map
 test/Sandbox.ts
 src/services/Database/*.txt
 data/*
+obj/Debug/InsightFacadeVS2019.njsprojAssemblyReference.cache
+obj/Debug/InsightFacadeVS2019.njsproj.FileListAbsolute.txt
+InsightFacadeVS2019.sln
+InsightFacadeVS2019.njsproj.user
+InsightFacadeVS2019.njsproj
+bin/Microsoft.NodejsTools.WebRole.dll
