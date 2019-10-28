@@ -4,6 +4,8 @@ import { validateKey } from "./ValidateKey";
 import { IDHolder } from "./IDHolder";
 import { ResultTooLargeError } from "../controller/IInsightFacade";
 import { Dataset } from "../data/Dataset";
+import { validateOptions } from "./ValidateOptions";
+import { endOfPipeline } from "./EndOfPipeline";
 const Decimal = require("decimal.js");
 
 /**
@@ -52,7 +54,7 @@ export const transformationsPipeline = (query: any,
  *
  * Validation:
  * - Each element of TRANSFORMATIONS.GROUP must be a valid key
- * - Verifies singularity of ID (sets ID if hasn't)
+ * - Verifies singularity of ID (sets ID if hasn't already been set)
  *
  * Processing:
  * - Groups elements based on group keys
@@ -66,7 +68,7 @@ const TPGroup = (query: any,
     // Validation
     let groupKeys: any[] = query.TRANSFORMATIONS.GROUP;
     // Validation of GROUP elements (keys), and setting of idHolder if it hasn't been set
-    groupKeys.forEach((key, _) => validateKey(key, allData, idHolder));
+    groupKeys.forEach((key) => validateKey(key, allData, idHolder));
 
     // Processing
     let groupsOfElements: any[];
@@ -78,7 +80,7 @@ const TPGroup = (query: any,
         groupsOfElements = makeGroups(groupKeys, dataset.Elements);
     }
 
-    return TPApply(query, groupsOfElements, idHolder);
+    return TPApply(query, groupsOfElements, idHolder, allData);
 };
 
 /**
@@ -95,9 +97,22 @@ const TPGroup = (query: any,
  */
 const TPApply = (query: any,
                  groupsOfElements: any[][],
-                 idHolder: IDHolder): any[] => {
-    invalid("UNIMPLEMENTED");
-    return null;
+                 idHolder: IDHolder,
+                 allData: AllData): any[] => {
+    const [groupObjects, applyKeys] = makeGroupObjects(query, groupsOfElements, allData, idHolder);
+    return TPOptions(query, groupObjects, applyKeys, idHolder, allData);
+};
+
+const TPOptions = (query: any,
+                   groupObjects: any[][],
+                   applyKeys: string[],
+                   idHolder: IDHolder,
+                   allData: AllData): any[] => {
+    // Validation
+    validateOptions(query, allData, idHolder, true, query.TRANSFORMATIONS.GROUP, applyKeys);
+
+    // Processing
+    return endOfPipeline(query, groupObjects);
 };
 
 const makeGroups = (groupKeys: string[], elements: any[]): any[][] => {
@@ -130,21 +145,22 @@ const makeGroups = (groupKeys: string[], elements: any[]): any[][] => {
 };
 
 /**
- * the transform apply stuff
+ * Apply
  */
-function applyApplyGroups(query: any, groups: any[][]) {
+const makeGroupObjects = (query: any, groups: any[][], allData: AllData, idHolder: IDHolder): [any[], string[]] => {
     const groupkeys: string[]  = query.TRANSFORMATIONS.GROUP;
     const applyrules: any[] = query.TRANSFORMATIONS.APPLY;
     const groupObjects: any[] = [];
+    const applyKeys: string[] = [];
     for (const group of groups) {
         const groupObject: any = {};
-        for (const groupkey of groupkeys) {
-            // Adding _ to distinguish from applyKeys. Later, we check for _
-            // to see if it's a key or an applykey
-            groupObject["_" + groupkey.split("_")[1]] = group[0][groupkey.split("_")[1]];
-        }
         for (const applyrule of applyrules) {
+            validateApplyrule(applyrule, allData, idHolder);
             const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "sumLat"
+            if (applyKeys.includes(applyKey)) {
+                invalid("Applykey not unique: " + applyKey);
+            }
+            applyKeys.push(applyKey);
             const av: any = Object.values(applyrule)[0]; // abstract object
             const applyToken: string = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
             const field = (Object.values(av)[0] as string).split("_")[1]; // field e.g. avg, year, lon, lat
@@ -167,10 +183,40 @@ function applyApplyGroups(query: any, groups: any[][]) {
                     break;
             }
         }
+        for (const groupkey of groupkeys) {
+            groupObject[groupkey] = group[0][groupkey];
+        }
         groupObjects.push(groupObject);
     }
-    return groupObjects;
-}
+    return [groupObjects, applyKeys];
+};
+
+const validateApplyrule = (applyrule: any, allData: AllData, idHolder: IDHolder): void => {
+    if (!applyrule || typeof applyrule !== "object") {
+        invalid("TRANSFORMATIONS.APPLY has invalid applyrule: wrong type");
+    }
+    const applyruleKeys: string[] = Object.keys(applyrule);
+    if (applyruleKeys.length !== 1) {
+        invalid("APPLYRULE must have only 1 property");
+    }
+    // Check for valid applykey
+    if (applyruleKeys[0].includes("_")) {
+        invalid("APPLYRULE cannot include underscore");
+    }
+
+    if (Object.keys(applyruleKeys).length !== 1) {
+        invalid("APPLYKEY does not have valid fields");
+    }
+    // Check for valid token
+    if (!["MAX", "MIN", "COUNT", "AVG", "SUM"].includes(Object.keys(applyruleKeys)[0])) {
+        invalid("APPLYRULE token invalid");
+    }
+
+    // Validate key
+    const key = Object.values(applyrule[0])[0];
+    const canBeSKey = Object.keys(applyrule[0])[0] === "COUNT";
+    validateKey(key, allData, idHolder, !canBeSKey, false);
+};
 
 function ave(groupMembers: any[], field: string) {
     let total = new Decimal(0);

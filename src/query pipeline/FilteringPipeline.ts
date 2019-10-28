@@ -123,7 +123,8 @@ const setID = (filter: any, allData: AllData, idHolder: IDHolder): void => {
             case "LT":
             case "EQ":
             case "IS":
-                validateKey(f[operator], allData, idHolder); // Get the ID from validateKey
+                const key = Object.keys(f[operator])[0];
+                validateKey(key, allData, idHolder); // Get the ID from validateKey
                 return;
             default:
                 invalid("FILTER: Invalid Operator (NOT, AND, OR, etc.)");

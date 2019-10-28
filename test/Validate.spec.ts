@@ -7,6 +7,7 @@ import Insight from "../src/util/Insight";
 import { getIdIfValid } from "../src/D2/query/Validate";
 import { Query } from "./D2/QueryBuilder";
 import Log from "../src/Util";
+import { queryPipeline } from "../src/query pipeline/QueryPipeline";
 
 const shouldRun: boolean = true;
 
@@ -31,7 +32,7 @@ if (shouldRun) {
 
         const t = async (q: any): Promise<void> => {
             try {
-                getIdIfValid(q, owen);
+                queryPipeline(q, owen);
             } catch (error) {
                 Log.trace(error);
                 throw error;
@@ -521,7 +522,7 @@ if (shouldRun) {
 
         const t = async (q: any): Promise<void> => {
             try {
-                getIdIfValid(q, owen);
+                queryPipeline(q, owen);
             } catch (error) {
                 Log.trace(error);
                 throw error;

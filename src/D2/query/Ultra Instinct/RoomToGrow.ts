@@ -3,22 +3,23 @@ import Log from "../../../Util";
 import { MagicQueue } from "./MagicQueue";
 import { getBodyFromDocument, getAttrByName, getChildrenNodesByName, getChildNodeByName } from "./UltraInstinct";
 import { getLatLonFromAddress } from "./GPS";
+import { getRoomFromTableRow, getFileByLink } from "./RoomToGrowP2";
 const parse5 = require("parse5");
 
-export const getRoomsFromLink = async (link: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
+export const getRoomsFromLink = async (id: string, link: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
     const file = getFileByLink(link, files);
     if (file != null) {
         Log.trace("Wow found: " + file.name);
         const str = await file.async("text");
-        return getRoomsFromHtmlStr(str, files);
+        return getRoomsFromHtmlStr(id, str, files);
     }
     return [];
 };
 
-export const getRoomsFromHtmlStr = async (str: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
+export const getRoomsFromHtmlStr = async (id: string, str: string, files: JSZip.JSZipObject[]): Promise<any[]> => {
     const doc: Document = parse5.parse(str);
     const body = getBodyFromDocument(doc);
-    return await searchHarderForRooms(body);
+    return await searchHarderForRooms(id, body);
 };
 
 const notFound: [boolean, string, string, number, number] = [false, null, null, null, null];
@@ -114,15 +115,24 @@ export const hasClass = (node: any, classy: string): boolean => {
     return false;
 };
 
-export const makeRooms = (fullname: string, address: string, lat: number, lon: number, rooms: any[]): any[] => {
+export const makeRooms
+= (id: string, fullname: string, address: string, lat: number, lon: number, rooms: any[]): any[] => {
     const result = [];
     for (const room of rooms) {
         const shortname = getShortnameFromHref(room.href);
-        result.push ({
-            fullname: fullname, address: address, shortname: shortname, number: room.number,
-            name: shortname + "_" + room.number, seats: room.seats, type: room.type,
-            furniture: room.furniture, href: room.href, lat: lat, lon: lon
-        });
+        const createdRoom: any = {};
+        createdRoom[id + "_fullname"] = fullname;
+        createdRoom[id + "_address"] = address;
+        createdRoom[id + "_shortname"] = shortname;
+        createdRoom[id + "_number"] = room.number;
+        createdRoom[id + "_name"] = shortname + "_" + room.number;
+        createdRoom[id + "_seats"] = room.seats;
+        createdRoom[id + "_type"] = room.type;
+        createdRoom[id + "_furniture"] = room.furniture;
+        createdRoom[id + "_href"] = room.href;
+        createdRoom[id + "_lat"] = lat;
+        createdRoom[id + "_lon"] = lon;
+        result.push(createdRoom);
     }
     return result;
 };
@@ -132,7 +142,7 @@ export const getShortnameFromHref = (href: string): string => {
     return split[split.length - 1].split("-")[0];
 };
 
-export const searchHarderForRooms = async (body: Node): Promise<any[]> => {
+export const searchHarderForRooms = async (id: string, body: Node): Promise<any[]> => {
     let foundFullnameAddressLatLon = false;
     let foundRooms = false;
     let fullname = null;
@@ -174,7 +184,7 @@ export const searchHarderForRooms = async (body: Node): Promise<any[]> => {
         }
     }
     if (foundFullnameAddressLatLon && foundRooms) {
-        return makeRooms(fullname, address, lat, lon, rooms);
+        return makeRooms(id, fullname, address, lat, lon, rooms);
     }
     return [];
 };
@@ -224,70 +234,4 @@ export const getHref = (td: any): string => {
         }
     }
     return null;
-};
-
-export const getRoomFromTableRow = (tr: Node): any => {
-    const tds = getChildrenNodesByName(tr.childNodes, "td");
-    let foundRoomNumber = false;
-    let foundSeats = false;
-    let foundType = false;
-    let foundFurniture = false;
-    let foundHref = false;
-    const room: any = {};
-    for (const td of tds) {
-        if (hasClass(td, "views-field views-field-field-room-number")) {
-            const numbery = getRoomNumber(td);
-            if (numbery != null) {
-                room.number = numbery;
-                foundRoomNumber = true;
-            }
-        } else if (hasClass(td, "views-field views-field-field-room-capacity")) {
-            const seats = getText(td).trim();
-            if (seats != null) {
-                const seatsInt = parseInt(seats, 10);
-                if (seatsInt != null) {
-                    room.seats = seatsInt;
-                    foundSeats = true;
-                }
-            }
-        } else if (hasClass(td, "views-field views-field-field-room-type")) {
-            const typey = getText(td).trim();
-            if (typey != null) {
-                room.type = typey;
-                foundType = true;
-            }
-        } else if (hasClass(td, "views-field views-field-field-room-furniture")) {
-            const furn = getText(td).trim();
-            if (furn != null) {
-                room.furniture = furn;
-                foundFurniture = true;
-            }
-        } else if (hasClass(td, "views-field views-field-nothing")) {
-            const href = getHref(td);
-            if (href != null) {
-                room.href = href;
-                foundHref = true;
-            }
-        }
-    }
-    if (foundRoomNumber && foundSeats && foundType && foundFurniture && foundHref) {
-        return room;
-    }
-    return null;
-};
-
-export const getFileByLink = (link: string, files: JSZip.JSZipObject[]): JSZip.JSZipObject => {
-    const path = toFilePathString(link);
-    for (const f of files) {
-        if (f.name === path) {
-            return f;
-        }
-    }
-    return null;
-};
-
-export const toFilePathString = (link: string): string => {
-    let prefix = "rooms";
-    let suffix = link.substring(1);
-    return prefix + suffix;
 };

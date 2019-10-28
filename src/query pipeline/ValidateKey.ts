@@ -65,7 +65,7 @@ const checkField = (field: string, kind: InsightDatasetKind, mustBeMField: boole
     }
     if (mustBeSField) {
         if (!sfields.includes(field)) {
-            invalid("Expected field (expected sfield)");
+            invalid("Invalid field (expected sfield)");
         }
         return;
     }
