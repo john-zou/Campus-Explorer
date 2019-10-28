@@ -1,12 +1,12 @@
 import JSZip = require("jszip");
-import { ActualDataset } from "../../../data/ActualDataset";
+import { Dataset } from "../../../data/Dataset";
 import { InsightError, InsightDatasetKind } from "../../../controller/IInsightFacade";
 import Log from "../../../Util";
 import { MagicQueue } from "./MagicQueue";
 import { getRoomsFromLink } from "./RoomToGrow";
 const parse5 = require("parse5");
 
-export async function ULTRAINSTINCT(id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> {
+export async function ULTRAINSTINCT(id: string, files: JSZip.JSZipObject[]): Promise<Dataset> {
     let index = null; // index.htm
     for (const f of files) {
         if (f.name === "rooms/index.htm") {
@@ -69,7 +69,7 @@ export function getChildNodeByName(nodes: any, str: string) {
 }
 
 export const searchForRooms =
-    async (htmlBody: Node, id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> => {
+    async (htmlBody: Node, id: string, files: JSZip.JSZipObject[]): Promise<Dataset> => {
     // BFS
     const q = new MagicQueue<Node>();
     q.enqueue(htmlBody);
@@ -80,7 +80,7 @@ export const searchForRooms =
                 continue;
             }
             const rooms = await tryToGetRoomsFromTableBody(n, id, files);
-            if (rooms.Rooms.length > 0) {
+            if (rooms.Elements.length > 0) {
                 return rooms;
             }
         }
@@ -96,8 +96,8 @@ export const searchForRooms =
 };
 
 export const tryToGetRoomsFromTableBody =
-    async (tbody: any, id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> => {
-    const actualDataset = new ActualDataset(id, InsightDatasetKind.Rooms);
+    async (tbody: any, id: string, files: JSZip.JSZipObject[]): Promise<Dataset> => {
+    const actualDataset = new Dataset(id, InsightDatasetKind.Rooms);
     if (tbody.childNodes == null) {
         return actualDataset; // let the caller deal with it
     }
@@ -108,7 +108,7 @@ export const tryToGetRoomsFromTableBody =
         if (tbody.childNodes[i].nodeName === "tr") {
             const rooms = await getRoomsFromTableRow(tr, id, files, visited);
             for (const r of rooms) {
-                actualDataset.Rooms.push(r);
+                actualDataset.Elements.push(r);
             }
         }
     }

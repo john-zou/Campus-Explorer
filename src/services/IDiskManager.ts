@@ -1,6 +1,6 @@
 import { IParsedData } from "../data/IParsedData";
-import { ActualDataset } from "../data/ActualDataset";
-import { OwensReality } from "../data/OwensReality";
+import { Dataset } from "../data/Dataset";
+import { AllData } from "../data/AllData";
 
 // Manages datasets on disk
 export interface IDiskManager {
@@ -8,12 +8,12 @@ export interface IDiskManager {
 
     initializeIfNeeded(): Promise<void>;
 
-    saveDatasetSync(dataset: ActualDataset): void;
+    saveDatasetSync(dataset: Dataset): void;
 
     deleteDatasetSync(id: string): void;
 
     // Return all data saved on disk
-    getDatasets(): Promise<ActualDataset[]>;
+    getDatasets(): Promise<Dataset[]>;
 }
 
 export enum DiskManagerStatus {

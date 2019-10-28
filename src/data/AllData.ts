@@ -1,6 +1,6 @@
 import { InsightDataset, InsightDatasetKind } from "../controller/IInsightFacade";
-import { JohnsRealityCheck } from "./JohnsRealityCheck";
-import { ActualDataset } from "./ActualDataset";
+import { IDCheckResult } from "./IDCheckResult";
+import { Dataset } from "./Dataset";
 import Log from "../Util";
 
 /**
@@ -12,12 +12,12 @@ import Log from "../Util";
  * - Directly supplies all the needs of InsightFacade other than performQuery
  * - A single Dataset can be served up by ID
  * - DataManager can add/remove/list
- * - DiskManager can create an OwensReality using fromDatasetArray
+ * - DiskManager can create an AllData using fromDatasetArray
  *
  * The reality behind the facade
  */
-export class OwensReality {
-    public ActualDatasets: ActualDataset[];
+export class AllData {
+    public Datasets: Dataset[];
     public InsightDatasets: InsightDataset[];
     public IDs: string[];
 
@@ -28,14 +28,14 @@ export class OwensReality {
     /**
      * @param datasets an array of datasets (Courses or Rooms flavor) from files
      */
-    public static fromDatasetArray(datasets: ActualDataset[]) {
-        const ir = new OwensReality();
-        ir.ActualDatasets = datasets;
+    public static fromDatasetArray(datasets: Dataset[]) {
+        const ir = new AllData();
+        ir.Datasets = datasets;
         ir.InsightDatasets = [];
         ir.IDs = [];
         for (const d of datasets) {
             try {
-                ir.InsightDatasets.push(ActualDataset.toInsightDataset(d));
+                ir.InsightDatasets.push(Dataset.toInsightDataset(d));
             } catch (err) {
                 Log.error(err);
             }
@@ -45,32 +45,32 @@ export class OwensReality {
         return ir;
     }
 
-    public checkID(id: string): JohnsRealityCheck {
+    public checkID(id: string): IDCheckResult {
         for (const d of this.InsightDatasets) {
             if (d.id === id) {
                 switch (d.kind) {
-                    case InsightDatasetKind.Courses: return JohnsRealityCheck.Courses;
-                    case InsightDatasetKind.Rooms: return JohnsRealityCheck.Rooms;
+                    case InsightDatasetKind.Courses: return IDCheckResult.Courses;
+                    case InsightDatasetKind.Rooms: return IDCheckResult.Rooms;
                 }
             }
         }
-        return JohnsRealityCheck.NotFound;
+        return IDCheckResult.NotFound;
     }
 
-    public getDataset(id: string): ActualDataset {
-        return this.ActualDatasets.find((d) => {
+    public getDataset(id: string): Dataset {
+        return this.Datasets.find((d) => {
             return d.ID === id;
         });
     }
 
-    public addDataset(dataset: ActualDataset) {
-        this.ActualDatasets.push(dataset);
-        this.InsightDatasets.push(ActualDataset.toInsightDataset(dataset));
+    public addDataset(dataset: Dataset) {
+        this.Datasets.push(dataset);
+        this.InsightDatasets.push(Dataset.toInsightDataset(dataset));
         this.IDs.push(dataset.ID);
     }
 
     public removeDataset(id: string) {
-        this.ActualDatasets = this.ActualDatasets.filter((d) => {
+        this.Datasets = this.Datasets.filter((d) => {
             return d.ID !== id;
         });
         this.InsightDatasets = this.InsightDatasets.filter((d) => {

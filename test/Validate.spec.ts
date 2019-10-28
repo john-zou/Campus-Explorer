@@ -1,8 +1,8 @@
 import { InsightDatasetKind as IDK, InsightError } from "../src/controller/IInsightFacade";
 import { expect } from "chai";
 import { QueryValidationResult as Res, QueryValidationResultFlag as R } from "../src/services/IQueryValidator";
-import { OwensReality } from "../src/data/OwensReality";
-import { ActualDataset } from "../src/data/ActualDataset";
+import { AllData } from "../src/data/AllData";
+import { Dataset } from "../src/data/Dataset";
 import Insight from "../src/util/Insight";
 import { getIdIfValid } from "../src/D2/query/Validate";
 import { Query } from "./D2/QueryBuilder";
@@ -12,9 +12,9 @@ const shouldRun: boolean = true;
 
 if (shouldRun) {
     describe("getIdIfValid: Bad Structure => Invalid Query", () => {
-        const coursesDb = new ActualDataset("cc", IDK.Courses);
-        const roomsDb = new ActualDataset("rr", IDK.Rooms);
-        const owen = OwensReality.fromDatasetArray([coursesDb, roomsDb]);
+        const coursesDb = new Dataset("cc", IDK.Courses);
+        const roomsDb = new Dataset("rr", IDK.Rooms);
+        const owen = AllData.fromDatasetArray([coursesDb, roomsDb]);
 
         /**
          * Expects the query to be recognized as malformed
@@ -502,9 +502,9 @@ if (shouldRun) {
     });
 
     describe("getIdIfValid: Good Structure, Multiple Valid IDs => Invalid Query (multiple valid IDs", () => {
-        const c1 = new ActualDataset("c1", IDK.Courses);
-        const c2 = new ActualDataset("c2", IDK.Courses);
-        const owen = OwensReality.fromDatasetArray([c1, c2]);
+        const c1 = new Dataset("c1", IDK.Courses);
+        const c2 = new Dataset("c2", IDK.Courses);
+        const owen = AllData.fromDatasetArray([c1, c2]);
 
         /**
          * Expects the query to be recognized as malformed

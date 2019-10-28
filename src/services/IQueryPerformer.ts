@@ -1,6 +1,6 @@
 import { IParsedData } from "../data/IParsedData";
-import { OwensReality } from "../data/OwensReality";
+import { AllData } from "../data/AllData";
 
 export interface IQueryPerformer {
-    performQuery(query: any, owen: OwensReality): Promise<any[]>;
+    performQuery(query: any, owen: AllData): Promise<any[]>;
 }

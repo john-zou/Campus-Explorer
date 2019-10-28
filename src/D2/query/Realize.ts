@@ -1,4 +1,4 @@
-import { OwensReality } from "../../data/OwensReality";
+import { AllData } from "../../data/AllData";
 import { QueryValidationResultFlag } from "../../services/IQueryValidator";
 import { InsightError, InsightDatasetKind, ResultTooLargeError } from "../../controller/IInsightFacade";
 import { f } from "./Filter";
@@ -7,7 +7,7 @@ import { dontTransform } from "./DontTransform";
 import { getIdIfValid } from "./Validate";
 
 /**
- * The query fulfillment pipeline:
+ * The query fulfillment pipeline (deprecated)
  * Stages:
  *  1. getIdIfValid (Validate.ts)
  *  2. f (Filter.ts)
@@ -18,7 +18,7 @@ import { getIdIfValid } from "./Validate";
  * @param query query json object
  * @param owen the super saiyan of data
  */
-export async function realize(query: any, owen: OwensReality): Promise<any[]> {
+export async function realize(query: any, owen: AllData): Promise<any[]> {
     const id = getIdIfValid(query, owen);
     const dataset = owen.getDataset(id);
     let things; // will be Rooms or Sections depending on the query's ID
@@ -26,10 +26,10 @@ export async function realize(query: any, owen: OwensReality): Promise<any[]> {
     // Set things to either Sections or Rooms
     switch (dataset.Kind) {
         case InsightDatasetKind.Courses:
-            things = dataset.Sections;
+            things = dataset.Elements;
             break;
         case InsightDatasetKind.Rooms:
-            things = dataset.Rooms;
+            things = dataset.Elements;
             break;
     }
 

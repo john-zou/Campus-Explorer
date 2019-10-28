@@ -1,4 +1,4 @@
-import { OwensReality } from "../../data/OwensReality";
+import { AllData } from "../../data/AllData";
 import { hasTransformations } from "../../services/QueryValidationFunctions_Common";
 import { getIdFromFilter } from "../../services/QueryValidationFunctions_Body";
 import { getKeysFromTransformations } from "../../services/QueryValidationFunctions_Transformations";
@@ -9,7 +9,7 @@ import { QueryValidationResultFlag } from "../../services/IQueryValidator";
 /**
  * Throws InsightError if query is invalid for any reason
  */
-export function getIdIfValid(query: any, owen: OwensReality): string {
+export function getIdIfValid(query: any, owen: AllData): string {
     const hasT = hasTransformations(query);
     let idW: string;
 

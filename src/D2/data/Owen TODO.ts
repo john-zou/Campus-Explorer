@@ -1,12 +1,12 @@
 import { InsightError, InsightDatasetKind } from "../../controller/IInsightFacade";
-import { ActualDataset } from "../../data/ActualDataset";
+import { Dataset } from "../../data/Dataset";
 import JSZip = require("jszip");
 import Insight from "../../util/Insight";
 
 /**
  * Have fun with this -John
  */
-export async function roomService(id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> {
+export async function roomService(id: string, files: JSZip.JSZipObject[]): Promise<Dataset> {
     // D2 TODO
     // Feel free to delete this file and make your own (don't have to keep this function name either)
     // This promise is awaited in DataParser.ts (line 39) as part of addDataset.
@@ -18,7 +18,7 @@ export async function roomService(id: string, files: JSZip.JSZipObject[]): Promi
     // files is the files/folders inside the rooms folder (so the rooms folder for sure exists at this point)
     // you'll need to see if index.htm exists, and go from there
 
-    const dataset = new ActualDataset(id, InsightDatasetKind.Rooms);
+    const dataset = new Dataset(id, InsightDatasetKind.Rooms);
 
     // To get a single file in string form:
     let fileInStringForm: string;

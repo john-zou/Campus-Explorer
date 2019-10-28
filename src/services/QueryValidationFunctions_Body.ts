@@ -2,12 +2,12 @@ import { QueryValidationResultFlag as F } from "./IQueryValidator";
 import { MFIELDS_COURSES as MFields, MFIELDS_COURSES, MFIELDS_ROOMS} from "../query_schema/MFields";
 import { SFIELDS_COURSES as SFields, SFIELDS_COURSES, SFIELDS_ROOMS} from "../query_schema/SFields";
 import { InsightDatasetKind } from "../controller/IInsightFacade";
-import { OwensReality } from "../data/OwensReality";
+import { AllData } from "../data/AllData";
 import { WT } from "../util/Insight";
-import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
+import { IDCheckResult } from "../data/IDCheckResult";
 
 export function getIdFromFilterArray(filters: any,
-                                     owen: OwensReality): string {
+                                     owen: AllData): string {
     if (filters == null) {
         WT(F.WrongType_LogicComparison);
     }
@@ -31,7 +31,7 @@ export function getIdFromFilterArray(filters: any,
     return firstId;
 }
 
-export function getIdFromFilter(filter: any, owen: OwensReality): string  {
+export function getIdFromFilter(filter: any, owen: AllData): string  {
 
     if (filter == null || typeof filter !== "object") {
         WT(F.WrongValue_LogicComparison);
@@ -55,7 +55,7 @@ export function getIdFromFilter(filter: any, owen: OwensReality): string  {
     }
 }
 
-export function getIdFromSComparison(sc: any, owen: OwensReality): string {
+export function getIdFromSComparison(sc: any, owen: AllData): string {
     if (Array.isArray(sc)) {
         WT(F.WrongType_SComparison);
     }
@@ -73,17 +73,17 @@ export function getIdFromSComparison(sc: any, owen: OwensReality): string {
     const id: string = parseResult[0];
     const field: string = parseResult[1];
     switch (owen.checkID(id)) {
-        case JohnsRealityCheck.Courses:
+        case IDCheckResult.Courses:
             if (!SFIELDS_COURSES.includes(field)) {
                 WT(F.InvalidSField);
             }
             break;
-        case JohnsRealityCheck.Rooms:
+        case IDCheckResult.Rooms:
             if (!SFIELDS_ROOMS.includes(field)) {
                 WT(F.InvalidMField);
             }
             break;
-        case JohnsRealityCheck.NotFound:
+        case IDCheckResult.NotFound:
             WT(F.IdDoesNotExist);
             break;
     }
@@ -112,7 +112,7 @@ export function validateSValue(value: string) {
 }
 
 export function getIdFromMComparison(mc: any,
-                                     owen: OwensReality): string {
+                                     owen: AllData): string {
     if (Array.isArray(mc)) {
         WT(F.WrongType_MComparison);
     }
@@ -131,17 +131,17 @@ export function getIdFromMComparison(mc: any,
     const field: string = parseResult[1];
 
     switch (owen.checkID(id)) {
-        case JohnsRealityCheck.Courses:
+        case IDCheckResult.Courses:
             if (!MFIELDS_COURSES.includes(field)) {
                 WT(F.InvalidMField);
             }
             break;
-        case JohnsRealityCheck.Rooms:
+        case IDCheckResult.Rooms:
             if (!MFIELDS_ROOMS.includes(field)) {
                 WT(F.InvalidMField);
             }
             break;
-        case JohnsRealityCheck.NotFound:
+        case IDCheckResult.NotFound:
             WT(F.IdDoesNotExist);
             break;
     }

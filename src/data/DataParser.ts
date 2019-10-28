@@ -6,7 +6,7 @@ import { ParsedCoursesData } from "./ParsedCoursesData";
 import { parseSectionsFromFile } from "./DataParsingFunctions";
 import Log from "../Util";
 import { FileParseResult, FileParseResultFlag } from "./FileParseResult";
-import { ActualDataset } from "./ActualDataset";
+import { Dataset } from "./Dataset";
 import { roomService } from "../D2/data/Owen TODO";
 import { ULTRAINSTINCT } from "../D2/query/Ultra Instinct/UltraInstinct";
 
@@ -16,7 +16,7 @@ export class DataParser {
      * @param content a non-null string
      * @param kind a non-null InsightDatasetKind
      */
-    public async parseDatasetZip(id: string, content: string, kind: InsightDatasetKind): Promise<ActualDataset> {
+    public async parseDatasetZip(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
         // Unreacheable code
         // if (id === null || content === null) {
         //     throw new InsightError("Null arguments");
@@ -39,12 +39,12 @@ export class DataParser {
         if (kind === InsightDatasetKind.Rooms) {
             return await ULTRAINSTINCT(id, files); // D2 TODO -- can change it if you want
         }
-        const [ad, summary]: [ActualDataset, ParseSummary] = await this.parseCoursesFiles(id, files);
-        if (ad.Sections.length === 0) {
+        const [dataset, summary]: [Dataset, ParseSummary] = await this.parseCoursesFiles(id, files);
+        if (dataset.Elements.length === 0) {
             throw new InsightError("No valid sections");
         } else {
             Log.trace(`==================================================================================`);
-            Log.trace(`| SUCCESSFULLY ADDED DATASET: ID: ${ad.ID}, numRows: ${ad.Sections.length}`);
+            Log.trace(`| SUCCESSFULLY ADDED DATASET: ID: ${dataset.ID}, numRows: ${dataset.Elements.length}`);
             Log.trace(`---------------------------------------------------------------------------------`);
             Log.trace(`| Total files in courses folder: ${files.length}`);
             Log.trace(`| JSON files with result array: ${summary.JsonFilesWithResultArray}`);
@@ -55,18 +55,18 @@ export class DataParser {
             Log.trace(`| Average items (any type) per result array: ${summary.AverageAnyPerArray}`);
             Log.trace(`| Average valid sections per result array: ${summary.AverageValidSectionsPerArray}`);
             Log.trace(`==================================================================================`);
-            return ad;
+            return dataset;
         }
     }
 
-    private async parseCoursesFiles(id: string, files: JSZip.JSZipObject[]): Promise<[ActualDataset, ParseSummary]> {
-        const actualDataset: ActualDataset = new ActualDataset(id, InsightDatasetKind.Courses);
-        actualDataset.Sections = [];
+    private async parseCoursesFiles(id: string, files: JSZip.JSZipObject[]): Promise<[Dataset, ParseSummary]> {
+        const actualDataset: Dataset = new Dataset(id, InsightDatasetKind.Courses);
+        actualDataset.Elements = [];
         let summary: ParseSummary = new ParseSummary();
         let totalValidSections: number = 0;
         for (const file of files) {
             try {
-                const result: FileParseResult = await parseSectionsFromFile(file, actualDataset);
+                const result: FileParseResult = await parseSectionsFromFile(file, actualDataset, id);
                 switch (result.Flag) {
                     case FileParseResultFlag.HasResultArray:
                         totalValidSections += result.ValidSections;

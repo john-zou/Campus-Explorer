@@ -2,12 +2,12 @@ import { QueryValidationResultFlag as F } from "./IQueryValidator";
 import { MFIELDS_COURSES as MFields } from "../query_schema/MFields";
 import { SFIELDS_COURSES as SFields } from "../query_schema/SFields";
 import { hasTooManyKeys, parseKeystring } from "./QueryValidationFunctions_Body";
-import { OwensReality } from "../data/OwensReality";
+import { AllData } from "../data/AllData";
 import { WT } from "../util/Insight";
 import { verifyAndGetIdAndField } from "./QueryValidationFunctions_Transformations";
 
 export function validateOptions(query: any,
-                                owen: OwensReality,
+                                owen: AllData,
                                 transformed: boolean,
                                 idFromTransformations?: string,
                                 groupFields?: string[],
@@ -101,7 +101,7 @@ export function validateOrderObject(order: any, columns: string[]) {
     }
 }
 
-function validateTransformedColumns(cols: any, owen: OwensReality,
+function validateTransformedColumns(cols: any, owen: AllData,
                                     id: string,
                                     groupFields: string[],
                                     applyFields: string[]) {
@@ -116,7 +116,7 @@ function validateTransformedColumns(cols: any, owen: OwensReality,
     validateTransformedColumnStrings(cols, owen, id, groupFields, applyFields);
 }
 
-export function validateTransformedColumnStrings(columns: any[], owen: OwensReality, id: string, groupFields: string[],
+export function validateTransformedColumnStrings(columns: any[], owen: AllData, id: string, groupFields: string[],
                                                  applyKeys: string[]) {
     for (const columnKey of columns) {
         if (columnKey == null || typeof columnKey !== "string") {
@@ -139,7 +139,7 @@ export function validateTransformedColumnStrings(columns: any[], owen: OwensReal
     }
 }
 
-export function validateColumnsAndGetID(columns: any, owen: OwensReality): string {
+export function validateColumnsAndGetID(columns: any, owen: AllData): string {
     // Check if columns is an array
     if (!(Array.isArray(columns))) {
         WT(F.ColumnsIsNotNonEmptyArray);
@@ -155,7 +155,7 @@ export function validateColumnsAndGetID(columns: any, owen: OwensReality): strin
 /**
  * @param columns must be a non-empty array (otherwise it may give wrong invalid flag (but daijoubu))
  */
-export function validateColumnStringsAndGetID(columns: any[], owen: OwensReality): string {
+export function validateColumnStringsAndGetID(columns: any[], owen: AllData): string {
     let id: string;
     for (const column of columns) {
         const [idd, _] = verifyAndGetIdAndField(column, owen);

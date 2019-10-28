@@ -22,6 +22,12 @@ export class MagicQueue<T> {
         }
     }
 
+    public enqueueAll = (items: T[]): void => {
+        for (const item of items)  {
+            this.enqueue(item);
+        }
+    }
+
     public EnQ = (item: T): void => {
         this.enqueue(item);
     }

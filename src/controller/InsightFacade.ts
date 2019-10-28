@@ -2,6 +2,7 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import { DatasetManager } from "../services/DatasetManager";
 import { realize } from "../D2/query/Realize";
+import { queryPipeline } from "../query pipeline/QueryPipeline";
 
 /**
  * DONE for d2
@@ -29,7 +30,7 @@ export default class InsightFacade implements IInsightFacade {
 
     public async performQuery(query: any): Promise <any[]> {
         try {
-            return await realize(query, this.datasetManager.Owen);
+            return queryPipeline(query, this.datasetManager.allData);
         } catch (err) {
             Log.trace(`Invalid Query: ${err}`);
             throw err;
