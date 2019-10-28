@@ -44,7 +44,7 @@ export function parseSection(json: any, actualDataset: Dataset, id: string): Sec
         const newSection: any = Section.fromValidSectionData(json, id);
         // If there is a json.Section === "overall", then set the year to 1900
         if (json.Section === "overall") {
-            newSection.year = 1900;
+            newSection[id + "_year"] = 1900;
         }
         actualDataset.Elements.push(newSection);
         return SectionParseResult.Valid;

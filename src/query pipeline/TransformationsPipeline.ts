@@ -120,20 +120,20 @@ const makeGroups = (groupKeys: string[], elements: any[]): any[][] => {
 
     // tl;dr either join a group or make a new one
 
-    objectsloop:
+    objectsLoop:
     for (const element of elements) {
-        groupsloop:
+        groupsLoop:
         for (const group of groups) {
             // keys loop
             for (const groupKey of groupKeys) {
                 // Check to make sures keys are the same as first thing in the group
                 const pioneer =  group[0];
                 if (pioneer[groupKey] !== element[groupKey]) {
-                    continue groupsloop;
+                    continue groupsLoop;
                 }
             }
             group.push(element);
-            continue objectsloop;
+            continue objectsLoop;
         }
         // Make a new group
         groups.push([element]);
@@ -152,69 +152,81 @@ const makeGroupObjects = (query: any, groups: any[][], allData: AllData, idHolde
     const applyrules: any[] = query.TRANSFORMATIONS.APPLY;
     const groupObjects: any[] = [];
     const applyKeys: string[] = [];
+    let shouldValidateApplyrule = true;
     for (const group of groups) {
         const groupObject: any = {};
         for (const applyrule of applyrules) {
-            validateApplyrule(applyrule, allData, idHolder);
-            const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "sumLat"
-            if (applyKeys.includes(applyKey)) {
-                invalid("Applykey not unique: " + applyKey);
+            if (shouldValidateApplyrule) {
+                validateApplyrule(applyrule, allData, idHolder, applyKeys);
             }
-            applyKeys.push(applyKey);
-            const av: any = Object.values(applyrule)[0]; // abstract object
+            const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "sumLat"
+            const av: any = Object.values(applyrule)[0]; // APPLYRULE[applykey]
             const applyToken: string = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
-            const field = (Object.values(av)[0] as string).split("_")[1]; // field e.g. avg, year, lon, lat
-            switch (applyToken) {
-                case "MAX":
-                    groupObject[applyKey] = max(group, field);
-                    break;
-                case "MIN":
-                    groupObject[applyKey] = min(group, field);
-                    break;
-                case "AVG":
-                    groupObject[applyKey] = ave(group, field);
-                    break;
-                case "SUM":
-                    const summ = sum(group, field);
-                    groupObject[applyKey] = Number(summ.toFixed(2));
-                    break;
-                case "COUNT":
-                    groupObject[applyKey] = count(group, field);
-                    break;
+            const field = av[applyToken]; // field e.g. avg, year, lon, lat
+            if (applyToken === "MAX") {
+                groupObject[applyKey] = max(group, field);
+            } else if (applyToken === "MIN") {
+                groupObject[applyKey] = min(group, field);
+            } else if (applyToken === "AVG") {
+                groupObject[applyKey] = ave(group, field);
+            } else if (applyToken === "SUM") {
+                const summ = sum(group, field);
+                groupObject[applyKey] = Number(summ.toFixed(2));
+            } else if (applyToken === "COUNT") {
+                groupObject[applyKey] = count(group, field);
             }
         }
         for (const groupkey of groupkeys) {
             groupObject[groupkey] = group[0][groupkey];
         }
         groupObjects.push(groupObject);
+        shouldValidateApplyrule = false;
     }
     return [groupObjects, applyKeys];
 };
 
-const validateApplyrule = (applyrule: any, allData: AllData, idHolder: IDHolder): void => {
+const validateApplyrule =
+(applyrule: any, allData: AllData, idHolder: IDHolder, applyKeys: string[]): void => {
     if (!applyrule || typeof applyrule !== "object") {
         invalid("TRANSFORMATIONS.APPLY has invalid applyrule: wrong type");
     }
     const applyruleKeys: string[] = Object.keys(applyrule);
     if (applyruleKeys.length !== 1) {
-        invalid("APPLYRULE must have only 1 property");
+        invalid("APPLYRULE must have only 1 key (the applykey)");
     }
-    // Check for valid applykey
-    if (applyruleKeys[0].includes("_")) {
-        invalid("APPLYRULE cannot include underscore");
+    const applykey: string = applyruleKeys[0];
+
+    // Check for duplicate applykeys:
+    if (applyKeys.includes(applykey)) {
+        invalid("Applykey not unique: " + applykey);
+    }
+    applyKeys.push(applykey);
+
+    // applykey ::= [^_]+ // one or more of any character except underscore.
+    if (applykey.length === 0) {
+        invalid ("APPLYKEY must be one or more of any character except underscore");
+    }
+    if (applykey.includes("_")) {
+        invalid("APPLYKEY must be one or more of any character except underscore");
     }
 
-    if (Object.keys(applyruleKeys).length !== 1) {
-        invalid("APPLYKEY does not have valid fields");
+    const applyvalue: any = applyrule[applykey];
+    if (!applyvalue || typeof applyvalue !== "object") {
+        invalid("APPLYRULE[applykey] must be an object");
     }
+    const applyvalueObjectKeys: string[] = Object.keys(applyvalue);
+    if (applyvalueObjectKeys.length !== 1) {
+        invalid("APPLYRULE[applykey] must have one key (the APPLYTOKEN)");
+    }
+    const applytoken = applyvalueObjectKeys[0];
     // Check for valid token
-    if (!["MAX", "MIN", "COUNT", "AVG", "SUM"].includes(Object.keys(applyruleKeys)[0])) {
+    if (!["MAX", "MIN", "COUNT", "AVG", "SUM"].includes(applytoken)) {
         invalid("APPLYRULE token invalid");
     }
 
     // Validate key
-    const key = Object.values(applyrule[0])[0];
-    const canBeSKey = Object.keys(applyrule[0])[0] === "COUNT";
+    const key = applyvalue[applytoken];
+    const canBeSKey: boolean = applytoken === "COUNT";
     validateKey(key, allData, idHolder, !canBeSKey, false);
 };
 

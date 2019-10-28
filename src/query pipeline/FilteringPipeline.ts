@@ -117,6 +117,9 @@ const setID = (filter: any, allData: AllData, idHolder: IDHolder): void => {
                 break;
             case "AND":
             case "OR":
+                if (!Array.isArray(f[operator])) {
+                    invalid("AND/OR must have an array");
+                }
                 queue.enqueueAll(f[operator]);
                 break;
             case "GT":
@@ -167,7 +170,7 @@ const filterElement = (element: any,
 };
 
 const filterElementAND
-= (element: any, filters: any[], idHolder: IDHolder, allData: AllData): boolean => {
+= (element: any, filters: any, idHolder: IDHolder, allData: AllData): boolean => {
 
     // Validation
     if (!Array.isArray(filters) || filters.length === 0) {
@@ -177,7 +180,8 @@ const filterElementAND
     // Processing
     let pass = true;
     for (const filter of filters) {
-        pass = pass && filterElement(element, filter, idHolder, allData);
+        const passed = filterElement(element, filter, idHolder, allData);
+        pass = passed && pass;
     }
 
     return pass;
@@ -194,7 +198,8 @@ const filterElementOR
     // Processing
     let pass = false;
     for (const filter of filters) {
-        pass = pass || filterElement(element, filter, idHolder, allData);
+        const passed = filterElement(element, filter, idHolder, allData);
+        pass = passed || pass;
     }
     return pass;
 };
@@ -231,7 +236,6 @@ const filterElementSComparison = (element: any,
                                   scomparison: any,
                                   idHolder: IDHolder,
                                   allData: AllData): boolean => {
-
     // Validation
     if (!scomparison || typeof scomparison !== "object") {
         invalid("FILTER - SComparison not an object");
@@ -248,5 +252,8 @@ const filterElementSComparison = (element: any,
 
     // Processing
     const [str, hasPreAsterisk, hasPostAsterisk] = getInputstring(scomparison);
+    if (str.includes("*")) {
+        invalid("Inputstring contains internal asterisk");
+    }
     return isMatch(element[key], str, hasPreAsterisk, hasPostAsterisk);
 };

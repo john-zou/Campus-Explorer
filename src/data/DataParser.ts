@@ -29,8 +29,12 @@ export class DataParser {
         }
         let folder: JSZip;
         switch (kind) {
-            case InsightDatasetKind.Courses: folder = zip.folder("courses");
-            case InsightDatasetKind.Rooms: folder = zip.folder("rooms");
+            case InsightDatasetKind.Courses:
+                folder = zip.folder("courses");
+                break;
+            case InsightDatasetKind.Rooms:
+                folder = zip.folder("rooms");
+                break;
         }
         let files: JSZip.JSZipObject[] = Object.values(folder.files);
         if (files.length === 0) {

@@ -12,7 +12,7 @@ import { queryPipeline } from "../src/query pipeline/QueryPipeline";
 const shouldRun: boolean = true;
 
 if (shouldRun) {
-    describe("getIdIfValid: Bad Structure => Invalid Query", () => {
+    describe("queryPipeline: Bad Structure => Invalid Query", () => {
         const coursesDb = new Dataset("cc", IDK.Courses);
         const roomsDb = new Dataset("rr", IDK.Rooms);
         const owen = AllData.fromDatasetArray([coursesDb, roomsDb]);
@@ -502,7 +502,7 @@ if (shouldRun) {
 
     });
 
-    describe("getIdIfValid: Good Structure, Multiple Valid IDs => Invalid Query (multiple valid IDs", () => {
+    describe("query: Good Structure, Multiple Valid IDs => Invalid Query (multiple valid IDs", () => {
         const c1 = new Dataset("c1", IDK.Courses);
         const c2 = new Dataset("c2", IDK.Courses);
         const owen = AllData.fromDatasetArray([c1, c2]);
