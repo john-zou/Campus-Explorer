@@ -13,12 +13,15 @@ export class Room implements IRoom {
     public furniture: string;
     public href: string;
 
-    private constructor() {
+    public constructor() {
         // Doesn't do anything
     }
 
     // Should get the room from the href
-    public getRoomFromFile(href: any) {
+    public getRoomFromFile() {
+        if (this.href === undefined) {
+            throw Error("No HREF");
+        }
         // stub
     }
 }

@@ -1,12 +1,12 @@
 import { Room } from "./Room";
 const Parse5 = require("parse5");
 import JSZip = require("jszip");
-import { tablesearch } from "./IndexValidatorFunctions";
+import { tablesearch, constructRooms } from "./IndexValidatorFunctions";
 import { InsightError } from "../../controller/IInsightFacade";
 import { IRoom } from "./IRoom";
 
 export class IndexValidator {
-    public async validate(index: JSZip.JSZipObject): Promise<Room[]> {
+    public async validate(index: JSZip.JSZipObject): Promise<IRoom[]> {
         const parsedDoc: Document = Parse5.parse(await index.async("text"));
         // traverse document recursively looking for a table element
         const tables: ChildNode[] = tablesearch(document);
@@ -16,7 +16,9 @@ export class IndexValidator {
         }
         // parse table instances to find rooms (should have an array of tables)
         // Follow links in table (href) to find more data about the rooms
-        return []; // stub
+        // First find array of rooms with only hrefs
+        const hrefrooms: IRoom[] = constructRooms(tables);
+        return hrefrooms;
     }
 
 }

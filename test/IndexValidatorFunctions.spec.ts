@@ -1,6 +1,8 @@
 import { expect } from "chai";
-import { tablesearch } from "../src/D2/data/IndexValidatorFunctions";
+import { tablesearch, constructRooms } from "../src/D2/data/IndexValidatorFunctions";
 import { findNode } from "../src/D2/data/IndexValidatorFunctions";
+import { IRoom } from "../src/D2/data/IRoom";
+const fs = require("fs");
 const Parse5 = require("parse5");
 // rely on autoimport
 
@@ -61,5 +63,14 @@ describe("Tests on index validator functions", () => {
         } catch (error) {
             // pass
         }
+    });
+
+    it("Should be able to parse and extract tables objects from html", async () => {
+        // Start by loading an example html
+        const htmlstring = (fs.readFileSync("./test/index.htm")).toString();
+        const parsedHtml = Parse5.parse(htmlstring);
+        const childnodes: ChildNode[] =  tablesearch(parsedHtml);
+        const rooms: IRoom[] = constructRooms(childnodes);
+        // This test only ensures there are no error causing failures
     });
 });

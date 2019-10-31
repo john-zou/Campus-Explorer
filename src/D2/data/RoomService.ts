@@ -2,23 +2,22 @@ import { InsightError, InsightDatasetKind } from "../../controller/IInsightFacad
 import { ActualDataset } from "../../data/ActualDataset";
 import JSZip = require("jszip");
 import Insight from "../../util/Insight";
+import { IndexValidator } from "./IndexValidator";
+import { IRoom } from "./IRoom";
 
 /**
  * Have fun with this -John
  */
 export async function roomService(id: string, files: JSZip.JSZipObject[]): Promise<ActualDataset> {
-    // D2 TODO
-    // Feel free to delete this file and make your own (don't have to keep this function name either)
-    // This promise is awaited in DataParser.ts (line 39) as part of addDataset.
-
-    // I made all necessary changes in InsightFacade,
-    // DataManager, DataParser, and DiskManager already
-    // So you just need to do the implementation of going from
-    // a list of files objects representing what's inside the rooms folder, to an ActualDataset
-    // files is the files/folders inside the rooms folder (so the rooms folder for sure exists at this point)
-    // you'll need to see if index.htm exists, and go from there
-
     const dataset = new ActualDataset(id, InsightDatasetKind.Rooms);
+    const indexValidator = new IndexValidator();
+    let index: JSZip.JSZipObject;
+    for (const f of files) {
+        if (f.name === "index.htm") {
+            index = f;
+        }
+    }
+    let roomsHref: IRoom[] = await indexValidator.validate(index);
 
     // To get a single file in string form:
     let fileInStringForm: string;

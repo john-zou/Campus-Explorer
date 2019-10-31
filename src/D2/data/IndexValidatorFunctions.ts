@@ -1,5 +1,9 @@
 import { IRoom } from "./IRoom";
 import { NotFoundError, InsightError } from "../../controller/IInsightFacade";
+import { Room } from "./Room";
+import JSZip = require("jszip");
+const fs = require("fs");
+const Parse5 = require("parse5");
 
 // May be a good idea to do some actual parsing on the table
 export function tablesearch(doc: Document): ChildNode[] {
@@ -29,27 +33,43 @@ function tablesearchrec(cnodes: NodeListOf<ChildNode>): ChildNode[] {
 
 // Attempts to add all HREF elements to new room objects, moves on to next table if there is a failure
 export function constructRooms(tables: ChildNode[]): IRoom[] {
-    for (let table of tables) {
+    let rooms: IRoom[] = [];
+    for (const table of tables) {
         // Extract some useful fields from the table
         let thead: ChildNode;
         let trthead: ChildNode;
         let tbody: ChildNode;
+        let hrefind: number;
         try {
             thead = findNode(table.childNodes, "thead");
             trthead = findNode(thead.childNodes, "tr");
             tbody = findNode(table.childNodes, "tbody");
+            hrefind = findNodeWithAttr(trthead.childNodes, "views-field views-field-title");
         } catch (error) {
             continue;
         }
-        // Find the relevant index for href
-        const hrefind: number = findNodeWithAttr(trthead.childNodes, "views-field views-field-title");
-        let hrefchildren: NodeListOf<ChildNode> = trthead.childNodes[hrefind].childNodes;
-        // const href: string = findNode(hrefchildren, "a").attrs[0].value;
-
+        // Find all hrefs
+        const len: number = tbody.childNodes.length;
+        for (let i = 0; i < len; i++) {
+            if (tbody.childNodes[i].nodeName !== "tr") {
+                continue;
+            }
+            const hrefnode = tbody.childNodes[i].childNodes[hrefind];
+            const href: string = (findNode(hrefnode.childNodes, "a") as any).attrs[0].value;
+            let room: Room = new Room();
+            room.href = href;
+            rooms.push(room);
+        }
     }
-    return null; // stub
+    return rooms;
 }
 
+// Given a file path, returns a Parse5 parsedDocument
+export function getParsedFile(path: string): Document {
+    const htmlstring = (fs.readFileSync(path)).toString();
+    const parsedDoc = Parse5.parse(htmlstring);
+    return parsedDoc;
+}
 
 // Find first instance of Node with a given name in a NodeListOf<ChildNode>
 export function findNode(nodes: NodeListOf<ChildNode>, name: string): ChildNode {
@@ -63,15 +83,15 @@ export function findNode(nodes: NodeListOf<ChildNode>, name: string): ChildNode 
 }
 
 // Returns node index with specfied attribute, returns -1 on none
-export function findNodeWithAttr (nodes: NodeListOf<ChildNode>, attr: string): number {
+export function findNodeWithAttr(nodes: NodeListOf<ChildNode>, attr: string): number {
     const len: number = nodes.length;
     for (let i = 0; i < len; i++) {
         if (!nodes[i].hasOwnProperty("attrs")) {
             continue;
         }
-        // if (nodes[i].attrs[0].value === attr) {
-        //     return i;
-        // }
+        if ((nodes[i] as any).attrs[0].value === attr) {
+            return i;
+        }
     }
     return -1;
 }
