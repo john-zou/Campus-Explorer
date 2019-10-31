@@ -4,9 +4,10 @@ import JSZip = require("jszip");
 import { tablesearch, constructRooms } from "./IndexValidatorFunctions";
 import { InsightError } from "../../controller/IInsightFacade";
 import { IRoom } from "./IRoom";
+import { Building } from "./Building";
 
 export class IndexValidator {
-    public async validate(index: JSZip.JSZipObject): Promise<IRoom[]> {
+    public async validate(index: JSZip.JSZipObject): Promise<Building[]> {
         const parsedDoc: Document = Parse5.parse(await index.async("text"));
         // traverse document recursively looking for a table element
         const tables: ChildNode[] = tablesearch(document);
@@ -17,7 +18,7 @@ export class IndexValidator {
         // parse table instances to find rooms (should have an array of tables)
         // Follow links in table (href) to find more data about the rooms
         // First find array of rooms with only hrefs
-        const hrefrooms: IRoom[] = constructRooms(tables);
+        const hrefrooms: Building[] = constructRooms(tables);
         return hrefrooms;
     }
 

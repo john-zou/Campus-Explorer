@@ -4,6 +4,7 @@ import JSZip = require("jszip");
 import Insight from "../../util/Insight";
 import { IndexValidator } from "./IndexValidator";
 import { IRoom } from "./IRoom";
+import { Building } from "./Building";
 
 /**
  * Have fun with this -John
@@ -17,7 +18,7 @@ export async function roomService(id: string, files: JSZip.JSZipObject[]): Promi
             index = f;
         }
     }
-    let roomsHref: IRoom[] = await indexValidator.validate(index);
+    let roomsHref: Building[] = await indexValidator.validate(index);
 
     // To get a single file in string form:
     let fileInStringForm: string;

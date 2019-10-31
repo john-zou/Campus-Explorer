@@ -2,6 +2,7 @@ import { IRoom } from "./IRoom";
 import { NotFoundError, InsightError } from "../../controller/IInsightFacade";
 import { Room } from "./Room";
 import JSZip = require("jszip");
+import { Building } from "./Building";
 const fs = require("fs");
 const Parse5 = require("parse5");
 
@@ -31,20 +32,24 @@ function tablesearchrec(cnodes: NodeListOf<ChildNode>): ChildNode[] {
     return found;
 }
 
-// Attempts to add all HREF elements to new room objects, moves on to next table if there is a failure
-export function constructRooms(tables: ChildNode[]): IRoom[] {
-    let rooms: IRoom[] = [];
+// Attempts to add all HREF elements to new buildings objects, moves on to next table if there is a failure
+export function constructRooms(tables: ChildNode[]): Building[] {
+    let buildings: Building[] = [];
     for (const table of tables) {
         // Extract some useful fields from the table
         let thead: ChildNode;
         let trthead: ChildNode;
         let tbody: ChildNode;
         let hrefind: number;
+        let addressind: number;
+        let codeind: number;
         try {
             thead = findNode(table.childNodes, "thead");
             trthead = findNode(thead.childNodes, "tr");
             tbody = findNode(table.childNodes, "tbody");
             hrefind = findNodeWithAttr(trthead.childNodes, "views-field views-field-title");
+            addressind = findNodeWithAttr(trthead.childNodes, "views-field views-field-field-building-address");
+            codeind = findNodeWithAttr(trthead.childNodes, "views-field views-field-field-building-code");
         } catch (error) {
             continue;
         }
@@ -56,12 +61,13 @@ export function constructRooms(tables: ChildNode[]): IRoom[] {
             }
             const hrefnode = tbody.childNodes[i].childNodes[hrefind];
             const href: string = (findNode(hrefnode.childNodes, "a") as any).attrs[0].value;
-            let room: Room = new Room();
-            room.href = href;
-            rooms.push(room);
+            const fullname: string = (findNode(hrefnode.childNodes, "a") as any).childNodes[0].value;
+            // const address: string =
+            // let building: Building = new Building(href, address, fullname, shortname);
+            // buildings.push(building);
         }
     }
-    return rooms;
+    return buildings;
 }
 
 // Given a file path, returns a Parse5 parsedDocument
