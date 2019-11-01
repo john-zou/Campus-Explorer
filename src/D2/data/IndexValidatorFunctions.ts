@@ -3,6 +3,7 @@ import { NotFoundError, InsightError } from "../../controller/IInsightFacade";
 import { Room } from "./Room";
 import JSZip = require("jszip");
 import { Building } from "./Building";
+import { IndexValidator } from "./IndexValidator";
 const fs = require("fs");
 const Parse5 = require("parse5");
 
@@ -88,7 +89,7 @@ export function findNode(nodes: NodeListOf<ChildNode>, name: string): ChildNode 
             return nodes[i];
         }
     }
-    throw new Error("Node not found");
+    throw new InsightError("Node not found");
 }
 
 // Returns node index with specfied attribute, returns -1 on none
@@ -102,5 +103,5 @@ export function findNodeWithAttr(nodes: NodeListOf<ChildNode>, attr: string): nu
             return i;
         }
     }
-    return -1;
+    throw new InsightError(attr + " not found.");
 }

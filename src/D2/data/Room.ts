@@ -1,4 +1,5 @@
 import { IRoom } from "./IRoom";
+import { Building } from "./Building";
 
 export class Room implements IRoom {
     public fullname: string;
@@ -13,7 +14,11 @@ export class Room implements IRoom {
     public furniture: string;
     public href: string;
 
-    public constructor() {
-        // Doesn't do anything
+    public constructor(building: Building) {
+        this.fullname = building.fullname;
+        this.shortname = building.shortname;
+        this.address = building.address;
+        this.lat = building.loc.lat;
+        this.lon = building.loc.lon;
     }
 }
