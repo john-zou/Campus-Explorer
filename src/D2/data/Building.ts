@@ -1,6 +1,8 @@
+import { GeoResponse, geolocate } from "./GeoResponse";
+
 export class Building {
     public href: string;
-    public loc: Geolocation;
+    public loc: GeoResponse;
     public address: string;
     public fullname: string;
     public shortname: string;
@@ -10,6 +12,5 @@ export class Building {
         this.address = address;
         this.fullname = fullname;
         this.shortname = shortname;
-        // Geolocate
     }
 }

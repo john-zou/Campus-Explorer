@@ -33,7 +33,7 @@ function tablesearchrec(cnodes: NodeListOf<ChildNode>): ChildNode[] {
 }
 
 // Attempts to add all HREF elements to new buildings objects, moves on to next table if there is a failure
-export function constructRooms(tables: ChildNode[]): Building[] {
+export function constructBuildings(tables: ChildNode[]): Building[] {
     let buildings: Building[] = [];
     for (const table of tables) {
         // Extract some useful fields from the table
@@ -62,9 +62,12 @@ export function constructRooms(tables: ChildNode[]): Building[] {
             const hrefnode = tbody.childNodes[i].childNodes[hrefind];
             const href: string = (findNode(hrefnode.childNodes, "a") as any).attrs[0].value;
             const fullname: string = (findNode(hrefnode.childNodes, "a") as any).childNodes[0].value;
-            // const address: string =
-            // let building: Building = new Building(href, address, fullname, shortname);
-            // buildings.push(building);
+            let addr: string = (tbody.childNodes[i].childNodes[addressind].childNodes[0] as any).value;
+            addr = addr.trim();
+            let shortname: string = (tbody.childNodes[i].childNodes[codeind].childNodes[0] as any).value.substring(2);
+            shortname = shortname.trim();
+            let building: Building = new Building(href, addr, fullname, shortname);
+            buildings.push(building);
         }
     }
     return buildings;

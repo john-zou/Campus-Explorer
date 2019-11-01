@@ -1,7 +1,8 @@
 import { expect } from "chai";
-import { tablesearch, constructRooms } from "../src/D2/data/IndexValidatorFunctions";
+import { tablesearch, constructBuildings } from "../src/D2/data/IndexValidatorFunctions";
 import { findNode } from "../src/D2/data/IndexValidatorFunctions";
 import { Building } from "../src/D2/data/Building";
+import { geolocate } from "../src/D2/data/GeoResponse";
 const fs = require("fs");
 const Parse5 = require("parse5");
 // rely on autoimport
@@ -70,7 +71,8 @@ describe("Tests on index validator functions", () => {
         const htmlstring = (fs.readFileSync("./test/index.htm")).toString();
         const parsedHtml = Parse5.parse(htmlstring);
         const childnodes: ChildNode[] =  tablesearch(parsedHtml);
-        const rooms: Building[] = constructRooms(childnodes);
-        // This test only ensures there are no error causing failures
+        const rooms: Building[] = constructBuildings(childnodes);
+        const newBuildings: Building[] = await geolocate(rooms);
+        // This test only ensures there are no error causing failures (mostly just for debugging)
     });
 });

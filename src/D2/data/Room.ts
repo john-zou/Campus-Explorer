@@ -16,12 +16,4 @@ export class Room implements IRoom {
     public constructor() {
         // Doesn't do anything
     }
-
-    // Should get the room from the href
-    public getRoomFromFile() {
-        if (this.href === undefined) {
-            throw Error("No HREF");
-        }
-        // stub
-    }
 }
