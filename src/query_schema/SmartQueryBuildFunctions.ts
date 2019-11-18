@@ -75,29 +75,29 @@
 //     return Object.values(mcomparison)[0] as number;
 // }
 
-// export function getIdstring(scomparison: any): [string, boolean, boolean] {
-//     let svalue: string = Object.values(scomparison)[0] as string;
-//     if (svalue.length === 0) {
-//         return [svalue, false, false];
-//     }
-//     let hasPrefixAsterisk: boolean = svalue[0] === "*";
-//     let hasPostfixAsterisk: boolean = svalue[svalue.length - 1] === "*";
-//     if (!hasPrefixAsterisk && !hasPostfixAsterisk) {
-//         return [svalue, false, false];
-//     }
-//     if (hasPrefixAsterisk && !hasPostfixAsterisk) {
-//         return [svalue.slice(1), true, false];
-//     }
-//     if (!hasPrefixAsterisk && hasPostfixAsterisk) {
-//         return [svalue.slice(0, svalue.length - 1), false, true];
-//     }
-//     // has asterisk on both sides
-//     if (svalue.length < 3) {
-//         return ["", true, true];
-//     } else {
-//         return [svalue.slice(1, svalue.length - 1), true, true];
-//     }
-// }
+export function getInputstring(scomparison: any): [string, boolean, boolean] {
+    let svalue: string = Object.values(scomparison)[0] as string;
+    if (svalue.length === 0) {
+        return [svalue, false, false];
+    }
+    let hasPrefixAsterisk: boolean = svalue[0] === "*";
+    let hasPostfixAsterisk: boolean = svalue[svalue.length - 1] === "*";
+    if (!hasPrefixAsterisk && !hasPostfixAsterisk) {
+        return [svalue, false, false];
+    }
+    if (hasPrefixAsterisk && !hasPostfixAsterisk) {
+        return [svalue.slice(1), true, false];
+    }
+    if (!hasPrefixAsterisk && hasPostfixAsterisk) {
+        return [svalue.slice(0, svalue.length - 1), false, true];
+    }
+    // has asterisk on both sides
+    if (svalue.length < 3) {
+        return ["", true, true];
+    } else {
+        return [svalue.slice(1, svalue.length - 1), true, true];
+    }
+}
 
 // export function getColumn(col: string): ISmartColumn {
 //     let smartColumn: ISmartColumn = new SmartColumn();

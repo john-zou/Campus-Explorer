@@ -1,3 +1,5 @@
+import { getInputstring } from "../../query_schema/SmartQueryBuildFunctions";
+import { isMatch } from "../../services/QP2_Helpers";
 
 export function f(thing: any, filt: any): boolean {
     const fk = Object.keys(filt)[0];
@@ -26,9 +28,9 @@ export function fM(thing: any, filt: any, gtlteq: string) {
 
 export function fS(thing: any, filt: any) {
     const fk = Object.keys(filt)[0];
-    const v = Object.values(filt)[0];
     const fkk = fk.split("_")[1];
-    return thing[fkk] === v;
+    const [str, hasPreAsterisk, hasPostAsterisk] = getInputstring(filt); // from D1
+    return isMatch(thing[fkk], str, hasPreAsterisk, hasPostAsterisk); // from D1
 }
 
 export function fAND(thing: any, arr: any[]): boolean {

@@ -1,0 +1,24 @@
+{
+  "query": {
+    "WHERE": {},
+    "OPTIONS": {
+      "COLUMNS": [
+        "rooms_furniture",
+        "sumlat"
+      ]
+    },
+    "TRANSFORMATIONS": {
+      "GROUP": [
+        "rooms_furniture"
+      ],
+      "APPLY": [
+        {
+          "sumlat": {
+            "SUM": "rooms_lat"
+          }
+        }
+      ]
+    }
+  },
+  "isQueryValid": true,
+  "result": [{"rooms_furniture":"Classroom-Fixed Tables/Movable Chairs","overallLatAvg":3349.98},{"rooms_furniture":"Classroom-Movable Tables & Chairs","overallLatAvg":8128.67},{"rooms_furniture":"Classroom-Moveable Tables & Chairs","overallLatAvg":1428.68},{"rooms_furniture":"Classroom-Moveable Tablets","overallLatAvg":49.27},{"rooms_furniture":"Classroom-Fixed Tablets","overallLatAvg":1625.75},{"rooms_furniture":"Classroom-Fixed Tables/Fixed Chairs","overallLatAvg":492.66},{"rooms_furniture":"Classroom-Fixed Tables/Moveable Chairs","overallLatAvg":147.8},{"rooms_furniture":"Classroom-Movable Tablets","overallLatAvg":2167.72},{"rooms_furniture":"Classroom-Hybrid Furniture","overallLatAvg":394.09},{"rooms_furniture":"Classroom-Learn Lab","overallLatAvg":147.79}]}

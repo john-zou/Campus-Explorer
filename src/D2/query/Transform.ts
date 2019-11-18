@@ -1,117 +1,159 @@
 import { sortByKey } from "../../services/QP2_Helpers";
 import { complicatedSort, sort } from "./Sort";
+import { ResultTooLargeError } from "../../controller/IInsightFacade";
 
-export function transform(q: any, t: any[]): any[] {
-    const groups = group(q, t);
-    const realGs = apply(q, groups);
-    const sortedGs = sort(q, realGs);
-    const realestGs = change(q, sortedGs);
-    return realestGs;
+const Decimal = require("decimal.js");
+
+export function transform(q: any, objects: any[]): any[] {
+    const groups = makeGroups(q, objects);
+    const groupObjects = apply(q, groups);
+    const sortedGroupObjects = sort(true, q, groupObjects);
+    const formattedResults = formatResult(q, sortedGroupObjects);
+    return formattedResults;
 }
 
-function group(q: any, t: any[]) {
-    const g = q.TRANSFORM.GROUP;
+function makeGroups(q: any, objects: any[]) {
+    const groupKeys = q.TRANSFORMATIONS.GROUP;
     const groups: any[][] = [];
 
     // tl;dr either join a group or make a new one
-
-    hi_es_lint:
-    for (const thing of t) {
-        how_you_like_my_snake_case_labels:
-        for (const ggg of groups) {
-            for (const gg of g) {
-                if (ggg[0][gg] !== thing[gg.split("_")[1]]) {
-                    continue how_you_like_my_snake_case_labels;
-                }
-            }
-            ggg.push(thing);
-            continue hi_es_lint;
-        }
-        groups.push([thing]);
+    if (q === undefined || q === null) {
+        throw new Error("q should not be null or undefined");
     }
 
+    if (objects === undefined || objects === null) {
+        throw new Error("t should not be null or undefined");
+    }
+
+    objectsloop:
+    for (const thing of objects) {
+        groupsloop:
+        for (const group of groups) {
+            // keys loop
+            for (const groupKey of groupKeys) {
+                // Check to make sures keys are the same as first thing in the group
+                if (group[0][groupKey.split("_")[1]] !== thing[groupKey.split("_")[1]]) {
+                    continue groupsloop;
+                }
+            }
+            group.push(thing);
+            continue objectsloop;
+        }
+        // Make a new group
+        groups.push([thing]);
+        if (groups.length > 5000) {
+            throw new ResultTooLargeError("Over 5000 groups");
+        }
+    }
     return groups;
 }
 
-function change(q: any, realGs: any[]) {
+export function formatResult(q: any, groups: any[]) {
     const cols: string[] = q.OPTIONS.COLUMNS;
 
-    const realestGs: any[] = [];
-    for (const realG of realGs) {
-        const realestG: any = {};
+    const formattedResults: any[] = [];
+    for (const group of groups) {
+        const formattedResult: any = {};
         for (const c of cols) {
             if (c.includes("_")) {
-                const realGKey = "_" + c.split("_")[1];
-                realestG[c] = realG[realGKey];
+                const groupKey = "_" + c.split("_")[1];
+                formattedResult[c] = group[groupKey];
             } else {
-                realestG[c] = realG[c];
+                formattedResult[c] = group[c];
             }
         }
-        realestGs.push(realestG);
+        formattedResults.push(formattedResult);
     }
-    return realestGs;
+    return formattedResults;
 }
 
 /**
  * the transform apply stuff
  */
-function apply(q: any, groups: any[]) {
-    const g = q.TRANSFORM.GROUP;
-    const a = q.TRANSFORM.APPLY;
-    const realGs: any[] = [];
-    for (const ggg of groups) {
-        const realGsMoveInSilenceLikeLasagna: any = {};
-        for (const gg of g) {
-            realGsMoveInSilenceLikeLasagna["_" + gg] = ggg[0][gg]; // aadded _ to prevent collision with applykey
+function apply(query: any, groups: any[]) {
+    const groupkeys: string[]  = query.TRANSFORMATIONS.GROUP;
+    const applyrules: any[] = query.TRANSFORMATIONS.APPLY;
+    const groupObjects: any[] = [];
+    for (const group of groups) {
+        const groupObject: any = {};
+        for (const groupkey of groupkeys) {
+            // Adding _ to distinguish from applyKeys. Later, we check for _
+            // to see if it's a key or an applykey
+            groupObject["_" + groupkey.split("_")[1]] = group[0][groupkey.split("_")[1]];
         }
-        for (const aa of a) {
-            const ak = Object.keys(aa)[0]; // applyKey e.g. "imESLintIMSOCOOL"
-            const av = Object.values(aa)[0]; // abstract object
-            const avk = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
-            const avv = Object.values(av)[0].split("_")[1]; // field e.g. avg, year, lon, lat
-            switch (avk) {
+        for (const applyrule of applyrules) {
+            const applyKey: string = Object.keys(applyrule)[0]; // applyKey e.g. "sumLat"
+            const av: any = Object.values(applyrule)[0]; // abstract object
+            const applyToken: string = Object.keys(av)[0]; // MAX / MIN / AVG / SUM / COUNT
+            const field = (Object.values(av)[0] as string).split("_")[1]; // field e.g. avg, year, lon, lat
+            switch (applyToken) {
                 case "MAX":
-                    realGsMoveInSilenceLikeLasagna[ak] = max(ggg, avv);
+                    groupObject[applyKey] = max(group, field);
                     break;
                 case "MIN":
-                    realGsMoveInSilenceLikeLasagna[ak] = min(ggg, avv);
+                    groupObject[applyKey] = min(group, field);
                     break;
                 case "AVG":
-                    realGsMoveInSilenceLikeLasagna[ak] = sum(ggg, avv) / ggg.length;
+                    groupObject[applyKey] = ave(group, field);
                     break;
                 case "SUM":
-                    realGsMoveInSilenceLikeLasagna[ak] = sum(ggg, avv);
+                    const summ = sum(group, field);
+                    groupObject[applyKey] = Number(summ.toFixed(2));
                     break;
                 case "COUNT":
-                    realGsMoveInSilenceLikeLasagna[ak] = ggg.length;
+                    groupObject[applyKey] = count(group, field);
                     break;
             }
         }
-        realGs.push(realGsMoveInSilenceLikeLasagna);
+        groupObjects.push(groupObject);
     }
-    return realGs;
+    return groupObjects;
 }
 
-function min(g: any[], key: string) {
-    let minn = g[0][key];
-    for (const lasagna of g) {
-        minn = lasagna[key] > minn ? minn : lasagna[key];
+function ave(groupMembers: any[], field: string) {
+    let total = new Decimal(0);
+    for (const member of groupMembers) {
+        const num = new Decimal(member[field]);
+        total = Decimal.add(num, total);
+    }
+    const avg = total.toNumber() / groupMembers.length;
+    return Number(avg.toFixed(2));
+}
+
+function min(groupMembers: any[], field: string) {
+    let minn = groupMembers[0][field];
+    for (const member of groupMembers) {
+        if (member[field] < minn) {
+            minn = member[field];
+        }
     }
     return minn;
 }
 
-function max(g: any[], key: string) {
-    let maxx = g[0][key];
-    for (const lasagna of g) {
-        maxx = lasagna[key] > maxx ? lasagna[key] : max;
+function max(groupMembers: any[], field: string) {
+    let maxx = groupMembers[0][field];
+    for (const member of groupMembers) {
+        if (member[field] > maxx) {
+            maxx = member[field];
+        }
     }
     return maxx;
 }
 
-function sum(g: any[], key: string) {
+function sum(groupMembers: any[], key: string) {
     let summ = 0;
-    for (const lasagna of g) {
-        summ += lasagna[key];
+    for (const member of groupMembers) {
+        summ += member[key];
     }
     return summ;
+}
+
+function count(groupMembers: any[], key: string) {
+    let uniques: any[] = [];
+    for ( const member of groupMembers) {
+        if (!uniques.includes(member[key])) {
+            uniques.push(member[key]);
+        }
+    }
+    return uniques.length;
 }

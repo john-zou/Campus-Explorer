@@ -3,12 +3,13 @@ import { IParsedData } from "../data/IParsedData";
 import fs = require("fs");
 import { ParsedCoursesData } from "../data/ParsedCoursesData";
 import Log from "../Util";
-import { ActualDataset } from "../data/ActualDataset";
+import { Dataset } from "../data/Dataset";
 
 export class DiskManager implements IDiskManager {
     // Constant
     private DIRNAME: string = "data";
-    private FILEDIR: string = ".\\" + this.DIRNAME + "\\";
+    // private FILEDIR: string = ".\\" + this.DIRNAME + "\\";
+    private FILEDIR: string = "./data/";
 
     public Status: DiskManagerStatus = DiskManagerStatus.NewlyBorn;
 
@@ -20,7 +21,7 @@ export class DiskManager implements IDiskManager {
             return;
         }
         // Check if database directory already exists
-        const dirs: string[] =  fs.readdirSync(".\\");
+        const dirs: string[] =  fs.readdirSync("./");
         if (!dirs.includes(this.DIRNAME)) {
             // Makes new directory if it does not already exist
             fs.mkdirSync(this.FILEDIR);
@@ -28,7 +29,7 @@ export class DiskManager implements IDiskManager {
         }
     }
 
-    public saveDatasetSync(dataset: ActualDataset): void {
+    public saveDatasetSync(dataset: Dataset): void {
         // Convert IParsedData into a nice JSON
         const dataAsJSON: string = JSON.stringify(dataset);
         // Save JSON into a .txt file
@@ -48,10 +49,10 @@ export class DiskManager implements IDiskManager {
         fs.unlinkSync(this.FILEDIR + id);
     }
 
-    public async getDatasets(): Promise<ActualDataset[]> {
+    public async getDatasets(): Promise<Dataset[]> {
         let fileNames: string[] = [];
         fileNames = fs.readdirSync(this.FILEDIR);
-        let foundData: ActualDataset[] = [];
+        let foundData: Dataset[] = [];
         // Terminate early if no datasets to get
         if (fileNames === undefined || fileNames.length === 0) {
             return foundData;

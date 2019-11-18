@@ -1,5 +1,5 @@
 import { InsightDatasetKind, InsightDataset } from "../controller/IInsightFacade";
-import { OwensReality } from "../data/OwensReality";
+import { AllData } from "../data/AllData";
 import Insight from "../util/Insight";
 
 export enum QueryValidationResultFlag {
@@ -74,7 +74,8 @@ export enum QueryValidationResultFlag {
     OrderKeysIsNotNonEmptyArray = "OrderKeysIsNotNonEmptyArray",
     OrderContainsKeyNotInColumns = "OrderContainsKeyNotInColumns",
     TransformationsIsMissingApply = "TransformationsIsMissingApply",
-    ApplyTokenCannotBeAppliedToSField = "ApplyTokenCannotBeAppliedToSField"
+    ApplyTokenCannotBeAppliedToSField = "ApplyTokenCannotBeAppliedToSField",
+    ApplyKeyMustBeNonEmptyString = "ApplyKeyMustBeNonEmptyString"
 }
 
 export class QueryValidationResult {
@@ -89,5 +90,5 @@ export class QueryValidationResult {
 
 export interface IQueryValidator {
     // Takes in a JSON and datasetkind and returns a validation result.
-    validate(json: any, owen: OwensReality): QueryValidationResult;
+    validate(json: any, owen: AllData): QueryValidationResult;
 }

@@ -11,6 +11,8 @@ export default class TestUtil {
     public static checkQueryResult(test: ITestQuery, response: any, done: any): void {
         try {
             if (test.isQueryValid) {
+                // expect(response).to.deep.equal(test.result);
+
                 expect(response).to.have.lengthOf(test.result.length);
                 // done();
             } else {

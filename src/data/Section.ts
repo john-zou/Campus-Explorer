@@ -17,21 +17,20 @@ export class Section implements ISection {
         //
     }
 
-    public static fromValidSectionData(data: IValidSectionFromData): Section {
-        const transformedSection: Section = new Section();
-        transformedSection.dept = data.Subject;
-        transformedSection.id = data.Course;
-        transformedSection.avg = data.Avg;
-        transformedSection.instructor = data.Professor;
-        transformedSection.title = data.Title;
-        transformedSection.pass = data.Pass;
-        transformedSection.fail = data.Fail;
-        transformedSection.audit = data.Audit;
-        transformedSection.year = parseInt(data.Year, 10);
-        transformedSection.uuid = data.id.toString();
-        // If it's not parseable to a whole number, set it to -1 (since we are treating any Year string value as valid)
-        if (transformedSection.year === undefined) {
-            transformedSection.year = -1;
+    public static fromValidSectionData(data: IValidSectionFromData, id: string): any {
+        const transformedSection: any = {};
+        transformedSection[id + "_dept"] = data.Subject;
+        transformedSection[id + "_id"] = data.Course;
+        transformedSection[id + "_avg"] = data.Avg;
+        transformedSection[id + "_instructor"] = data.Professor;
+        transformedSection[id + "_title"] = data.Title;
+        transformedSection[id + "_pass"] = data.Pass;
+        transformedSection[id + "_fail"] = data.Fail;
+        transformedSection[id + "_audit"] = data.Audit;
+        transformedSection[id + "_year"] = parseInt(data.Year, 10);
+        transformedSection[id + "_uuid"] = data.id.toString();
+        if (transformedSection[id + "_year"] === undefined) {
+            transformedSection[id + "_year"] = 1900;
         }
         return transformedSection;
     }

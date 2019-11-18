@@ -1,20 +1,21 @@
 import { InsightDatasetKind as IDK, InsightError } from "../src/controller/IInsightFacade";
 import { expect } from "chai";
 import { QueryValidationResult as Res, QueryValidationResultFlag as R } from "../src/services/IQueryValidator";
-import { OwensReality } from "../src/data/OwensReality";
-import { ActualDataset } from "../src/data/ActualDataset";
+import { AllData } from "../src/data/AllData";
+import { Dataset } from "../src/data/Dataset";
 import Insight from "../src/util/Insight";
 import { getIdIfValid } from "../src/D2/query/Validate";
 import { Query } from "./D2/QueryBuilder";
 import Log from "../src/Util";
+import { queryPipeline } from "../src/query pipeline/QueryPipeline";
 
-const shouldRun: boolean = false; // turn this on for coverage :^)
+const shouldRun: boolean = true;
 
 if (shouldRun) {
-    describe("getIdIfValid: Bad Structure => Invalid Query", () => {
-        const coursesDb = new ActualDataset("cc", IDK.Courses);
-        const roomsDb = new ActualDataset("rr", IDK.Rooms);
-        const owen = OwensReality.fromDatasetArray([coursesDb, roomsDb]);
+    describe("queryPipeline: Bad Structure => Invalid Query", () => {
+        const coursesDb = new Dataset("cc", IDK.Courses);
+        const roomsDb = new Dataset("rr", IDK.Rooms);
+        const owen = AllData.fromDatasetArray([coursesDb, roomsDb]);
 
         /**
          * Expects the query to be recognized as malformed
@@ -31,7 +32,7 @@ if (shouldRun) {
 
         const t = async (q: any): Promise<void> => {
             try {
-                getIdIfValid(q, owen);
+                queryPipeline(q, owen);
             } catch (error) {
                 Log.trace(error);
                 throw error;
@@ -423,17 +424,6 @@ if (shouldRun) {
             e(q._);
         });
 
-        it ("TRANSFORMATIONS.APPLY must be non-empty array (but is empty)", async () => {
-            const q = nq();
-            q.Columns(["cc_avg", "max"]);
-            const transform: any = {
-                GROUP: ["cc_dept"],
-                APPLY: []
-            };
-            q.Transform(transform);
-            e(q._);
-        });
-
         it ("TRANSFORMATIONS.APPLY must be non-empty array (but is not an array)", async () => {
             const q = nq();
             q.Columns(["cc_avg", "max"]);
@@ -473,6 +463,32 @@ if (shouldRun) {
                 e(q._);
         });
 
+        it ("TRANSFORMATIONS.APPLY's APPLYRULE must have one key"
+        , async () => {
+            const q = nq();
+            q.Columns(["cc_avg", "max"]);
+            const invalidApplyRule = { min: {MIN: "cc_avg"}, max: {MAX: "cc_avg"}};
+            const transform: any = {
+                GROUP: ["cc_dept"],
+                APPLY: [invalidApplyRule]
+            };
+            q.Transform(transform);
+            e(q._);
+        });
+
+        it ("TRANSFORMATIONS.APPLY's APPLYRULE must have a field from the correct Kind"
+        , async () => {
+            const q = nq();
+            q.Columns(["cc_avg", "max"]);
+            const invalidApplyRule = { min: {MIN: "cc_seats"}};
+            const transform: any = {
+                GROUP: ["cc_dept"],
+                APPLY: [invalidApplyRule]
+            };
+            q.Transform(transform);
+            e(q._);
+        });
+
         it("Transformations applykey should be unique", async () => {
             const q = nq();
             q.Columns(["cc_avg", "max"]);
@@ -486,10 +502,10 @@ if (shouldRun) {
 
     });
 
-    describe("getIdIfValid: Good Structure, Multiple Valid IDs => Invalid Query (multiple valid IDs", () => {
-        const c1 = new ActualDataset("c1", IDK.Courses);
-        const c2 = new ActualDataset("c2", IDK.Courses);
-        const owen = OwensReality.fromDatasetArray([c1, c2]);
+    describe("query: Good Structure, Multiple Valid IDs => Invalid Query (multiple valid IDs", () => {
+        const c1 = new Dataset("c1", IDK.Courses);
+        const c2 = new Dataset("c2", IDK.Courses);
+        const owen = AllData.fromDatasetArray([c1, c2]);
 
         /**
          * Expects the query to be recognized as malformed
@@ -506,7 +522,7 @@ if (shouldRun) {
 
         const t = async (q: any): Promise<void> => {
             try {
-                getIdIfValid(q, owen);
+                queryPipeline(q, owen);
             } catch (error) {
                 Log.trace(error);
                 throw error;

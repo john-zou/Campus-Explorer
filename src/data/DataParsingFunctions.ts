@@ -5,17 +5,14 @@ import { ISection } from "./ISection";
 import JSZip = require("jszip");
 import Log from "../Util";
 import { FileParseResult, FileParseResultFlag, SectionParseResult } from "./FileParseResult";
-import { ActualDataset } from "./ActualDataset";
+import { Dataset } from "./Dataset";
 
 export async function parseSectionsFromFile(file: JSZip.JSZipObject,
-                                            actualDataset: ActualDataset):
+                                            actualDataset: Dataset,
+                                            id: string):
                                             Promise<FileParseResult> {
     const jsonString: string = await file.async("text");
     const json: any = JSON.parse(jsonString);
-    // if (Object.keys(json).length !== 2) {
-    //     throw new Error("Current file does not have exactly 2 keys");
-    // }
-    // Check if it has the "result" key
     let fileParseResult = new FileParseResult();
     if (!Object.keys(json).includes("result")) {
         fileParseResult.Flag = FileParseResultFlag.MissingResultKey;
@@ -27,11 +24,9 @@ export async function parseSectionsFromFile(file: JSZip.JSZipObject,
         throw new Error("Result value is not an array");
     }
     fileParseResult.Flag = FileParseResultFlag.HasResultArray;
-    // Log.trace(json.result);
     // For each item in the array, try to parse it as a section
     for (const potentialSection of json.result) {
-        // Log.trace(JSON.stringify(potentialSection));
-        let sectionResult: SectionParseResult = parseSection(potentialSection, actualDataset);
+        let sectionResult: SectionParseResult = parseSection(potentialSection, actualDataset, id);
         switch (sectionResult) {
             case SectionParseResult.Valid:
                 ++fileParseResult.ValidSections;
@@ -44,14 +39,14 @@ export async function parseSectionsFromFile(file: JSZip.JSZipObject,
     return fileParseResult;
 }
 
-export function parseSection(json: any, actualDataset: ActualDataset): SectionParseResult {
+export function parseSection(json: any, actualDataset: Dataset, id: string): SectionParseResult {
     if (isValidSection(json)) {
-        const newSection: Section = Section.fromValidSectionData(json);
+        const newSection: any = Section.fromValidSectionData(json, id);
         // If there is a json.Section === "overall", then set the year to 1900
         if (json.Section === "overall") {
-            newSection.year = 1900;
+            newSection[id + "_year"] = 1900;
         }
-        actualDataset.Sections.push(newSection);
+        actualDataset.Elements.push(newSection);
         return SectionParseResult.Valid;
     } else {
         return SectionParseResult.Invalid;
@@ -61,16 +56,13 @@ export function parseSection(json: any, actualDataset: ActualDataset): SectionPa
 export function isValidSection(json: any): boolean {
     // Check if it's an object
     if (json == null || typeof json !== "object") {
-        // Log.trace("Not an object");
         return false;
     }
     // Check for the presence of all necessary keys:
     const keysInJson: string[] = Object.keys(json);
-    // Log.trace(keysInJson.toString());
     const requiredKeys: string[] = Object.values(KeyMap);
     for (const key of requiredKeys) {
         if (!keysInJson.includes(key)) {
-            // Log.trace(`Missing a key: ${key}`);
             return false;
         }
     }
@@ -97,8 +89,3 @@ export function isString(x: any): boolean {
 export function isNumber(x: any): boolean {
     return x != null && typeof x === "number";
 }
-
-// Unused
-// export function isStringAndCanBeParsedToInt(x: any): boolean {
-//     return isString(x) && parseInt(x, 10) !== undefined;
-// }

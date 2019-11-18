@@ -4,15 +4,15 @@ import { InsightDatasetKind, InsightDataset, InsightError } from "../controller/
 import { parseKeystring as splitOn_ } from "./QueryValidationFunctions_Body";
 import { SFIELDS_COURSES, SFIELDS_ROOMS } from "../query_schema/SFields";
 import { IParsedData } from "../data/IParsedData";
-import { OwensReality } from "../data/OwensReality";
-import { JohnsRealityCheck } from "../data/JohnsRealityCheck";
+import { AllData } from "../data/AllData";
+import { IDCheckResult } from "../data/IDCheckResult";
 import Insight, { WT } from "../util/Insight";
 import { APPLYTOKENS } from "../query_schema/ApplyTokens";
 
 /**
  * @returns [ID, groups, applyKeys]
  */
-export function getKeysFromTransformations(q: any, owen: OwensReality): [string, string[], string[]] {
+export function getKeysFromTransformations(q: any, owen: AllData): [string, string[], string[]] {
     const t = q.TRANSFORMATIONS;
     // Always has a group, always has an apply
     if (t == null || typeof t !== "object") {
@@ -41,17 +41,17 @@ export function getKeysFromTransformations(q: any, owen: OwensReality): [string,
 /**
  * @returns [id, fields] the fields have a prepended _ to prevent collision with applykeys
  */
-export function getGroupFields(g: any, owen: OwensReality): [string, string[]] {
-    if (!Array.isArray(g)) {
+export function getGroupFields(group: any, owen: AllData): [string, string[]] {
+    if (!Array.isArray(group)) {
         WT(F.GroupIsNotAnArray);
     }
-    if (g.length === 0) {
+    if (group.length === 0) {
         WT(F.GroupMustBeNonEmptyArray);
     }
     let id: string;
     const fields: string[] = [];
-    for (const k of g) {
-        const [nextId, field] = verifyAndGetIdAndField(k, owen);
+    for (const key of group) {
+        const [nextId, field] = verifyAndGetIdAndField(key, owen);
         if (id === undefined) {
             id = nextId;
         } else {
@@ -72,20 +72,20 @@ export function getGroupFields(g: any, owen: OwensReality): [string, string[]] {
  *
  * (DOES NOT ADD _ TO THE FIELD)
  */
-export function verifyAndGetIdAndField(k: any, owen: OwensReality): [string, string] {
+export function verifyAndGetIdAndField(k: any, owen: AllData): [string, string] {
     const res: [string, string] = splitOn_(k);
     const parsedId = res[0];
     const field = res[1];
 
     switch (owen.checkID(parsedId)) {
-        case JohnsRealityCheck.NotFound: WT(F.IdDoesNotExist);
-        case JohnsRealityCheck.Courses:
+        case IDCheckResult.NotFound: WT(F.IdDoesNotExist);
+        case IDCheckResult.Courses:
             if (MFIELDS_COURSES.includes(field) || SFIELDS_COURSES.includes(field)) {
                 return [parsedId, field];
             } else {
                 WT(F.InvalidKey);
             }
-        case JohnsRealityCheck.Rooms:
+        case IDCheckResult.Rooms:
             if (MFIELDS_ROOMS.includes(field) || SFIELDS_ROOMS.includes(field)) {
                 return [parsedId, field];
             } else {
@@ -102,20 +102,18 @@ export function verifyAndGetIdAndField(k: any, owen: OwensReality): [string, str
 /**
  * @returns string array of applykeys if valid (throws if not)
  */
-export function getApplyKeys(a: any, id: string, owen: OwensReality): string[] {
+export function getApplyKeys(a: any, id: string, owen: AllData): string[] {
     // ID is guaranteed to be in dataset already (comes from getGroupKeys)
     if (!Array.isArray(a)) {
         WT(F.ApplyIsNotAnArray);
     }
     if (a.length === 0) {
-        WT(F.ApplyMustBeNonEmptyArray);
+        return [];
     }
     const applyKeys: string[] = [];
 
     // Iterate through the ApplyRules array
     for (const applyRule of a) {
-        // check if it's an object
-        // APPLYRULE
         const applyKey = getApplyKeyFromApplyRule(applyRule, id, owen);
         if (applyKeys.includes(applyKey)) {
             WT(F.ApplyKeysMustBeUnique);
@@ -129,7 +127,7 @@ export function getApplyKeys(a: any, id: string, owen: OwensReality): string[] {
 /**
  * Throws InsightError if the applykey is invalid
  */
-export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: OwensReality): string {
+export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: AllData): string {
     if (applyRule == null || typeof applyRule !== "object") {
         WT(F.ApplyRuleMustBeAnObject);
     }
@@ -141,6 +139,10 @@ export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: Owens
     // applykey is supposed to be unique. this is what gets returned.
     // it cannot have underscore!
     const applyKey = Object.keys(applyRule)[0];
+
+    if (applyKey.length === 0) {
+        WT(F.ApplyKeyMustBeNonEmptyString);
+    }
 
     if (applyKey.includes("_")) {
         WT(F.ApplyKeyContainsUnderscore);
@@ -164,7 +166,7 @@ export function getApplyKeyFromApplyRule(applyRule: any, id: string, owen: Owens
     return applyKey;
 }
 
-export function validateKeyForApplyToken(key: any, id: string, owen: OwensReality, token: string) {
+export function validateKeyForApplyToken(key: any, id: string, owen: AllData, token: string) {
     const [idd, field] = verifyAndGetIdAndField(key, owen);
     if (id !== idd) {
         WT(F.MoreThanOneId);
